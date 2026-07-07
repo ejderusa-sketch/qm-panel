@@ -742,9 +742,28 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy reklam paneli · QM47</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy reklam paneli · QM47 · <b style={{color:"var(--azure)"}}>v2</b></div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
+<div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
+<div className="sl">
+{accounts.map((a,i)=>{
+const on=a.id===act;
+const st=acctStats[a.id]||{count:0,close:0};
+const gmailUrl=a.email?("https://mail.google.com/mail/u/0/#search/"+encodeURIComponent("from:"+a.email+" (has:attachment OR csv OR screenshot)")):null;
+return(
+<div key={a.id} className={"si"+(on?" on":"")} style={{flexDirection:"column",alignItems:"stretch",gap:6}}>
+<div style={{display:"flex",alignItems:"center",gap:9,cursor:"pointer"}} onClick={()=>setAct(a.id)} onDoubleClick={()=>renAcct(a.id)} title={lang==="tr"?"Çift tık = adı değiştir":"Double-click = rename"}>
+<span className="ic">{String(i+1).padStart(2,"0")}</span>
+<span className="sn">{a.name}</span>
+{st.count>0&&<span className={"sb"+(st.close?" red":"")}>{st.count}</span>}
+</div>
+<input value={a.email||""} placeholder={lang==="tr"?"✉️ e-posta ekle…":"✉️ add email…"} onClick={e=>e.stopPropagation()} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>s.id===a.id?{...s,email:v}:s))}} style={{width:"100%",fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 7px",background:"var(--panel)",color:"var(--ink)"}}/>
+{a.email&&<a href={gmailUrl} target="_blank" rel="noopener noreferrer" style={{fontSize:11,color:"var(--azure)",textDecoration:"none",fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}>📥 {lang==="tr"?"e-postadan çek":"fetch from email"}</a>}
+</div>);
+})}
+</div>
+<button className="sa" onClick={addAcct}>+ {lang==="tr"?"mağaza ekle":"add store"}</button>
 <div className="sf">
 <button className="btn" style={{fontSize:11,padding:"5px 10px",fontWeight:700,letterSpacing:".05em"}} onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 <select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
