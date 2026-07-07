@@ -3,8 +3,21 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>QM · Etsy Marketing Paneli</title>
-<style>
+<title>QM47</title>
+<style>html,body{margin:0;padding:0;background:#fff}#root{min-height:100vh}#boot{display:flex;align-items:center;justify-content:center;min-height:100vh;color:#e23b4e;font-family:system-ui;font-weight:700;letter-spacing:.05em;font-size:18px}</style>
+</head>
+<body>
+<div id="root"><div id="boot">QM yükleniyor…</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script type="text/babel" data-presets="react">
+const {useState,useEffect,useMemo,useRef,useCallback}=React;
+
+/* ========== CSS ========== */
+const CSS=`
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -17,16 +30,18 @@
 --red:#e23b4e;--red-s:rgba(226,59,78,.11);
 --azure:#1f7ae0;
 }
-html,body,#root{min-height:100vh}
-body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
 .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
-#boot{display:flex;align-items:center;justify-content:center;min-height:100vh;color:#e23b4e;font-family:system-ui;font-weight:700;letter-spacing:.05em;font-size:18px}
+
+/* layout */
 .shell{display:flex;min-height:100vh}
 .sidebar{position:sticky;top:0;width:248px;flex-shrink:0;height:100vh;overflow-y:auto;background:#f6f8fc;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:16px 12px}
 .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 14px;margin-bottom:6px;border-bottom:1px solid var(--line)}
 .brand .dot{width:11px;height:11px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px var(--red-s)}
 .qm-name{font-family:'Space Grotesk';font-size:19px;font-weight:700;letter-spacing:.02em;color:var(--red);text-transform:uppercase}
 .qm-sub{font-size:11px;color:var(--faint);font-weight:500}
+.lang-btn{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.05em;padding:6px 12px;border-radius:8px;border:2px solid var(--orange);background:var(--orange-s);color:var(--orange);cursor:pointer;transition:.13s;white-space:nowrap}
+.lang-btn:hover{background:var(--orange);color:#fff}
 .sh{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.16em;color:var(--faint);padding:14px 10px 8px}
 .sl{display:flex;flex-direction:column;gap:3px;flex:1;overflow-y:auto}
 .si{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;transition:.12s;font-size:13px}
@@ -34,21 +49,54 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;-
 .si.on{background:var(--panel2);border-color:var(--line2);color:var(--ink)}
 .si.on .ic{background:var(--orange);color:#fff}
 .ic{width:20px;height:20px;border-radius:5px;background:var(--line2);color:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:11px;flex-shrink:0}
-.sn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;color:var(--red);font-family:'Space Grotesk';font-size:13px}
+.sn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;color:var(--red);font-family:'Space Grotesk';font-size:13.5px}
+.sb{font-family:'JetBrains Mono';font-size:11px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--line2);color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb.red{background:var(--red);color:#fff}
 .sa{margin-top:8px;width:100%;text-align:left;padding:9px 10px;border-radius:9px;border:1px dashed var(--line2);background:transparent;color:var(--faint);cursor:pointer;font-size:12.5px;font-family:'Space Grotesk';font-weight:600}
 .sa:hover{color:var(--ink);border-color:var(--faint)}
-.sf{display:flex;gap:8px;align-items:center;padding-top:12px;margin-top:8px;border-top:1px solid var(--line);flex-wrap:wrap}
+.sf{display:flex;gap:8px;align-items:center;padding-top:12px;margin-top:8px;border-top:1px solid var(--line)}
 .main{flex:1;min-width:0;padding:0 28px 80px}
+
+/* hero & tabs */
 .hero{display:flex;align-items:flex-end;gap:14px;margin:20px 0 2px;flex-wrap:wrap}
 .mk{font-family:'Space Grotesk';font-size:26px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:linear-gradient(90deg,var(--orange),var(--amber) 60%,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
 .store{font-family:'JetBrains Mono';font-size:12.5px;color:var(--azure);border:1px solid var(--line2);background:rgba(31,122,224,.08);padding:5px 12px;border-radius:999px}
-.tabs{display:flex;gap:8px;margin:14px 0 4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs{display:flex;gap:8px;margin:14px 0 4px;border-bottom:1px solid var(--line)}
 .tabs button{font-family:'Space Grotesk';font-size:13px;font-weight:600;padding:10px 16px;border:none;background:transparent;color:var(--faint);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.13s}
 .tabs button:hover{color:var(--ink)}
 .tabs button.on{color:var(--orange);border-bottom-color:var(--orange)}
-.pills{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line2);border-radius:11px;padding:4px}
-.pills button{font-family:'Space Grotesk';font-size:12.5px;font-weight:700;letter-spacing:.03em;padding:7px 15px;border-radius:8px;border:none;cursor:pointer;transition:.13s;background:transparent;color:var(--muted)}
-.pills button.on{background:var(--orange);color:#fff}
+
+/* command */
+.cmd{margin:18px 0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#eef3ff 0%,#f6f8fc 55%,#fdf1e9 100%)}
+.cmd-h{padding:18px 22px 4px;display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.ey{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.16em;color:var(--orange);text-transform:uppercase}
+.cmd-d{font-family:'JetBrains Mono';font-size:12px;color:var(--faint)}
+.cmd-l{padding:6px 22px 18px;font-family:'Space Grotesk';font-size:20px;font-weight:600;line-height:1.35}
+.ctags{display:flex;gap:10px;flex-wrap:wrap;padding:0 22px 20px}
+.ctag{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:11px;font-family:'JetBrains Mono';font-size:13px;border:1px solid transparent}
+.ctag .n{font-weight:700;font-size:16px}
+.ctag.r{background:var(--red-s);color:var(--red);border-color:rgba(226,59,78,.25)}
+.ctag.a{background:var(--amber-s);color:var(--amber);border-color:rgba(179,129,10,.25)}
+.ctag.g{background:var(--green-s);color:var(--green);border-color:rgba(15,157,99,.25)}
+
+/* rules */
+.rules{border:1px solid var(--line);border-radius:13px;padding:14px 16px;margin-bottom:18px;background:var(--panel)}
+.rh{font-family:'Space Grotesk';font-size:13px;font-weight:600;display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.fbul{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--muted);line-height:1.45}
+.fbul>span:first-child{font-size:10px;flex-shrink:0;line-height:1.6}
+.rules-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.rule{display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--line2);border-radius:12px;background:var(--bg2);font-size:15px;white-space:nowrap}
+.rule.off{opacity:.5}
+.rule b{color:var(--red);font-weight:700}
+.rule .num{font-family:'Space Grotesk';color:var(--orange);font-size:12px;font-weight:700;letter-spacing:.06em;flex-shrink:0}
+.ri{width:60px;background:var(--panel);border:1px solid var(--line2);border-radius:7px;color:var(--ink);font-family:'JetBrains Mono';font-size:14px;text-align:center;padding:6px 6px;margin:0 4px}
+.sw{width:32px;height:18px;border-radius:999px;background:var(--line2);border:none;position:relative;cursor:pointer;transition:.15s;flex-shrink:0;padding:0}
+.sw.on{background:var(--green)}
+.sw .kn{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw.on .kn{left:16px}
+@media(max-width:900px){.rules-grid{grid-template-columns:1fr}}
+
+/* kpis */
 .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px 16px;position:relative;overflow:hidden}
 .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--azure)}
@@ -59,6 +107,9 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;-
 .kpi .lab{font-size:11.5px;color:var(--muted);font-weight:500;margin-bottom:9px}
 .kpi .val{font-family:'JetBrains Mono';font-size:22px;font-weight:700;letter-spacing:-.02em}
 .kpi .sub{font-family:'JetBrains Mono';font-size:11px;color:var(--faint);margin-top:4px}
+.pos{color:var(--green)}.neg{color:var(--red)}
+
+/* section heads, buttons */
 .sec{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px;gap:12px;flex-wrap:wrap}
 .sec h2{font-family:'Space Grotesk';font-size:15px;font-weight:600;display:flex;align-items:center;gap:9px}
 .sec h2 .bar{width:3px;height:15px;background:var(--orange);border-radius:2px}
@@ -66,15 +117,36 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;-
 .btn:hover{border-color:var(--faint)}
 .btn.pri{background:var(--orange);border-color:var(--orange);color:#fff}
 .btn.pri:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent}
 .btn:disabled{opacity:.6;cursor:wait}
 .brow{display:flex;gap:9px;flex-wrap:wrap}
 .cur-sel{background:var(--panel);border:1px solid var(--line2);color:var(--ink);font-family:'JetBrains Mono';font-size:12px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.icon-btn{background:var(--panel);border:1px solid var(--line2);color:var(--muted);width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.icon-btn:hover{color:var(--ink);border-color:var(--faint)}
+
+/* dropzone */
 .dz{margin-bottom:16px;border:3px dashed var(--red);border-radius:13px;padding:22px;text-align:center;color:var(--ink);font-size:14px;cursor:pointer;transition:.13s;background:#fff9e6}
-.dz:hover{border-color:var(--red);background:#fff3cc}
-.dz.over{border-color:var(--orange);background:#ffe8a3}
+.dz:hover{border-color:var(--red);background:#fff3cc;color:var(--ink)}
+.dz.over{border-color:var(--orange);background:#ffe8a3;color:var(--ink)}
+.dz b{color:var(--azure);font-weight:600}
 .dz .big{font-family:'Space Grotesk';font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
-.rules{border:1px solid var(--line);border-radius:13px;padding:14px 16px;margin-bottom:18px;background:var(--panel)}
-.rh{font-family:'Space Grotesk';font-size:13px;font-weight:600;display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.etsy-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 16px;border:1px solid var(--line);border-radius:13px 13px 0 0;background:var(--bg2);border-bottom:none}
+.etsy-bar .ef{font-family:'Inter';font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.etsy-bar .ef:hover{border-color:var(--faint)}
+.etsy-bar .ef select{border:none;background:transparent;color:var(--ink);font-family:'Inter';font-size:12.5px;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;padding-right:2px}
+.etsy-bar .efspc{flex:1}
+.etsy-bar .efsrch{font-family:'Inter';font-size:12.5px;padding:7px 12px;border-radius:999px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);width:180px}
+.etsy-bar .efsrch:focus{outline:none;border-color:var(--orange)}
+.tw.ntr{border-radius:0 0 13px 13px}
+
+/* paste */
+.pb{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px;margin-bottom:16px}
+.pb textarea{width:100%;min-height:120px;resize:vertical;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:12px;color:var(--ink);font-family:'JetBrains Mono';font-size:12.5px;line-height:1.6}
+.pb textarea:focus{outline:none;border-color:var(--orange)}
+.ph{font-size:12px;color:var(--muted);margin:10px 0 12px;line-height:1.6}
+.ph code{font-family:'JetBrains Mono';background:var(--panel2);padding:2px 6px;border-radius:5px;color:var(--orange);font-size:11.5px}
+
+/* table */
 .tw{border:1px solid var(--line);border-radius:13px;overflow:auto;background:var(--panel);margin-bottom:8px}
 table{width:100%;border-collapse:collapse;min-width:900px}
 thead th{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);text-align:right;padding:13px 12px;border-bottom:1px solid var(--line2);white-space:nowrap;font-weight:500}
@@ -88,367 +160,965 @@ tbody tr:hover{background:var(--bg2)}
 .ci.nm{text-align:left;width:180px;font-family:'Inter';font-weight:500}
 .calc{font-family:'JetBrains Mono';font-size:13px;color:var(--muted)}
 .calc.s{color:var(--ink);font-weight:500}
+.vd{font-family:'JetBrains Mono';font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 9px;border-radius:7px;display:inline-block;white-space:nowrap}
+.vd.r{background:var(--red-s);color:var(--red)}
+.vd.a{background:var(--amber-s);color:var(--amber)}
+.vd.g{background:var(--green-s);color:var(--green)}
+.vd.m{background:var(--panel2);color:var(--faint)}
 .dl{background:transparent;border:none;color:var(--faint);cursor:pointer;font-size:15px;padding:4px;line-height:1}
 .dl:hover{color:var(--red)}
+.rr td{padding:0 12px 11px;border-bottom:1px solid var(--line);text-align:left}
+.rs{font-size:12px;color:var(--muted);line-height:1.5;display:flex;gap:7px;align-items:flex-start}
+.rs .tk{color:var(--orange);font-family:'JetBrains Mono'}
 .empty{padding:46px 20px;text-align:center;color:var(--faint)}
+.empty p{font-size:13.5px;line-height:1.6}
 .empty .big{font-family:'Space Grotesk';font-size:16px;color:var(--muted);margin-bottom:6px;font-weight:600}
-.vd{font-family:'JetBrains Mono';font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 9px;border-radius:7px;display:inline-block;white-space:nowrap}
+
+/* budget */
+.bgt{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:20px 22px}
+.bgt .bh{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.bgt .bw{font-family:'JetBrains Mono';font-size:28px;font-weight:700;color:var(--red);letter-spacing:-.02em}
+.bgt .bh small{font-size:12.5px;color:var(--muted)}
+.ml{display:flex;flex-direction:column;gap:9px}
+.mv{display:flex;align-items:center;gap:12px;font-size:13px;padding:10px 13px;background:var(--bg2);border-radius:9px;border:1px solid var(--line)}
+.mv .fr{color:var(--red);font-family:'JetBrains Mono';font-size:12px}
+.mv .ar{color:var(--faint)}
+.mv .to{color:var(--green);font-weight:600;flex:1}
+.mv .am{font-family:'JetBrains Mono';color:var(--ink);font-weight:600}
+
+/* history */
+.hist{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hist .hl{font-size:12px;color:var(--faint);margin-right:4px}
+.hist .hc{font-family:'JetBrains Mono';font-size:12px;padding:6px 11px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:var(--muted);cursor:pointer;transition:.12s}
+.hist .hc:hover{color:var(--ink)}
+.hist .hc.on{border-color:var(--orange);color:var(--orange)}
+
+/* busy / err */
 .busy{display:flex;align-items:center;gap:11px;background:var(--orange-s);border:1px solid rgba(239,102,6,.3);color:var(--orange);font-size:13px;padding:13px 16px;border-radius:11px;margin-bottom:16px;font-weight:500}
-.busy .sp{width:15px;height:15px;border:2px solid rgba(239,102,6,.35);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
+.busy .sp{width:15px;height:15px;border:2px solid rgba(239,102,6,.35);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 .err{background:var(--red-s);border:1px solid rgba(226,59,78,.3);color:var(--red);font-size:12.5px;padding:12px 15px;border-radius:11px;margin-bottom:16px;line-height:1.5}
+
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}
+.mod{background:var(--bg);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:440px;padding:26px;max-height:90vh;overflow:auto}
+.mod h3{font-family:'Space Grotesk';font-size:17px;font-weight:700;margin-bottom:5px}
+.mod .desc{font-size:12.5px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.fld{margin-bottom:17px}
+.fld label{display:block;font-size:12.5px;font-weight:500;margin-bottom:4px}
+.fld .ht{font-size:11.5px;color:var(--faint);margin-bottom:8px;line-height:1.5}
+.fld input{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:10px 12px;color:var(--ink);font-family:'JetBrains Mono';font-size:14px}
+.fld input:focus{outline:none;border-color:var(--orange)}
+.ma{display:flex;gap:10px;margin-top:8px}
+
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:60;background:var(--panel2);border:1px solid var(--line2);color:var(--ink);padding:11px 18px;border-radius:11px;font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.12);font-family:'Space Grotesk'}
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#eef3ff 0%,#f6f8fc 55%,#fdf1e9 100%)}
-.auth-card{background:#fff;border:1px solid var(--line2);border-radius:18px;width:100%;max-width:400px;padding:30px}
-.auth-card h1{font-family:'Space Grotesk';font-size:24px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
-.auth-card .sub{font-size:13px;color:var(--muted);margin-bottom:22px}
-.auth-card label{display:block;font-size:12.5px;font-weight:600;margin:14px 0 5px}
-.auth-card input{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:11px 12px;font-family:'JetBrains Mono';font-size:14px;color:var(--ink)}
-.auth-card input:focus{outline:none;border-color:var(--orange)}
-.auth-card .full{width:100%;margin-top:20px;justify-content:center;padding:12px}
-.auth-card .switch{margin-top:16px;text-align:center;font-size:12.5px;color:var(--muted)}
-.auth-card .switch button{background:none;border:none;color:var(--azure);font-weight:600;cursor:pointer;font-size:12.5px}
+
+/* note */
+.note{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:13px 16px;font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.note b{color:var(--ink)}
+
+/* gmail */
+.gsetup{max-width:560px;margin:40px auto;text-align:center}
+.gsetup .gico{font-size:48px;margin-bottom:12px}
+.gsetup .gti{font-family:'Space Grotesk';font-size:22px;font-weight:700;margin-bottom:10px}
+.gsetup .gde{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px}
+.gst{margin-top:32px;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:18px 20px}
+.gst .sh2{font-family:'Space Grotesk';font-size:13px;font-weight:700;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.gst .stp{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:7px;padding-left:4px}
+.gst a{color:var(--azure);text-decoration:none}
+.gst a:hover{text-decoration:underline}
+.gst code{font-family:'JetBrains Mono';background:var(--panel);padding:2px 7px;border-radius:5px;font-size:12px;color:var(--orange)}
+.gcid{margin-top:18px;border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:8px}
+.gcid label{font-size:12.5px;font-weight:600}
+.gcid input{width:100%;background:var(--panel);border:1px solid var(--line2);border-radius:9px;padding:10px 12px;color:var(--ink);font-family:'JetBrains Mono';font-size:13px}
+.gcid input:focus{outline:none;border-color:var(--orange)}
+.gbar{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);margin-bottom:4px;flex-wrap:wrap}
+.gbar .gw{font-family:'JetBrains Mono';font-size:13px;font-weight:600}
+
 @media(max-width:760px){.shell{flex-direction:column}.sidebar{position:static;width:100%;height:auto;border-right:none;border-bottom:1px solid var(--line)}.sl{flex-direction:row;flex-wrap:wrap;overflow:visible}.si{width:auto}.main{padding:0 16px 60px}}
-</style>
-</head>
-<body>
-<div id="root"><div id="boot">QM yükleniyor…</div></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="text/babel" data-presets="react">
-const {useState,useEffect,useMemo,useRef}=React;
+`;
 
-/* ===== Supabase bağlantısı (publishable key herkese açık, güvenlidir) ===== */
-const SB_URL="https://pepvzsffeyvzhxvlliex.supabase.co";
-const SB_KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
-const sb=supabase.createClient(SB_URL,SB_KEY);
-
-/* ===== Yardımcılar / hesap mantığı ===== */
+/* ========== HELPERS ========== */
+const todayISO=()=>new Date().toISOString().slice(0,10);
 const numFmt=(v,d=0)=>new Intl.NumberFormat("tr-TR",{minimumFractionDigits:d,maximumFractionDigits:d}).format(v||0);
 const CUR={"₺":{s:"₺",p:true},"$":{s:"$",p:false},"€":{s:"€",p:true}};
 function money(v,c){const x=CUR[c]||CUR["$"];const s=numFmt(v,2);return x.p?`${s} ${x.s}`:`${x.s}${s}`}
-const pct=v=>(v*100).toFixed(2)+"%";
 function toNum(raw){if(raw==null)return 0;let s=String(raw).replace(/[^\d.,-]/g,"").trim();if(!s)return 0;const k=/[kK]/.test(String(raw));if(k){s=s.replace(/,/g,".");return(parseFloat(s)||0)*1000}const hc=s.includes(","),hd=s.includes(".");if(hc&&hd){if(s.lastIndexOf(",")>s.lastIndexOf("."))s=s.replace(/\./g,"").replace(",",".");else s=s.replace(/,/g,"")}else if(hc){s=(s.length-s.lastIndexOf(",")-1===3)?s.replace(/,/g,""):s.replace(",",".")}return parseFloat(s)||0}
 
-const PERIODS=[["1ay","1 AY"],["3ay","3 AY"],["6ay","6 AY"],["1yil","1 YIL"]];
-const DEFAULT_SETTINGS={cur:"$",targetRoas:3,watchRoas:2,minClicks:30,minSpend:30,minImp:1000,
-rules:[
-{id:"rctr",on:true,type:"ctr_fix",n:0.5,label:"CTR < X% (1000+ gösterim) → DÜZELT"},
-{id:"rk1",on:true,type:"clk_no_sale",n:30,label:"Tıklama ≥ X ve 0 satış → KAPAT"},
-{id:"rk2",on:true,type:"spend_no_sale",n:7,label:"Harcama ≥ X ve 0 satış → KAPAT"},
-{id:"rk3",on:true,type:"roas_lt",n:2,label:"ROAS < X → KAPAT"},
-{id:"rk4",on:true,type:"conv_lt",n:2,label:"Dönüşüm < X% → KAPAT"}],
-warnings:[
-{id:"w1",text:"Christmas (Noel) reklamları pahalıdır — Kasım-Aralık'ta rekabet ve CPC çok yükselir. Erken başla, bütçeyi dikkatli kullan."},
-{id:"w2",text:"Mevsimi geçen listingleri reklama KAPAT — tıklama gelse bile satış düşer, bütçe boşa gider."},
-{id:"w3",text:"Mevsimi gelecek olanı sezon GELMEDEN 3-4 hafta önce AÇ ki listing ısınsın."}],
-dzChecks:[
-{id:"d1",on:false,label:"Konu mevsiminde değil"},
-{id:"d2",on:false,label:"Başlık / etiketler zayıf — SEO düzelt"},
-{id:"d3",on:false,label:"Ana görsel / mockup çekici değil"},
-{id:"d4",on:false,label:"Fiyat rakiplerden yüksek"},
-{id:"d5",on:false,label:"Yorum yok / çok az"},
-{id:"d6",on:false,label:"Kargo pahalı veya yavaş"}],
-agents:[
-{id:"a1",name:"Etsy Veri Çekici",icon:"📥",schedule:"Her sabah 08:00",todo:["Mağaza CSV'lerini çek","QM formatında birleştir","KAPAT / İZLE / BÜYÜT kararını ver","Sonucu özetle"]},
-{id:"a2",name:"İhlal Bekçisi",icon:"🛡️",schedule:"Her saat başı",todo:["Maili tara","İhlal/askı/telif uyarısı var mı bak","Varsa kırmızı alarm","Diğer mailleri atla"]},
-{id:"a3",name:"Sipariş & Kargo Özeti",icon:"📦",schedule:"Her akşam 20:00",todo:["Son 24 saatin siparişlerini say","Kargoları say","Mağaza bazında özet","Bildir"]}]
-};
-const RULE_TYPES=[
-{type:"spend_gte",label:"Harcama ≥ X → KAPAT"},{type:"clk_no_sale",label:"Tıklama ≥ X ve 0 satış → KAPAT"},
-{type:"roas_lt",label:"ROAS < X → KAPAT"},{type:"rev_lt",label:"Gelir < X → KAPAT"},
-{type:"ctr_lt",label:"CTR < X% → KAPAT"},{type:"ctr_fix",label:"CTR < X% (1000+ gösterim) → DÜZELT"},
-{type:"imp_no_clk",label:"Gösterim ≥ X ve 0 tıklama → KAPAT"},{type:"spend_no_sale",label:"Harcama ≥ X ve 0 satış → KAPAT"},
-{type:"acos_gt",label:"ACOS > X% → KAPAT"},{type:"conv_lt",label:"Dönüşüm < X% → KAPAT"}];
-function newRuleDefault(type){const n=type==="roas_lt"?2:type==="ctr_lt"?1:type==="ctr_fix"?0.5:type==="acos_gt"?50:type==="conv_lt"?1:type==="rev_lt"?10:10;const rt=RULE_TYPES.find(t=>t.type===type);return{id:"r"+Date.now().toString(36),on:true,type,n,label:rt?rt.label:type}}
-const CATS=[
-{key:"embroidery",label:"Embroidery / Nakış",kw:/embroider|embroidered|embroidery|naki[sş]|monogram/i},
-{key:"disney",label:"Disney / Theme Park",kw:/disney|mickey|minnie|disneyland|pixar|princess|epcot/i},
-{key:"family",label:"Family / Personalized",kw:/mom|dad|mama|papa|grandma|grandpa|bear|family|father|mother|parent|memorial|photo|personali[sz]/i},
-{key:"travel",label:"Travel / Vacation",kw:/cruise|travel|vacation|trip|adventure|alaska|beach|island|hawaii|caribbean/i},
-{key:"holiday",label:"Holiday / Seasonal",kw:/4th of july|july 4|patriotic|usa|america|christmas|halloween|valentine|easter|independence/i},
-{key:"dance",label:"Dance / Activity",kw:/dance|ballet|cheer|gym|sport|yoga|fitness|team/i},
-{key:"nurse",label:"Healthcare / Profession",kw:/nurse|doctor|teacher|rn |medical|dental|vet/i},
-{key:"humor",label:"Humor / Novelty",kw:/funny|silly|goose|humor|sarcas|meme|joke/i},
-{key:"pet",label:"Animal / Pet",kw:/dog|cat|pet|puppy|kitten|animal|paw/i},
-{key:"wedding",label:"Wedding / Event",kw:/wedding|bride|groom|bachelorette|birthday|baby shower|gender reveal/i},
-{key:"custom",label:"Custom / General Apparel",kw:/custom|comfort colors|sweatshirt|hoodie|shirt|t-shirt|tank top|crewneck/i}];
-function categoryOf(name){const s=(name||"").toLowerCase();for(const c of CATS)if(c.kw.test(s))return c.label;return "Diğer / Sınıfsız"}
+function parseReport(text){
+const lines=text.split(/\r?\n/).map(l=>l.trim());const out=[];let nb=[];
+const strip=s=>String(s).replace(/efficient spending|greater visibility|ad on\/?off|on\s*\/\s*off|strategy|advertised|section|\bon\b|\boff\b/gi,"").replace(/[\$₺€✕×|•·]+/g," ").replace(/[\t;,]+/g," ").replace(/\s{2,}/g," ").trim();
+const hdr=/^(listing|views|clicks|click rate|orders|revenue|spend|roas|ad on|strategy|advertised|section|show \d+ listings|turn ads|select strategy|last \d+ days|compare to|search your listings|g[öo]sterim|t[ıi]klama|harcama|gelir|sipari[şs]|karar)\b/i;
+for(const line of lines){
+if(!line||hdr.test(line))continue;
+const ms=[...line.matchAll(/(-?\d[\d.,]*)([kK])?(%)?/g)].filter(m=>/\d/.test(m[1]));
+if(ms.length>=5){const vals=ms.map(m=>({v:toNum(m[1]+(m[2]?"k":"")),pct:!!m[3]}));const hasPct=vals.some(x=>x.pct);
+let imp,clk,spend,ord,rev,bn;
+if(vals.length>=7||(hasPct&&vals.length>=6)){bn=Math.min(7,vals.length);const l=vals.slice(-7).map(x=>x.v);while(l.length<7)l.push(0);imp=l[0];clk=l[1];ord=l[3];rev=l[4];spend=l[5]}
+else{bn=Math.min(5,vals.length);const l=vals.slice(-5).map(x=>x.v);while(l.length<5)l.unshift(0);[imp,clk,spend,ord,rev]=l}
+const bi=ms[ms.length-bn].index;const inl=strip(line.slice(0,bi));let name=strip(nb.join(" ")+" "+inl);if(!name)name="Listing";
+out.push({id:Math.random().toString(36).slice(2),name,impressions:String(imp),clicks:String(clk),spend:String(spend),orders:String(ord),revenue:String(rev)});nb=[]}
+else{const t=strip(line);if(t&&!/^\d+$/.test(t)){nb.push(t);if(nb.length>2)nb.shift()}}}return out}
+
+/* ===== NOVA AGENT ===== */
+const AGENTS=[
+ {id:"etsy-veri-cekici",name:"Etsy Veri Çekici",icon:"📥",color:"var(--orange)",status:"draft",schedule:"Her sabah 08:00",todo:["novaallemail'deki mağaza CSV'lerini çek","QM formatında oku ve birleştir","KAPAT / İZLE / BÜYÜT kararını ver","Sonucu özetle ve bildir"]},
+ {id:"ihlal-bekcisi",name:"İhlal Bekçisi",icon:"🛡️",color:"var(--red)",status:"draft",schedule:"Her saat başı",todo:["novaallemail'i tara","Etsy ihlal / askı / telif-marka uyarısı var mı bak","Varsa kırmızı alarm + mağaza adı","Diğer mailleri atla"]},
+ {id:"email-triyaj",name:"Email Triyaj",icon:"✉️",color:"var(--azure)",status:"draft",schedule:"Her saat başı",todo:["Gelen kutusunu tara","Banka/güvenlik/sipariş gibi acilleri bildir","Reklam & rutin mailleri okundu yap","Kısa Türkçe özet ver"]},
+ {id:"llc-durum",name:"LLC Durum Bekçisi",icon:"🏛️",color:"var(--green)",status:"draft",schedule:"Her gün 09:00",todo:["Açık LLC başvurularının NM SOS durumunu kontrol et","Onaylanınca bildir","Yeni Business ID'yi kaydet"]},
+ {id:"siparis-kargo",name:"Sipariş & Kargo Özeti",icon:"📦",color:"var(--amber)",status:"draft",schedule:"Her akşam 20:00",todo:["Son 24 saatin Etsy siparişlerini say","ShipStation kargolarını say","Mağaza bazında günlük özet","Telefona bildir"]},
+];
+
+/* ===== Etsy CSV parser ===== */
+function parseCSVLine(line){const out=[];let cur="",q=false;for(let i=0;i<line.length;i++){const c=line[i];if(q){if(c==='"'){if(line[i+1]==='"'){cur+='"';i++}else q=false}else cur+=c}else{if(c==='"')q=true;else if(c===","){out.push(cur);cur=""}else cur+=c}}out.push(cur);return out}
+function parseCSV(text){
+const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
+if(lines.length<2)return[];
+const hdr=parseCSVLine(lines[0]).map(h=>h.trim().toLowerCase());
+const find=(re,ex)=>hdr.findIndex(h=>re.test(h)&&(!ex||!ex.test(h)));
+const iName=find(/listing|title|item|product|name/);
+const iImp=find(/view|impression/);
+const iClk=find(/click/,/rate|ctr|%/);
+const iRev=find(/revenue|sales|order value|order amount|order total/);
+const iOrd=find(/order/,/value|amount|revenue|total/);
+const iSpend=find(/spend|cost|budget/);
+const out=[];
+for(let r=1;r<lines.length;r++){
+const c=parseCSVLine(lines[r]);if(!c.length)continue;
+const g=i=>i>=0&&i<c.length?c[i]:"";
+const name=String(g(iName)||"").trim();
+if(/^(total|grand total|sum|toplam)/i.test(name))continue;
+const o={id:Math.random().toString(36).slice(2),name:name||"Listing",impressions:String(toNum(g(iImp))),clicks:String(toNum(g(iClk))),spend:String(toNum(g(iSpend))),orders:String(toNum(g(iOrd))),revenue:String(toNum(g(iRev)))};
+if(o.name==="Listing"&&!toNum(o.impressions)&&!toNum(o.spend)&&!toNum(o.revenue))continue;
+out.push(o)}
+return out}
 
 function evaluate(r,s){
 const imp=toNum(r.impressions),clk=toNum(r.clicks),spend=toNum(r.spend),ord=toNum(r.orders),rev=toNum(r.revenue);
 const ctr=imp?clk/imp:0,cpc=clk?spend/clk:0,conv=clk?ord/clk:0,roas=spend?rev/spend:0,acos=rev?spend/rev:(spend>0?Infinity:0),net=rev-spend;
-const b={imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net};
-const _mi=toNum(s.minImp)||1000,_mc=toNum(s.minClicks)||30;
-if(imp<_mi&&clk<_mc)return{...b,verdict:"VERİ AZ",tone:"muted",reason:`Yeterli veri yok — en az ${numFmt(_mi)} gösterim veya ${_mc} tıklama biriksin.`};
-for(const rule of (s.rules||[])){if(!rule.on)continue;const rv=toNum(rule.n);
-if(rule.type==="spend_gte"&&spend>=rv)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: harcama ${money(spend,s.cur)} ≥ ${money(rv,s.cur)} — kapat.`};
-if(rule.type==="clk_no_sale"&&clk>=rv&&ord<=0)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: ${numFmt(clk)} tıklama var ama 0 satış — kapat.`};
-if(rule.type==="roas_lt"&&spend>0&&roas<rv)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: ROAS ${roas.toFixed(2)}× < ${rv}× — kapat.`};
-if(rule.type==="ctr_lt"&&imp>0&&ctr*100<rv)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: CTR ${(ctr*100).toFixed(2)}% < ${rv}% — kapat.`};
-if(rule.type==="ctr_fix"&&imp>=1000&&ctr*100<rv)return{...b,verdict:"DÜZELT",tone:"amber",reason:`Kural: ${numFmt(imp)} gösterim + CTR ${(ctr*100).toFixed(2)}% < ${rv}% — görsel/başlık düzelt.`};
-if(rule.type==="imp_no_clk"&&imp>=rv&&clk<=0)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: ${numFmt(imp)} gösterim var ama 0 tıklama — kapat.`};
-if(rule.type==="spend_no_sale"&&spend>=rv&&ord<=0)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: ${money(spend,s.cur)} harcanmış ama 0 satış — kapat.`};
-if(rule.type==="rev_lt"&&spend>0&&rev<rv)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: gelir ${money(rev,s.cur)} < ${money(rv,s.cur)} — kapat.`};
-if(rule.type==="acos_gt"&&rev>0&&acos*100>rv)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: ACOS ${(acos*100).toFixed(1)}% > ${rv}% — kapat.`};
-if(rule.type==="conv_lt"&&clk>0&&conv*100<rv)return{...b,verdict:"KAPAT",tone:"red",reason:`Kural: dönüşüm ${(conv*100).toFixed(2)}% < ${rv}% — kapat.`};}
-if(clk<s.minClicks&&spend<s.minSpend)return{...b,verdict:"VERİ AZ",tone:"muted",reason:`Sadece ${numFmt(clk)} tıklama / ${money(spend,s.cur)} harcama.`};
-if(spend>0&&rev<=0)return{...b,verdict:"KAPAT",tone:"red",reason:`${money(spend,s.cur)} harcandı, 0 satış — kapat.`};
-if(roas<s.watchRoas)return{...b,verdict:"KAPAT",tone:"red",reason:`ROAS ${roas.toFixed(2)}× — alt sınırın (${s.watchRoas}×) altında.`};
-if(roas<s.targetRoas)return{...b,verdict:"İZLE",tone:"amber",reason:`ROAS ${roas.toFixed(2)}× — hedefin altında ama sınırda. İzle.`};
-return{...b,verdict:"BÜYÜT",tone:"green",reason:`ROAS ${roas.toFixed(2)}× — kârlı. Bütçe artır.`};}
-function advise(e){const v=e.verdict;
-if(v==="BÜYÜT")return{label:"Artır",color:"var(--green)",strong:false,rank:0};
-if(v==="İZLE")return{label:"İzle",color:"var(--amber)",strong:false,rank:2};
-if(v==="DÜZELT")return{label:"Düzelt",color:"var(--orange)",strong:true,rank:3};
-if(v==="KAPAT")return{label:"Durdur",color:"var(--red)",strong:true,rank:4};
-return{label:"Veri az",color:"var(--faint)",strong:false,rank:5};}
-function parseCSVLine(line){const out=[];let cur="",q=false;for(let i=0;i<line.length;i++){const c=line[i];if(q){if(c==='"'){if(line[i+1]==='"'){cur+='"';i++}else q=false}else cur+=c}else{if(c==='"')q=true;else if(c===","){out.push(cur);cur=""}else cur+=c}}out.push(cur);return out}
-function parseCSV(text){const lines=text.split(/\r?\n/).filter(l=>l.trim().length);if(lines.length<2)return[];
-const hdr=parseCSVLine(lines[0]).map(h=>h.trim().toLowerCase());const find=(re,ex)=>hdr.findIndex(h=>re.test(h)&&(!ex||!ex.test(h)));
-const iN=find(/listing|title|item|product|name/),iI=find(/view|impression/),iC=find(/click/,/rate|ctr|%/),
-iR=find(/revenue|sales|order value|order amount|order total/),iO=find(/order/,/value|amount|revenue|total/),iS=find(/spend|cost|budget/);
-const out=[];for(let r=1;r<lines.length;r++){const c=parseCSVLine(lines[r]);if(!c.length)continue;const g=i=>i>=0&&i<c.length?c[i]:"";
-const name=String(g(iN)||"").trim();if(/^(total|grand total|sum|toplam)/i.test(name))continue;
-const o={name:name||"Listing",impressions:toNum(g(iI)),clicks:toNum(g(iC)),spend:toNum(g(iS)),orders:toNum(g(iO)),revenue:toNum(g(iR))};
-if(o.name==="Listing"&&!o.impressions&&!o.spend&&!o.revenue)continue;out.push(o)}return out}
+const _minImp=toNum(s.minImp)||1000,_minClk=toNum(s.minClicks)||30;
+if(imp<_minImp&&clk<_minClk)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"VERİ AZ",tone:"muted",reason:`Yeterli veri yok — en az ${numFmt(_minImp)} gösterim veya ${_minClk} tıklama biriksin.`};
+const R=s.rules||[];
+if(Array.isArray(R)){for(const rule of R){if(!rule.on)continue;const rv=toNum(rule.n);
+if(rule.type==="spend_gte"&&spend>=rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: harcama ${money(spend,s.cur)} ≥ ${money(rv,s.cur)} — kapat.`};
+if(rule.type==="clk_no_sale"&&clk>=rv&&ord<=0)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ${numFmt(clk)} tıklama var ama 0 satış — kapat.`};
+if(rule.type==="roas_lt"&&spend>0&&roas<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ROAS ${roas.toFixed(2)}× < ${rv}× — kapat.`};
+if(rule.type==="ctr_lt"&&imp>0&&ctr*100<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: CTR ${(ctr*100).toFixed(2)}% < ${rv}% — kapat.`};
+if(rule.type==="ctr_fix"&&imp>=1000&&ctr*100<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"DÜZELT",tone:"amber",reason:`Kural: ${numFmt(imp)} gösterim + CTR ${(ctr*100).toFixed(2)}% < ${rv}% — görsel/başlık düzelt.`};
+if(rule.type==="imp_no_clk"&&imp>=rv&&clk<=0)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ${numFmt(imp)} gösterim var ama 0 tıklama — kapat.`};
+if(rule.type==="spend_no_sale"&&spend>=rv&&ord<=0)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ${money(spend,s.cur)} harcanmış ama 0 satış — kapat.`};
+if(rule.type==="rev_lt"&&spend>0&&rev<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: gelir ${money(rev,s.cur)} < ${money(rv,s.cur)} eşiği — kapat.`};
+if(rule.type==="acos_gt"&&rev>0&&acos*100>rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ACOS ${(acos*100).toFixed(1)}% > ${rv}% — kapat.`};
+if(rule.type==="conv_lt"&&clk>0&&conv*100<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: dönüşüm ${(conv*100).toFixed(2)}% < ${rv}% — kapat.`};
+}}
+let verdict="VERİ AZ",tone="muted",reason="";
+if(clk<s.minClicks&&spend<s.minSpend){reason=`Sadece ${numFmt(clk)} tıklama / ${money(spend,s.cur)} harcama. En az ${s.minClicks} tıklama biriksin.`}
+else if(spend>0&&rev<=0){verdict="KAPAT";tone="red";reason=`${money(spend,s.cur)} harcandı, 0 satış — kapat.`}
+else if(roas<s.watchRoas){verdict="KAPAT";tone="red";reason=`ROAS ${roas.toFixed(2)}× — alt sınırın (${s.watchRoas}×) altında.`}
+else if(roas<s.targetRoas){verdict="İZLE";tone="amber";reason=`ROAS ${roas.toFixed(2)}× — hedefin altında ama sınırda. İzle.`}
+else{verdict="BÜYÜT";tone="green";reason=`ROAS ${roas.toFixed(2)}× — kârlı. Bütçe artır.`}
+return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict,tone,reason}}
 
-/* ===== Veri katmanı ===== */
-async function uid(){return (await sb.auth.getUser()).data.user.id}
-async function listStores(){const{data,error}=await sb.from("stores").select("*").order("sort",{ascending:true});if(error)throw error;return data||[]}
-async function addStore(name,sort){const u=await uid();const{data,error}=await sb.from("stores").insert({name,sort,user_id:u}).select().single();if(error)throw error;return data}
-async function renameStore(id,name){const{error}=await sb.from("stores").update({name}).eq("id",id);if(error)throw error}
-async function listEntries(sid,p){const{data,error}=await sb.from("entries").select("*").eq("store_id",sid).eq("period",p).order("created_at",{ascending:true});if(error)throw error;return data||[]}
-async function listAllEntries(sid){const{data,error}=await sb.from("entries").select("*").eq("store_id",sid);if(error)throw error;return data||[]}
-function norm(r){return{name:r.name||"Listing",months:r.months??null,impressions:Number(r.impressions)||0,clicks:Number(r.clicks)||0,spend:Number(r.spend)||0,orders:Number(r.orders)||0,revenue:Number(r.revenue)||0}}
-async function addEntry(sid,p,row){const u=await uid();const{data,error}=await sb.from("entries").insert({...norm(row),store_id:sid,period:p,user_id:u}).select().single();if(error)throw error;return data}
-async function addEntriesBulk(sid,p,rows){const u=await uid();const payload=rows.map(r=>({...norm(r),store_id:sid,period:p,user_id:u}));const{data,error}=await sb.from("entries").insert(payload).select();if(error)throw error;return data||[]}
-async function updateEntry(id,patch){const{error}=await sb.from("entries").update(patch).eq("id",id);if(error)throw error}
-async function deleteEntry(id){const{error}=await sb.from("entries").delete().eq("id",id);if(error)throw error}
-async function deleteEntries(sid,p){const{error}=await sb.from("entries").delete().eq("store_id",sid).eq("period",p);if(error)throw error}
-async function getSettings(){const{data,error}=await sb.from("user_settings").select("data").maybeSingle();if(error)throw error;return data?data.data:null}
-async function saveSettings(d){const u=await uid();const{error}=await sb.from("user_settings").upsert({user_id:u,data:d,updated_at:new Date().toISOString()});if(error)throw error}
+/* ===== screenshot-style tavsiye ===== */
+function advise(e){
+const v=e.verdict;
+if(v==="BÜYÜT")return{label:"Artır",key:"advGrow",color:"var(--green)",strong:false,rank:0};
+if(v==="İZLE")return{label:"İzle",key:"advWatch",color:"var(--amber)",strong:false,rank:2};
+if(v==="DÜZELT")return{label:"Düzelt",key:"advFix",color:"var(--orange)",strong:true,rank:3};
+if(v==="KAPAT")return{label:"Durdur",key:"advStop",color:"var(--red)",strong:true,rank:4};
+return{label:"Veri az",key:"advLow",color:"var(--faint)",strong:false,rank:5};
+}
 
-/* ===== AUTH ===== */
-function Auth(){
-const[mode,setMode]=useState("login");const[email,setEmail]=useState("");const[pw,setPw]=useState("");
-const[busy,setBusy]=useState(false);const[err,setErr]=useState("");const[info,setInfo]=useState("");
-const submit=async e=>{e.preventDefault();setErr("");setInfo("");setBusy(true);
-try{if(mode==="signup"){const{error}=await sb.auth.signUp({email,password:pw});if(error)throw error;setInfo("Kayıt oluşturuldu. E-postanı doğrulaman gerekebilir, sonra giriş yap.");setMode("login");}
-else{const{error}=await sb.auth.signInWithPassword({email,password:pw});if(error)throw error;}}
-catch(e2){setErr(e2.message||"Bir hata oldu.")}finally{setBusy(false)}};
-return(<div className="auth-wrap"><form className="auth-card" onSubmit={submit}>
-<h1>QM</h1><div className="sub">Etsy Marketing Paneli · {mode==="login"?"Giriş":"Kayıt"}</div>
-{err&&<div className="err">⚠ {err}</div>}
-{info&&<div className="busy" style={{background:"var(--green-s)",borderColor:"rgba(15,157,99,.3)",color:"var(--green)"}}>{info}</div>}
-<label>E-posta</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="ornek@mail.com" required/>
-<label>Şifre</label><input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="••••••••" required minLength={6}/>
-<button className="btn pri full" disabled={busy}>{busy?"...":mode==="login"?"Giriş yap":"Kayıt ol"}</button>
-<div className="switch">{mode==="login"?<span>Hesabın yok mu? <button type="button" onClick={()=>{setMode("signup");setErr("")}}>Kayıt ol</button></span>:<span>Zaten hesabın var mı? <button type="button" onClick={()=>{setMode("login");setErr("")}}>Giriş yap</button></span>}</div>
-</form></div>);}
+/* storage */
+const store={
+async get(k,d){try{if(window.storage){const r=await window.storage.get(k);return r?JSON.parse(r.value):d}}catch(e){}try{const v=localStorage.getItem(k);return v!=null?JSON.parse(v):d}catch(e){}return d},
+async set(k,v){try{if(window.storage){await window.storage.set(k,JSON.stringify(v));return}}catch(e){}try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-/* ===== MARKETING ===== */
-function Marketing({storeId,settings}){
-const[period,setPeriod]=useState("1ay");const[rows,setRows]=useState([]);const[allRows,setAllRows]=useState([]);
-const[busy,setBusy]=useState(false);const[msg,setMsg]=useState("");const[err,setErr]=useState("");const[dragO,setDragO]=useState(false);const[toast,setToast]=useState("");
-const fileRef=useRef();const tRef=useRef();
-const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
-const reload=async()=>{if(!storeId)return;setBusy(true);setErr("");try{const[cur,all]=await Promise.all([listEntries(storeId,period),listAllEntries(storeId)]);setRows(cur);setAllRows(all)}catch(e){setErr("Yüklenemedi: "+(e.message||e))}finally{setBusy(false)}};
-useEffect(()=>{reload()},[storeId,period]);
-const handleCSV=async file=>{if(!file)return;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setErr("CSV dosyası seç (.csv).");return}setErr("");setBusy(true);setMsg("CSV okunuyor…");
-try{const text=await file.text();const parsed=parseCSV(text);if(!parsed.length)throw new Error("CSV okunamadı — Etsy'den 'Download data' ile indir, başlık satırı olmalı.");await addEntriesBulk(storeId,period,parsed);await reload();flash(`${parsed.length} listing yüklendi.`)}catch(e){setErr("CSV hatası: "+(e.message||e))}finally{setBusy(false);setMsg("");if(fileRef.current)fileRef.current.value=""}};
-const onAdd=async()=>{try{const r=await addEntry(storeId,period,{name:""});setRows(x=>[...x,r]);setAllRows(x=>[...x,r])}catch(e){setErr("Eklenemedi: "+e.message)}};
-const onEdit=(id,f,v)=>setRows(x=>x.map(r=>r.id===id?{...r,[f]:v}:r));
-const onCommit=async(id,f,v)=>{const patch=(f==="name"||f==="months")?{[f]:v}:{[f]:Number(v)||0};try{await updateEntry(id,patch);setAllRows(x=>x.map(r=>r.id===id?{...r,...patch}:r))}catch(e){setErr("Kaydedilemedi: "+e.message)}};
-const onDelete=async id=>{try{await deleteEntry(id);setRows(x=>x.filter(r=>r.id!==id));setAllRows(x=>x.filter(r=>r.id!==id))}catch(e){setErr("Silinemedi: "+e.message)}};
-const onDeleteAll=async()=>{if(!rows.length||!window.confirm("Bu dönemdeki tüm kayıtları sil?"))return;try{await deleteEntries(storeId,period);await reload()}catch(e){setErr("Silinemedi: "+e.message)}};
-const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,settings)})),[rows,settings]);
-const totals=useMemo(()=>{const t={spend:0,rev:0,imp:0,clk:0,ord:0,close:0,watch:0,grow:0,wasted:0};for(const{e}of evals){t.spend+=e.spend;t.rev+=e.rev;t.imp+=e.imp;t.clk+=e.clk;t.ord+=e.ord;if(e.verdict==="KAPAT"){t.close++;t.wasted+=Math.max(e.spend-e.rev,0)}if(e.verdict==="İZLE")t.watch++;if(e.verdict==="BÜYÜT")t.grow++}t.net=t.rev-t.spend;t.roas=t.spend?t.rev/t.spend:0;t.acos=t.rev?t.spend/t.rev:0;t.ctr=t.imp?t.clk/t.imp:0;return t},[evals]);
-const periodSummary=useMemo(()=>{const ps={};for(const[k]of PERIODS){const rs=allRows.filter(r=>r.period===k);let spend=0,rev=0,n=0;for(const r of rs){const e=evaluate(r,settings);spend+=e.spend;rev+=e.rev;if(e.imp||e.spend)n++}ps[k]={spend,rev,net:rev-spend,roas:spend?rev/spend:0,n}}return ps},[allRows,settings]);
-const spendDist=useMemo(()=>{const map={};let tot=0;for(const{e,row}of evals){if(e.spend<=0)continue;const k=categoryOf(row.name);if(!map[k])map[k]={label:k,spend:0,n:0};map[k].spend+=e.spend;map[k].n++;tot+=e.spend}return{list:Object.values(map).sort((a,b)=>b.spend-a.spend),tot}},[evals]);
-const cur=settings.cur;const hasCmp=PERIODS.some(([k])=>periodSummary[k].n>0);const maxNet=Math.max(1,...PERIODS.map(([k])=>Math.abs(periodSummary[k].net)));
-const pal=["var(--orange)","var(--green)","var(--amber)","var(--red)","var(--azure)","var(--faint)"];
-return(<>
-<div style={{display:"flex",alignItems:"center",gap:10,margin:"16px 0 12px",flexWrap:"wrap"}}>
-<span style={{fontFamily:"'JetBrains Mono'",fontSize:10.5,letterSpacing:".14em",color:"var(--faint)"}}>DÖNEM</span>
-<div className="pills">{PERIODS.map(([k,lb])=><button key={k} className={period===k?"on":""} onClick={()=>setPeriod(k)}>{lb}</button>)}</div>
-<span style={{fontSize:11.5,color:"var(--faint)"}}>— her dönemin verisi ayrı tutulur</span></div>
-<div className="kpis">
-<div className="kpi"><div className="lab">Gösterim</div><div className="val">{numFmt(totals.imp)}</div><div className="sub">{numFmt(totals.clk)} tıklama · CTR {totals.imp?pct(totals.ctr):"—"}</div></div>
-<div className="kpi"><div className="lab">Reklam geliri</div><div className="val">{money(totals.rev,cur)}</div><div className="sub">{numFmt(totals.ord)} sipariş</div></div>
-<div className="kpi"><div className="lab">Toplam harcama</div><div className="val">{money(totals.spend,cur)}</div><div className="sub">ACOS {totals.rev?pct(totals.acos):"—"}</div></div>
-<div className="kpi"><div className="lab">Net</div><div className="val" style={{color:totals.net>=0?"var(--green)":"var(--red)"}}>{money(totals.net,cur)}</div><div className="sub">ROAS {totals.spend?totals.roas.toFixed(2)+"×":"—"}</div></div>
-<div className="kpi"><div className="lab">Kararlar</div><div className="val" style={{fontSize:14,lineHeight:1.5}}><span style={{color:"var(--red)"}}>{totals.close} KAPAT</span> · <span style={{color:"var(--amber)"}}>{totals.watch} İZLE</span> · <span style={{color:"var(--green)"}}>{totals.grow} BÜYÜT</span></div><div className="sub">{totals.wasted>0?money(totals.wasted,cur)+" boşa":"boşa giden yok 👍"}</div></div>
-</div>
-{hasCmp&&<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📊 Dönemler arası karşılaştırma (net kâr / ROAS)</span></div>
-<div style={{display:"flex",flexDirection:"column",gap:10,marginTop:10}}>{PERIODS.map(([k,lb])=>{const p=periodSummary[k];const w=Math.abs(p.net)/maxNet*100;const col=p.net>=0?"var(--green)":"var(--red)";return(
-<div key={k} style={{display:"flex",alignItems:"center",gap:12}}>
-<button onClick={()=>setPeriod(k)} style={{flex:"0 0 64px",textAlign:"left",fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:13,color:period===k?"var(--orange)":"var(--ink)",background:"none",border:"none",cursor:"pointer"}}>{lb}</button>
-<div style={{flex:1,height:12,background:"var(--panel2)",borderRadius:6,overflow:"hidden"}}><div style={{width:(p.n?w:0)+"%",height:"100%",background:col}}/></div>
-<span className="mono" style={{fontSize:12.5,fontWeight:700,minWidth:92,textAlign:"right",color:col}}>{p.n?money(p.net,cur):"—"}</span>
-<span className="mono" style={{fontSize:12,color:"var(--muted)",minWidth:52,textAlign:"right"}}>{p.n?p.roas.toFixed(2)+"×":"—"}</span>
-<span className="mono" style={{fontSize:11,color:"var(--faint)",minWidth:74,textAlign:"right"}}>{p.n?p.n+" listing":"veri yok"}</span></div>);})}</div></div>}
-<div className={"dz"+(dragO?" over":"")} onClick={()=>fileRef.current&&fileRef.current.click()}
-onDragOver={e=>{e.preventDefault();setDragO(true)}} onDragLeave={()=>setDragO(false)}
-onDrop={e=>{e.preventDefault();setDragO(false);const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)handleCSV(f)}}>
-<div className="big">📄 Etsy CSV'ni buraya bırak</div>Sürükle-bırak ya da tıkla · Etsy Shop Manager → Settings → Download Data</div>
-<input ref={fileRef} type="file" accept=".csv,text/csv" style={{display:"none"}} onChange={e=>handleCSV(e.target.files&&e.target.files[0])}/>
-{err&&<div className="err">⚠ {err}</div>}{busy&&<div className="busy"><span className="sp"/>{msg||"Yükleniyor…"}</div>}
-<div className="sec"><h2><span className="bar"/>ANALİZ & KARARLAR</h2><div className="brow"><button className="btn" onClick={onAdd}>+ Satır ekle</button><button className="btn" onClick={onDeleteAll}>🗑 Tümünü sil</button></div></div>
-<div className="tw"><table><thead><tr><th className="l">Ürün</th><th>Ay</th><th>Gösterim</th><th>Tıklama</th><th>CTR</th><th>Sipariş</th><th>Gelir</th><th>Harcama</th><th>ROAS</th><th className="l">Karar</th><th></th></tr></thead><tbody>
-{evals.length===0&&<tr><td colSpan={11}><div className="empty"><div className="big">Henüz veri yok</div><p>CSV yükle ya da "+ Satır ekle" ile başla.</p></div></td></tr>}
-{evals.map(x=>({...x,a:advise(x.e)})).sort((p,q)=>p.a.rank-q.a.rank||q.e.roas-p.e.roas).map(({row:r,e,a})=>{
-const soft={"var(--green)":"var(--green-s)","var(--amber)":"var(--amber-s)","var(--orange)":"var(--orange-s)","var(--red)":"var(--red-s)","var(--faint)":"var(--panel2)"}[a.color]||"var(--panel2)";
-return(<tr key={r.id} style={{verticalAlign:"top"}}>
-<td className="l" style={{paddingTop:11}}><input className="ci nm" value={r.name||""} placeholder="Listing adı" onChange={ev=>onEdit(r.id,"name",ev.target.value)} onBlur={ev=>onCommit(r.id,"name",ev.target.value)}/></td>
-<td style={{paddingTop:11}}><input className="ci" style={{width:44,textAlign:"center"}} value={r.months||""} placeholder="—" onChange={ev=>onEdit(r.id,"months",ev.target.value)} onBlur={ev=>onCommit(r.id,"months",ev.target.value)}/></td>
-{["impressions","clicks"].map(f=><td key={f} style={{paddingTop:11}}><input className="ci" value={r[f]??""} onChange={ev=>onEdit(r.id,f,ev.target.value)} onBlur={ev=>onCommit(r.id,f,ev.target.value)}/></td>)}
-<td className="calc" style={{paddingTop:14}}>{e.imp?pct(e.ctr):"—"}</td>
-{["orders","revenue","spend"].map(f=><td key={f} style={{paddingTop:11}}><input className="ci" value={r[f]??""} onChange={ev=>onEdit(r.id,f,ev.target.value)} onBlur={ev=>onCommit(r.id,f,ev.target.value)}/></td>)}
-<td className="calc s" style={{fontWeight:700,paddingTop:14,color:e.roas>=1.7?"var(--green)":e.roas<1?"var(--red)":"var(--ink)"}}>{e.spend?e.roas.toFixed(2)+"×":"—"}</td>
-<td className="l" style={{whiteSpace:"normal",paddingTop:11}}><div style={{display:"flex",flexDirection:"column",gap:6,maxWidth:280}}>
-<span style={{display:"inline-flex",alignItems:"center",gap:7,alignSelf:"flex-start",fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:12.5,letterSpacing:".03em",color:a.color,background:soft,border:"1.5px solid "+a.color,borderRadius:9,padding:"6px 12px",whiteSpace:"nowrap"}}><span style={{width:9,height:9,borderRadius:"50%",background:a.color,display:"inline-block",flexShrink:0}}/>{a.label.toUpperCase()}</span>
-{e.reason&&<span style={{color:"var(--muted)",fontWeight:400,fontSize:11.5,lineHeight:1.5}}>{e.reason}</span>}</div></td>
-<td style={{paddingTop:11}}><button className="dl" onClick={()=>onDelete(r.id)} title="Sil">✕</button></td></tr>);})}
-</tbody></table></div>
-{spendDist.tot>0&&<div className="rules" style={{marginTop:18}}><div className="rh"><span style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📊 Reklam harcaması dağılımı — hangi konu ne kadar yemiş</span></div>
-<div style={{display:"flex",height:16,borderRadius:8,overflow:"hidden",border:"1px solid var(--line2)",margin:"12px 0 14px"}}>{spendDist.list.map((c,i)=><div key={c.label} title={c.label} style={{width:(c.spend/spendDist.tot)*100+"%",background:pal[i%pal.length]}}/>)}</div>
-<div style={{display:"flex",flexDirection:"column",gap:9}}>{spendDist.list.map((c,i)=>{const col=pal[i%pal.length];const p=(c.spend/spendDist.tot)*100;return(
-<div key={c.label} style={{display:"flex",alignItems:"center",gap:12}}><span style={{width:10,height:10,borderRadius:3,background:col,flexShrink:0}}/>
-<span style={{flex:"0 0 190px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{c.label} <span style={{color:"var(--faint)",fontWeight:400,fontSize:11.5}}>({c.n})</span></span>
-<div style={{flex:1,height:10,background:"var(--panel2)",borderRadius:6,overflow:"hidden"}}><div style={{width:p+"%",height:"100%",background:col}}/></div>
-<span className="mono" style={{fontSize:12.5,fontWeight:700,minWidth:48,textAlign:"right"}}>%{p.toFixed(1)}</span>
-<span className="mono" style={{fontSize:11.5,color:"var(--muted)",minWidth:72,textAlign:"right"}}>{money(c.spend,cur)}</span></div>);})}</div></div>}
-{toast&&<div className="toast">{toast}</div>}
-</>);}
+/* ========== i18n ========== */
+const L={
+tr:{
+  stores:"MAĞAZALAR",addStore:"+ mağaza ekle",marketing:"📊 MARKETING",views:"👁 GÖRÜNTÜLEME",gmail:"✉️ GMAIL",
+  mktTitle:"MARKETING",viewsTitle:"GÖRÜNTÜLEME",gmailTitle:"GMAIL RAPORU",
+  actions:"Bugünün Aksiyonları",noData:"Ekran görüntüsünü yükle ya da raporu yapıştır.",
+  close:"KAPAT",watch:"İZLE",grow:"BÜYÜT",dataLow:"VERİ AZ",
+  rule1h:"1 NO — OTOMATİK KAPATMA VE AÇMA KURALLARI",
+  ruleInfo:"Kurallar yukarıdan aşağı sırayla işlenir. Açık olan ilk eşleşen kural \"KAPAT\" der.",
+  addRule:"+ Yeni kural ekle…",addBtn:"Ekle",
+  r2h:"2 NO — ETSY HANGİ KONULARDA GÖRÜNTÜLEME YAPMIŞ",
+  a1:"A — SON 1 AY",a2:"B — SON 2 AY",a3:"C — SON 3 AY",
+  listing:"Listing",catTopic:"Kategori / Konu",keyword:"Anahtar Kelime",viewsH:"Gösterim",rank:"Sıra",note:"Not",
+  noRec:"Henüz kayıt yok",noRecSub:"\"+ Ekle\" ile Etsy'nin gösterdiği konuları kaydet.",
+  add:"+ Ekle",autoDetect:"🔄 Otomatik Tespit Et",
+  topicsDetected:" konu tespit edildi.",loadFirst:"Önce listing verisi yükle.",
+  listInTopic:" listing bu konuda",
+  totalSpend:"Toplam harcama",adRev:"Reklam geliri",net:"Net",roas:"ROAS",acos:"ACOS",
+  clicks:"tıklama",orders:"sipariş",adBased:"reklam bazlı",target:"hedef",
+  listingData:"Listing verileri",imgUpload:"📷 Görüntü yükle",screenCap:"🖥 Ekranı yakala",
+  pasteTxt:"📋 Metin yapıştır",addRow:"+ Satır ekle",
+  dzTitle:"📷 Görsel veya 📄 CSV buraya bırak",dzSub:"Görsel/CSV sürükle-bırak · Ctrl+V yapıştır · ya da tıkla",
+  pasteHelp:"Etsy kopyala-yapıştır: tabloyu seç → kopyala → buraya yapıştır.",
+  parseAdd:"Ayrıştır & ekle",cancel:"Vazgeç",
+  noDataYet:"Henüz veri yok",noDataSub:"Görüntü yükle, ekranı yakala ya da metin yapıştır.",
+  budget:"Bütçe önerisi",wasted:"boşa gidiyor",fromClose:"KAPAT'tan",shiftTo:"En kârlı listinglere kaydır:",
+  noProfitable:"Kârlı listing yok — önce kazananları bul.",noWaste:"Boşa giden bütçe yok 👍",
+  dailyRec:"Günlük kayıt",dateL:"Tarih:",today:"Bugün",autoSave:"Veriler otomatik kaydedilir.",
+  settings:"Ayarlar",settingsDesc:"Kapat/izle/büyüt kararları bu eşiklere göre verilir.",
+  targetRoas:"Hedef ROAS (BÜYÜT)",targetRoasH:"Üstündeki → bütçe artır.",
+  lowRoas:"Alt ROAS (KAPAT)",lowRoasH:"Altındaki → kapat.",
+  minClicks:"Min tıklama",minClicksH:"Bu birikene kadar 'veri az'.",
+  minSpend:"Min harcama",minSpendH:"Bu kadar harcamada 0 satış → kapat.",
+  apiKey:"Anthropic API anahtarı (opsiyonel)",apiKeyH:"Görüntü okuma için. Tarayıcıda kalır.",
+  gClientId:"Google Client ID (Gmail sekmesi için)",gClientIdH:"Gmail'e bağlanmak için Google Cloud Console'dan alınır.",
+  ok:"Tamam",defaults:"Varsayılana dön",saved:"Kaydedildi.",
+  analysis:"📊 ANALİZ & TAVSİYELER",
+  topProfit:"EN KÂRLI LİSTİNGLER — Bütçe artır",topProfitTxt:"Bu listinglerin bütçesini %20-30 artır.",
+  losing:"LİSTİNG ZARAR EDİYOR",losingTxt:"Bunları kapat ve bütçeyi kazananlara kaydır.",
+  topCat:"EN ÇOK GÖRÜNTÜLENEN KONU: ",topCatTxt:" görüntüleme. Bu konuda yeni listingler açarak trafiği artırabilirsin.",
+  nextUpload:"BUNDAN SONRA ŞU LİSTİNGLERİ YÜKLEYEBİLİRSİN",
+  efficiency:"GENEL VERİMLİLİK",effGood:"Çok iyi — ölçeklendir!",effMid:"İyi ama iyileştirme var — KAPAT listingleri temizle.",effLow:"Düşük — önce zarar edenleri kapat, sonra büyüt.",
+  borderline:"LİSTİNG SINIRDA — 1 hafta izle",borderlineTxt:"Başlık/görsel iyileştir, 1 hafta sonra tekrar değerlendir.",
+  nextSteps:"SIRADAKI ADIMLAR",nextStepsTxt:"1. KAPAT listinglerin reklamını kapat\n2. Kazanan listinglere bütçe artır\n3. En kârlı konuda 2-3 yeni listing aç\n4. 7 gün sonra yeni screenshot yükle ve karşılaştır\n5. GÖRÜNTÜLEME sekmesinde sıra takibi yap",
+  reading:"Okunuyor…",ocrReading:"Cihazda OCR ile okunuyor…",readOk:" listing okundu.",added:" listing eklendi.",cantRead:"Okunamadı.",
+  gmailConn:"Gmail Bağlantısı",gmailDesc:"Google ile giriş yap — son 7 günün Etsy sipariş ve ShipStation kargo e-postalarını oku.",
+  gmailLogin:"🔑 Google ile Giriş Yap",gmailSetup:"İlk kez — Google Client ID kurulumu (bir kez)",gmailConnect:"Bağlan",
+  gmailReading:"Gmail okunuyor…",refresh:"🔄 Yenile",logout:"Çıkış",
+  etsyOrders:"Etsy Siparişleri (7 gün)",ssShip:"ShipStation Kargo (7 gün)",totalEtsy:"Toplam Etsy E-postası",totalSS:"Toplam SS E-postası",
+  etsyEmails:"Etsy Sipariş E-postaları",ssEmails:"ShipStation Kargo",subject:"Konu",date:"Tarih",summary:"Özet",
+  noEtsy7:"Son 7 günde Etsy e-postası yok.",noSS7:"Son 7 günde SS e-postası yok.",
+  tabMkt:"📊 MARKETING",tabRules:"⚙ RULES",tabDikkat:"⚠ DİKKAT",tabTrend:"📈 GÖSTERİM TRENDİ",tabAgent:"🤖 NOVA AGENT",
+  hRules:"RULES",hDikkat:"REKLAM DİKKAT",hTrend:"GÖSTERİM TRENDİ",hAgent:"NOVA AGENT",
+  cProduct:"Ürün",cMonth:"Ay",cMonthTip:"Listing kaç aydır açık",cImpr:"Görüntülenme",cClicks:"Tıklama",cOrders:"Sipariş",cRev:"Gelir",cSpend:"Harcama",cAction:"RULES · Action",
+  emptyT:"Henüz veri yok",emptyS:"Veri yükle; analiz ve tavsiyeler burada oluşur.",delAll:"🗑 Tümünü sil",delAllQ:"Tüm reklamları sil?",delOne:"Bu reklamı sil",
+  advGrow:"Artır",advWatch:"İzle",advFix:"Düzelt",advStop:"Durdur",advLow:"Veri az",
+  spTitle:"📊 Reklam harcaması dağılımı — hangi konu ne kadar yemiş",spEmb:"🧵 Embroidery",spOther:"📦 Diğer listingler",spNote:"Konular listing adından otomatik tespit edilir. Embroidery için başlıkta \"embroidery/embroidered/nakış/monogram\" geçmeli.",spUncat:"Diğer / Sınıfsız",
+  rSyncNote:"Buradaki kurallar Marketing tablosuyla senkron çalışır. Bir kuralı AÇIK yaparsan, koşulu sağlayan reklamlar Marketing'de otomatik Durdur ya da Düzelt olarak işaretlenir. Kurallar yukarıdan aşağı sırayla bakılır; açık olan ilk eşleşen kural kararı verir.",
+  rFormulas:"Formüller",rThreshHead:"1 · Yeterli veri eşiği",rThreshDesc:"Bir reklam bu kadar gösterim VEYA tıklama biriktirmeden hiçbir karar verilmez (\"Veri az\" der).",rMinImp:"En az gösterim",rMinClk:"En az tıklama",
+  rDecHead:"2 · Karar kuralları",rOpen:"açık",rAddRule:"+ Yeni kural ekle…",rAdd:"Ekle",rFixHead:"3 · DÜZELT sebep listesi",rFixDesc:"Bir reklam DÜZELT'e düşünce olası sebebi aç/kapat ile işaretle:",rClose:"KAPAT",rFix:"DÜZELT",
+  rCtrHead:"CTR rehberi · bilgi",rCtr1:"1000 gösterimde 5'ten az tıklama",rCtr1b:"→ GÖRSEL + BAŞLIK DÜZELT",rCtr1c:"(CTR %0,5 altı)",rCtr2:"2000 gösterimde 10'dan az tıklama",rCtr2b:"→ ANA FOTOĞRAFI DEĞİŞTİR",rCtr2c:"(kesin sorun)",rCtr3a:"İyi referans:",rCtr3:"1000 gösterimde ~20 tıklama",rCtr3c:"(CTR %2)",rCtrFoot:"CTR düşük = tıklama yok = para gitmiyor → asla kapatma, sadece görsel/başlık düzelt.",
+  dkNote:"Reklam verirken dikkat edilecek noktalar. Her madde bir hatırlatma; kendi uyarılarını ekleyebilirsin.",dkHead:"⚠ Reklam dikkat notları",dkCount:"madde",dkAdd:"+ Madde ekle",dkPh:"Uyarı yaz…",dkEmpty:"Henüz uyarı yok. \"+ Madde ekle\" ile başla.",dkDel:"Maddeyi sil",
+  trFromMkt:"📥 Marketing'ten çek",trAddTopic:"+ Konu ekle",trThreshCap:"Son 1 ay ≥ son 3 ayın aylık ortalaması × 1,1 → Artan · × 0,9 altı → Azalan",
+  trIntro:"Konular ve Son 1 Ay gösterimleri Marketing verinden OTOMATİK çekilir (🔄). Sen sadece her konunun Son 3 Ay ve Tüm Yıl toplam gösterimini gir. Sistem son 1 ayı, son 3 ayın aylık ortalamasıyla kıyaslar → artan ve azalan konuları ayırır.",trAutoEmpty:"Marketing'e gösterim verisi yükle — konular buraya otomatik gelir.",trAutoTip:"Marketing'den otomatik",
+  trTopic:"Konu",trM1:"Son 1 Ay",trM3:"Son 3 Ay",trY:"Tüm Yıl",trTrend:"Trend",trTopicPh:"Konu adı",trNoTopic:"Henüz konu yok",trNoTopicSub:"\"+ Konu ekle\" ile başla.",trRising:"Artıyor",trFalling:"Azalıyor",trStable:"Sabit",trNoData:"— veri yok",trUp:"📈 Gösterimi ARTAN konular",trUpDesc:"Talep yükseliyor — bu konularda yeni listing aç ve reklam bütçesini artır.",trUpEmpty:"Artan konu yok (veya veri eksik).",trDown:"📉 Gösterimi AZALAN konular",trDownDesc:"Talep düşüyor — sezon dışıysa reklamı kıs/kapat, yeni listing açma.",trDownEmpty:"Azalan konu yok (veya veri eksik).",trFlat:"≈ Sabit / dengeli konular",trMo:"3 ay ort/ay",trLast1:"son 1 ay",trDelTopic:"Konuyu sil",trYearHead:"📅 Yıl boyunca en çok gösterilen konular",trYearDesc:"Tüm Yıl gösterimine göre sıralı — Etsy yıl boyunca seni en çok hangi konularda gösterdi.",trYearEmpty:"Konuların Tüm Yıl değerini gir — yıl boyu en çok gösterilen konular burada sıralanır.",
+  agMine:"🤖 AGENTLARIM",agCount:"agent",agIntro:"Her kart bir otomatik ajan. Scheduled = ne zaman çalışır, yapması gerekenler = görevi. Kartlar şu an taslak; \"aktif\" olması için Claude'a söyle, gerçek zamanlanmış göreve çevrilsin.",agActive:"Aktif",agDraft:"Taslak",agTodo:"Yapması gerekenler",agNew:"Yeni agent ekle",
+},
+en:{
+  stores:"STORES",addStore:"+ add store",marketing:"📊 MARKETING",views:"👁 VISIBILITY",gmail:"✉️ GMAIL",
+  mktTitle:"MARKETING",viewsTitle:"VISIBILITY",gmailTitle:"GMAIL REPORT",
+  actions:"Today's Actions",noData:"Upload a screenshot or paste your report.",
+  close:"CLOSE",watch:"WATCH",grow:"GROW",dataLow:"LOW DATA",
+  rule1h:"1 — AUTO CLOSE & OPEN RULES",
+  ruleInfo:"Rules are processed top to bottom. First matching active rule triggers \"CLOSE\".",
+  addRule:"+ Add new rule…",addBtn:"Add",
+  r2h:"2 — WHICH TOPICS ETSY SHOWS YOUR LISTINGS IN",
+  a1:"A — LAST 1 MONTH",a2:"B — LAST 2 MONTHS",a3:"C — LAST 3 MONTHS",
+  listing:"Listing",catTopic:"Category / Topic",keyword:"Keyword",viewsH:"Views",rank:"Rank",note:"Note",
+  noRec:"No data yet",noRecSub:"Click \"+ Add\" to record topics Etsy shows.",
+  add:"+ Add",autoDetect:"🔄 Auto Detect",
+  topicsDetected:" topics detected.",loadFirst:"Load listing data first.",
+  listInTopic:" listings in this topic",
+  totalSpend:"Total spend",adRev:"Ad revenue",net:"Net",roas:"ROAS",acos:"ACOS",
+  clicks:"clicks",orders:"orders",adBased:"ad-based",target:"target",
+  listingData:"Listing data",imgUpload:"📷 Upload image",screenCap:"🖥 Capture screen",
+  pasteTxt:"📋 Paste text",addRow:"+ Add row",
+  dzTitle:"📷 Drop screenshot here",dzSub:"Drag & drop · Ctrl+V paste · or click",
+  pasteHelp:"Copy-paste from Etsy: select table → copy → paste here.",
+  parseAdd:"Parse & add",cancel:"Cancel",
+  noDataYet:"No data yet",noDataSub:"Upload image, capture screen, or paste text.",
+  budget:"Budget suggestion",wasted:"wasted",fromClose:"from CLOSE",shiftTo:"Shift to top performers:",
+  noProfitable:"No profitable listings — find winners first.",noWaste:"No wasted budget 👍",
+  dailyRec:"Daily record",dateL:"Date:",today:"Today",autoSave:"Data is saved automatically.",
+  settings:"Settings",settingsDesc:"Close/watch/grow decisions are based on these thresholds.",
+  targetRoas:"Target ROAS (GROW)",targetRoasH:"Above this → increase budget.",
+  lowRoas:"Low ROAS (CLOSE)",lowRoasH:"Below this → close.",
+  minClicks:"Min clicks",minClicksH:"Until this many clicks, 'low data'.",
+  minSpend:"Min spend",minSpendH:"This much spend with 0 sales → close.",
+  apiKey:"Anthropic API key (optional)",apiKeyH:"For image reading. Stays in your browser.",
+  gClientId:"Google Client ID (for Gmail tab)",gClientIdH:"Get from Google Cloud Console.",
+  ok:"OK",defaults:"Reset to defaults",saved:"Saved.",
+  analysis:"📊 ANALYSIS & RECOMMENDATIONS",
+  topProfit:"TOP PERFORMERS — Increase budget",topProfitTxt:"Increase budget by 20-30% for these listings.",
+  losing:"LISTINGS LOSING MONEY",losingTxt:"Close these and shift budget to winners.",
+  topCat:"TOP VIEWED TOPIC: ",topCatTxt:" views. Open new listings in this topic to increase traffic.",
+  nextUpload:"SUGGESTED NEW LISTINGS TO CREATE",
+  efficiency:"OVERALL EFFICIENCY",effGood:"Excellent — scale up!",effMid:"Good but room to improve — clean up CLOSE listings.",effLow:"Low — close losers first, then grow.",
+  borderline:"LISTINGS ON THE EDGE — watch 1 week",borderlineTxt:"Improve title/images, re-evaluate in 1 week.",
+  nextSteps:"NEXT STEPS",nextStepsTxt:"1. Turn off ads for CLOSE listings\n2. Increase budget for winners\n3. Create 2-3 new listings in top topic\n4. Upload new screenshot in 7 days and compare\n5. Track ranking in VISIBILITY tab",
+  reading:"Reading…",ocrReading:"Reading with on-device OCR…",readOk:" listings read.",added:" listings added.",cantRead:"Could not parse.",
+  gmailConn:"Gmail Connection",gmailDesc:"Sign in with Google — read Etsy orders and ShipStation shipping emails from the last 7 days.",
+  gmailLogin:"🔑 Sign in with Google",gmailSetup:"First time — Google Client ID setup (one-time)",gmailConnect:"Connect",
+  gmailReading:"Reading Gmail…",refresh:"🔄 Refresh",logout:"Sign out",
+  etsyOrders:"Etsy Orders (7 days)",ssShip:"ShipStation Shipping (7 days)",totalEtsy:"Total Etsy Emails",totalSS:"Total SS Emails",
+  etsyEmails:"Etsy Order Emails",ssEmails:"ShipStation Shipping",subject:"Subject",date:"Date",summary:"Summary",
+  noEtsy7:"No Etsy emails in the last 7 days.",noSS7:"No SS emails in the last 7 days.",
+  tabMkt:"📊 MARKETING",tabRules:"⚙ RULES",tabDikkat:"⚠ CAUTION",tabTrend:"📈 IMPRESSION TREND",tabAgent:"🤖 NOVA AGENT",
+  hRules:"RULES",hDikkat:"AD CAUTION",hTrend:"IMPRESSION TREND",hAgent:"NOVA AGENT",
+  cProduct:"Product",cMonth:"Mo.",cMonthTip:"How many months the listing has been live",cImpr:"Impressions",cClicks:"Clicks",cOrders:"Orders",cRev:"Revenue",cSpend:"Spend",cAction:"RULES · Action",
+  emptyT:"No data yet",emptyS:"Upload data; analysis and recommendations appear here.",delAll:"🗑 Delete all",delAllQ:"Delete all ads?",delOne:"Delete this ad",
+  advGrow:"Grow",advWatch:"Watch",advFix:"Fix",advStop:"Stop",advLow:"Low data",
+  spTitle:"📊 Ad spend distribution — which topic ate how much",spEmb:"🧵 Embroidery",spOther:"📦 Other listings",spNote:"Topics are auto-detected from the listing name. For Embroidery the title must contain \"embroidery/embroidered/monogram\".",spUncat:"Other / Uncategorized",
+  rSyncNote:"These rules stay in sync with the Marketing table. If you turn a rule ON, ads meeting the condition are auto-marked Stop or Fix in Marketing. Rules are checked top to bottom; the first matching active rule decides.",
+  rFormulas:"Formulas",rThreshHead:"1 · Enough-data threshold",rThreshDesc:"No decision is made until an ad reaches this many impressions OR clicks (shows \"Low data\").",rMinImp:"Min impressions",rMinClk:"Min clicks",
+  rDecHead:"2 · Decision rules",rOpen:"on",rAddRule:"+ Add new rule…",rAdd:"Add",rFixHead:"3 · FIX reason list",rFixDesc:"When an ad falls to FIX, toggle the likely reason on/off:",rClose:"STOP",rFix:"FIX",
+  rCtrHead:"CTR guide · info",rCtr1:"Fewer than 5 clicks per 1000 impressions",rCtr1b:"→ FIX IMAGE + TITLE",rCtr1c:"(CTR below 0.5%)",rCtr2:"Fewer than 10 clicks per 2000 impressions",rCtr2b:"→ CHANGE MAIN PHOTO",rCtr2c:"(definite problem)",rCtr3a:"Good benchmark:",rCtr3:"~20 clicks per 1000 impressions",rCtr3c:"(CTR 2%)",rCtrFoot:"Low CTR = no clicks = no money spent → never close, just fix image/title.",
+  dkNote:"Points to watch when advertising. Each item is a reminder; you can add your own.",dkHead:"⚠ Ad caution notes",dkCount:"items",dkAdd:"+ Add item",dkPh:"Write a note…",dkEmpty:"No notes yet. Start with \"+ Add item\".",dkDel:"Delete item",
+  trFromMkt:"📥 Pull from Marketing",trAddTopic:"+ Add topic",trThreshCap:"Last 1 mo ≥ 3-month monthly avg × 1.1 → Rising · below × 0.9 → Falling",
+  trIntro:"Topics and Last 1 Mo impressions are pulled AUTOMATICALLY from your Marketing data (🔄). You only enter each topic's Last 3 Mo and Full Year totals. The system compares last 1 month to the 3-month monthly average → separating rising and falling topics.",trAutoEmpty:"Upload impression data in Marketing — topics appear here automatically.",trAutoTip:"Auto from Marketing",
+  trTopic:"Topic",trM1:"Last 1 Mo",trM3:"Last 3 Mo",trY:"Full Year",trTrend:"Trend",trTopicPh:"Topic name",trNoTopic:"No topics yet",trNoTopicSub:"Start with \"+ Add topic\".",trRising:"Rising",trFalling:"Falling",trStable:"Stable",trNoData:"— no data",trUp:"📈 RISING impression topics",trUpDesc:"Demand is climbing — create new listings here and raise ad budget.",trUpEmpty:"No rising topics (or missing data).",trDown:"📉 FALLING impression topics",trDownDesc:"Demand is dropping — if off-season, cut/close ads, don't add listings.",trDownEmpty:"No falling topics (or missing data).",trFlat:"≈ Stable / balanced topics",trMo:"3-mo avg/mo",trLast1:"last 1 mo",trDelTopic:"Delete topic",trYearHead:"📅 Most-shown topics over the year",trYearDesc:"Ranked by Full-Year impressions — which topics Etsy showed you in most over the year.",trYearEmpty:"Enter topics' Full-Year values — the year's most-shown topics rank here.",
+  agMine:"🤖 MY AGENTS",agCount:"agents",agIntro:"Each card is an automated agent. Scheduled = when it runs, to-dos = its task. Cards are drafts for now; tell Claude to make one \"active\" to turn it into a real scheduled task.",agActive:"Active",agDraft:"Draft",agTodo:"To-do",agNew:"Add new agent",
+}};
 
-/* ===== RULES ===== */
-function Switch({on,onClick}){return(<button onClick={onClick} style={{width:34,height:20,borderRadius:999,border:"none",cursor:"pointer",background:on?"var(--green)":"var(--line2)",position:"relative",flexShrink:0,transition:".15s"}}><span style={{position:"absolute",top:2,left:on?16:2,width:16,height:16,borderRadius:"50%",background:"#fff",transition:".15s",boxShadow:"0 1px 3px rgba(0,0,0,.3)"}}/></button>)}
-function Rules({settings,onChange}){
-const[addType,setAddType]=useState(RULE_TYPES[0].type);const rules=settings.rules||[];const dz=settings.dzChecks||[];
-const setF=(k,v)=>onChange({[k]:v});
-const upRule=(id,p)=>onChange({rules:rules.map(r=>r.id===id?{...r,...p}:r)});
-const delRule=id=>onChange({rules:rules.filter(r=>r.id!==id)});
-const addRule=()=>onChange({rules:[...rules,newRuleDefault(addType)]});
-const toggleDz=id=>onChange({dzChecks:dz.map(c=>c.id===id?{...c,on:!c.on}:c)});
-const NI=({label,k})=><label style={{fontSize:13}}>{label}<input className="ci" style={{display:"block",marginTop:5,width:100,textAlign:"left",border:"1px solid var(--line2)"}} value={settings[k]} onChange={e=>setF(k,Number(e.target.value)||0)}/></label>;
-return(<div style={{padding:"8px 0 40px"}}>
-<div className="rules" style={{background:"var(--panel2)"}}>Buradaki kurallar <b>Marketing tablosuyla senkron</b> çalışır. Bir kuralı açtığında, koşulu sağlayan reklamlar Marketing'de otomatik <b style={{color:"var(--red)"}}>Durdur</b> ya da <b style={{color:"var(--orange)"}}>Düzelt</b> olarak işaretlenir. Kurallar yukarıdan aşağı sırayla bakılır; açık olan ilk eşleşen kural kararı verir.</div>
-<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>1 · Eşikler</span></div>
-<div style={{display:"flex",gap:18,flexWrap:"wrap"}}><NI label="En az gösterim" k="minImp"/><NI label="En az tıklama" k="minClicks"/><NI label="Hedef ROAS (BÜYÜT)" k="targetRoas"/><NI label="Alt ROAS (KAPAT)" k="watchRoas"/></div></div>
-<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--red)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>2 · Karar kuralları</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{rules.filter(r=>r.on).length} açık</span></div>
-<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>{rules.map(r=><div key={r.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",border:"1px solid var(--line2)",borderRadius:12,background:r.on?"var(--bg2)":"transparent",opacity:r.on?1:0.55}}>
-<Switch on={r.on} onClick={()=>upRule(r.id,{on:!r.on})}/><span style={{flex:1,fontSize:14}}>{r.label}</span>
-<input className="ci" style={{width:70,border:"1px solid var(--line2)",textAlign:"center"}} value={r.n} onChange={e=>upRule(r.id,{n:Number(e.target.value)||0})}/>
-<button className="dl" onClick={()=>delRule(r.id)} title="Sil">✕</button></div>)}</div>
-<div style={{display:"flex",gap:8,marginTop:14,flexWrap:"wrap",alignItems:"center"}}><select className="cur-sel" value={addType} onChange={e=>setAddType(e.target.value)} style={{fontFamily:"'Inter'",fontSize:13}}>{RULE_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}</select><button className="btn pri" onClick={addRule}>+ Ekle</button></div></div>
-<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>3 · DÜZELT sebep listesi</span></div>
-<div style={{display:"flex",flexDirection:"column",gap:8}}>{dz.map(c=><div key={c.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 13px",border:"1px solid var(--line)",borderRadius:10,background:"var(--bg2)"}}><Switch on={c.on} onClick={()=>toggleDz(c.id)}/><span style={{fontSize:13.5}}>{c.label}</span></div>)}</div></div>
-</div>);}
+const DS={cur:"$",targetRoas:3,watchRoas:2,minClicks:30,minSpend:30,minImp:1000,apiKey:"",googleClientId:"",lang:"tr",warnings:[{id:"w1",text:"Christmas (Noel) reklamları pahalıdır — Kasım-Aralık'ta rekabet ve tıklama başı maliyet (CPC) çok yükselir. Erken başla, bütçeyi dikkatli kullan, düşük ROAS'a hazırlıklı ol."},{id:"w2",text:"Mevsimi geçen listingleri reklama KAPAT — sezonu bitmiş ürünlere (ör. yazın kışlık, Noel sonrası Noel ürünü) reklam verme; tıklama gelse bile satış düşer, bütçe boşa gider."},{id:"w3",text:"Mevsimi gelecek olanı sezon GELMEDEN önce AÇ — talep artmadan 3-4 hafta önce reklama başla ki listing ısınsın, yorum toplasın ve sezonun zirvesinde üst sıralarda olsun."}],dzChecks:[{id:"d1",on:false,label:"Konu mevsiminde değil (ör. kışlık ürünü yazın satıyorsun)"},{id:"d2",on:false,label:"Başlık / etiketler (title & tag) zayıf — SEO düzelt"},{id:"d3",on:false,label:"Ana görsel / mockup çekici değil"},{id:"d4",on:false,label:"Fiyat rakiplerden yüksek"},{id:"d5",on:false,label:"Yorum yok / çok az"},{id:"d6",on:false,label:"Kargo pahalı veya yavaş"},{id:"d7",on:false,close:true,label:"Mevsimi geçmiş — şu anda mevsimi değil (sezon dışı)"}],trendTopics:[],rulesV:5,rules:[
+{id:"rctr",on:true,type:"ctr_fix",n:0.5,label:"CTR < X% (1000+ gösterim) → DÜZELT"},
+{id:"rk1",on:true,type:"clk_no_sale",n:30,label:"Tıklama ≥ X ve 0 satış → KAPAT"},
+{id:"rk2",on:true,type:"spend_no_sale",n:7,label:"Harcama ≥ X ve 0 satış → KAPAT"},
+{id:"rk3",on:true,type:"roas_lt",n:2,label:"ROAS < X → KAPAT"},
+{id:"rk4",on:true,type:"conv_lt",n:2,label:"Dönüşüm < X% → KAPAT"}
+]};
 
-/* ===== DİKKAT ===== */
-function Dikkat({settings,onChange}){const list=settings.warnings||[];
-const add=()=>onChange({warnings:[...list,{id:"w"+Date.now().toString(36),text:""}]});
-const up=(id,text)=>onChange({warnings:list.map(w=>w.id===id?{...w,text}:w)});
-const del=id=>onChange({warnings:list.filter(w=>w.id!==id)});
-return(<div style={{padding:"8px 0 40px"}}>
-<div className="rules" style={{background:"var(--panel2)"}}>Reklam verirken dikkat edilecek noktalar. Her madde bir hatırlatma; kendi uyarılarını ekleyebilirsin.</div>
-<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--amber)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚠ Reklam dikkat notları</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{list.length} madde</span></div>
-<div style={{display:"flex",flexDirection:"column",gap:10,marginTop:10}}>{list.length===0&&<div className="empty" style={{padding:20}}><p>Henüz uyarı yok.</p></div>}
-{list.map(w=><div key={w.id} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"12px 14px",border:"1px solid var(--line2)",borderRadius:11,background:"var(--bg2)"}}>
-<span style={{color:"var(--amber)",fontSize:16,lineHeight:1.4}}>⚠</span>
-<textarea value={w.text} onChange={e=>up(w.id,e.target.value)} placeholder="Uyarı yaz…" style={{flex:1,minHeight:54,resize:"vertical",background:"transparent",border:"none",outline:"none",color:"var(--ink)",fontFamily:"'Inter'",fontSize:13.5,lineHeight:1.6}}/>
-<button className="dl" onClick={()=>del(w.id)} title="Sil">✕</button></div>)}</div>
-<button className="btn" style={{marginTop:12}} onClick={add}>+ Madde ekle</button></div></div>);}
+const RULE_TYPES=[
+{type:"spend_gte",label:"Harcama ≥ X → KAPAT",unit:"cur",desc:"harcama eşiği"},
+{type:"clk_no_sale",label:"Tıklama ≥ X ve 0 satış → KAPAT",unit:"",desc:"tıklama eşiği"},
+{type:"roas_lt",label:"ROAS < X → KAPAT",unit:"×",desc:"ROAS alt sınırı"},
+{type:"rev_lt",label:"Gelir < X → KAPAT",unit:"cur",desc:"gelir alt sınırı"},
+{type:"ctr_lt",label:"CTR < X% → KAPAT",unit:"%",desc:"CTR alt sınırı"},
+{type:"ctr_fix",label:"CTR < X% (1000+ gösterim) → DÜZELT",unit:"%",desc:"CTR düzelt eşiği"},
+{type:"imp_no_clk",label:"Gösterim ≥ X ve 0 tıklama → KAPAT",unit:"",desc:"gösterim eşiği"},
+{type:"spend_no_sale",label:"Harcama ≥ X ve 0 satış → KAPAT",unit:"cur",desc:"harcama eşiği"},
+{type:"acos_gt",label:"ACOS > X% → KAPAT",unit:"%",desc:"ACOS üst sınırı"},
+{type:"conv_lt",label:"Dönüşüm < X% → KAPAT",unit:"%",desc:"dönüşüm alt sınırı"},
+];
+const blankRow=()=>({id:Math.random().toString(36).slice(2),name:"",impressions:"",clicks:"",spend:"",orders:"",revenue:""});
+const blankV=()=>({id:Math.random().toString(36).slice(2),name:"",category:"",keyword:"",position:"",views:"",note:""});
 
-/* ===== TREND ===== */
-const MONTHS={"1ay":1,"3ay":3,"6ay":6,"1yil":12};
-function Trend({storeId}){
-const[all,setAll]=useState([]);const[busy,setBusy]=useState(false);const[err,setErr]=useState("");
-useEffect(()=>{if(!storeId)return;setBusy(true);setErr("");listAllEntries(storeId).then(setAll).catch(e=>setErr("Yüklenemedi: "+(e.message||e))).finally(()=>setBusy(false))},[storeId]);
-const topics=useMemo(()=>{const map={};for(const r of all){const imp=toNum(r.impressions);if(imp<=0)continue;const lab=categoryOf(r.name);if(!map[lab])map[lab]={name:lab,"1ay":0,"3ay":0,"6ay":0,"1yil":0};map[lab][r.period]=(map[lab][r.period]||0)+imp}
-return Object.values(map).map(m=>{const p1=m["1ay"]/1,p3=m["3ay"]/3;const ref=p3>0?p3:(m["6ay"]/6)||(m["1yil"]/12);const change=ref>0?((p1-ref)/ref)*100:(p1>0?100:0);const has=m["1ay"]>0||m["3ay"]>0||m["6ay"]>0||m["1yil"]>0;const dir=!has||(p1===0&&ref===0)?"none":change>10?"up":change<-10?"down":"flat";return{...m,p1,ref,change,dir,year:m["1yil"]}})},[all]);
-const rising=topics.filter(x=>x.dir==="up").sort((a,b)=>b.change-a.change);
-const falling=topics.filter(x=>x.dir==="down").sort((a,b)=>a.change-b.change);
-const yearList=topics.filter(x=>x.year>0).sort((a,b)=>b.year-a.year);const totY=yearList.reduce((s,x)=>s+x.year,0);
-const fp=v=>(v>0?"+":"")+Math.round(v)+"%";
-return(<div style={{padding:"8px 0 60px"}}>
-<div className="rules" style={{background:"var(--panel2)"}}>Konular ve gösterimler <b>Marketing verinden otomatik</b> gelir. Her dönemin gösterimi aylık hıza çevrilir; son 1 ayın hızı 3 ayın ortalamasıyla kıyaslanır → artan ve azalan konular ayrılır.</div>
-{err&&<div className="err">⚠ {err}</div>}{busy&&<div className="busy"><span className="sp"/>Yükleniyor…</div>}
-<div className="tw" style={{marginBottom:14}}><table><thead><tr><th className="l">Konu</th><th>1 Ay</th><th>3 Ay</th><th>6 Ay</th><th>1 Yıl</th><th className="l">Trend</th></tr></thead><tbody>
-{topics.length===0&&<tr><td colSpan={6}><div className="empty"><div className="big">Henüz konu yok</div><p>Marketing'e gösterim verisi yükle — konular buraya otomatik gelir.</p></div></td></tr>}
-{topics.map(x=><tr key={x.name}><td className="l" style={{fontWeight:600}}>{x.name}</td>
-<td className="calc">{x["1ay"]?numFmt(x["1ay"]):"—"}</td><td className="calc">{x["3ay"]?numFmt(x["3ay"]):"—"}</td><td className="calc">{x["6ay"]?numFmt(x["6ay"]):"—"}</td><td className="calc">{x["1yil"]?numFmt(x["1yil"]):"—"}</td>
-<td className="l">{x.dir==="up"?<span className="vd" style={{background:"var(--green-s)",color:"var(--green)"}}>📈 Artıyor {fp(x.change)}</span>:x.dir==="down"?<span className="vd" style={{background:"var(--red-s)",color:"var(--red)"}}>📉 Azalıyor {fp(x.change)}</span>:x.dir==="flat"?<span className="vd" style={{background:"var(--amber-s)",color:"var(--amber)"}}>≈ Sabit</span>:<span className="vd" style={{background:"var(--panel2)",color:"var(--faint)"}}>— veri yok</span>}</td></tr>)}
-</tbody></table></div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:14}}>
-<div className="rules" style={{margin:0}}><div className="rh"><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📈 Gösterimi ARTAN konular</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{rising.length}</span></div>
-<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>Talep yükseliyor — bu konularda yeni listing aç, bütçeyi artır.</div>
-{rising.length===0&&<div className="empty" style={{padding:20}}><p>Artan konu yok (veya veri eksik).</p></div>}
-{rising.map(x=><div key={x.name} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",border:"1px solid rgba(15,157,99,.25)",borderRadius:12,background:"var(--green-s)",marginBottom:8}}><span style={{fontSize:18}}>📈</span><div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{x.name}</div></div><span className="mono" style={{fontWeight:700,fontSize:15,color:"var(--green)"}}>{fp(x.change)}</span></div>)}</div>
-<div className="rules" style={{margin:0}}><div className="rh"><span style={{width:3,height:15,background:"var(--red)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📉 Gösterimi AZALAN konular</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{falling.length}</span></div>
-<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>Talep düşüyor — sezon dışıysa reklamı kıs/kapat.</div>
-{falling.length===0&&<div className="empty" style={{padding:20}}><p>Azalan konu yok (veya veri eksik).</p></div>}
-{falling.map(x=><div key={x.name} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",border:"1px solid rgba(226,59,78,.25)",borderRadius:12,background:"var(--red-s)",marginBottom:8}}><span style={{fontSize:18}}>📉</span><div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{x.name}</div></div><span className="mono" style={{fontWeight:700,fontSize:15,color:"var(--red)"}}>{fp(x.change)}</span></div>)}</div>
-</div>
-<div className="rules" style={{marginTop:14}}><div className="rh"><span style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📅 Yıl boyunca en çok gösterilen konular</span></div>
-{yearList.length===0&&<div className="empty" style={{padding:20}}><p>"1 Yıl" döneminde gösterim verisi gir.</p></div>}
-{yearList.map((x,i)=>{const p=totY?(x.year/totY)*100:0;return(<div key={x.name} style={{display:"flex",alignItems:"center",gap:12,marginBottom:9}}>
-<span style={{flex:"0 0 210px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}><span style={{color:"var(--azure)",fontWeight:700}}>{i+1}.</span> {x.name}</span>
-<div style={{flex:1,height:10,background:"var(--panel2)",borderRadius:6,overflow:"hidden"}}><div style={{width:p+"%",height:"100%",background:"var(--azure)"}}/></div>
-<span className="mono" style={{fontSize:12.5,fontWeight:700,minWidth:74,textAlign:"right"}}>{numFmt(x.year)}</span></div>);})}</div>
-</div>);}
-
-/* ===== AGENT ===== */
-function Agent({settings}){const agents=settings.agents||[];return(<div style={{padding:"8px 0 40px"}}>
-<div className="rules" style={{background:"var(--panel2)"}}>Her kart bir otomatik ajan. <b>Zamanlama</b> = ne zaman çalışır, <b>yapması gerekenler</b> = görevi. Kartlar şu an taslak.</div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:14}}>{agents.map(a=><div key={a.id} className="rules" style={{margin:0}}>
-<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}><span style={{fontSize:24}}>{a.icon}</span><div style={{flex:1}}><div style={{fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:15}}>{a.name}</div><div className="mono" style={{fontSize:11,color:"var(--faint)"}}>{a.schedule}</div></div><span className="vd" style={{background:"var(--amber-s)",color:"var(--amber)"}}>Taslak</span></div>
-<div style={{fontFamily:"'JetBrains Mono'",fontSize:10.5,letterSpacing:".08em",color:"var(--faint)",marginBottom:6}}>YAPMASI GEREKENLER</div>
-{a.todo.map((t,i)=><div key={i} style={{display:"flex",gap:8,alignItems:"baseline",fontSize:13,color:"var(--muted)",lineHeight:1.4,marginBottom:4}}><span style={{color:"var(--orange)",fontFamily:"'JetBrains Mono'",fontSize:11}}>{i+1}.</span>{t}</div>)}</div>)}</div></div>);}
-
-/* ===== APP ===== */
+/* ========== APP ========== */
 function App(){
-const[session,setSession]=useState(undefined);const[stores,setStores]=useState([]);const[activeStore,setActiveStore]=useState(null);
-const[settings,setSettings]=useState(DEFAULT_SETTINGS);const[tab,setTab]=useState("marketing");const[loadingData,setLoadingData]=useState(false);const[err,setErr]=useState("");
-useEffect(()=>{sb.auth.getSession().then(({data})=>setSession(data.session));const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>setSession(s));return()=>sub.subscription.unsubscribe()},[]);
-useEffect(()=>{if(!session){setStores([]);setActiveStore(null);return}(async()=>{setLoadingData(true);setErr("");
-try{const st=await listStores();setStores(st);setActiveStore(a=>a||(st[0]&&st[0].id)||null);const s=await getSettings();if(s)setSettings({...DEFAULT_SETTINGS,...s});else await saveSettings(DEFAULT_SETTINGS)}
-catch(e){setErr("Veri yüklenemedi: "+(e.message||e))}finally{setLoadingData(false)}})()},[session]);
-const changeSettings=async patch=>{const next={...settings,...patch};setSettings(next);try{await saveSettings(next)}catch(e){}};
-const onAddStore=async()=>{const name=prompt("Yeni mağaza adı:",`${String(stores.length+1).padStart(2,"0")} `);if(!name)return;try{const s=await addStore(name.trim(),stores.length);setStores(x=>[...x,s]);setActiveStore(s.id)}catch(e){alert("Eklenemedi: "+e.message)}};
-const onRenameStore=async id=>{const cur=stores.find(s=>s.id===id);const name=prompt("Mağaza adı:",(cur&&cur.name)||"");if(!name)return;try{await renameStore(id,name.trim());setStores(x=>x.map(s=>s.id===id?{...s,name}:s))}catch(e){alert("Değiştirilemedi: "+e.message)}};
-if(session===undefined)return <div id="boot">Yükleniyor…</div>;
-if(!session)return <Auth/>;
-const activeName=(stores.find(s=>s.id===activeStore)||{}).name||"—";
-const title={marketing:"MARKETING",rules:"RULES",dikkat:"REKLAM DİKKAT",trend:"GÖSTERİM TRENDİ",agent:"NOVA AGENT"}[tab];
-return(<div className="shell">
-<aside className="sidebar"><div className="brand"><span className="dot"/><div><div className="qm-name">QM</div><div className="qm-sub">Etsy marketing paneli</div></div></div>
-<div className="sh">MAĞAZALAR</div><div className="sl">
-{stores.map((s,i)=><button key={s.id} className={"si"+(s.id===activeStore?" on":"")} onClick={()=>setActiveStore(s.id)} onDoubleClick={()=>onRenameStore(s.id)} title="Çift tık = yeniden adlandır"><span className="ic">{String(i+1).padStart(2,"0")}</span><span className="sn">{s.name}</span></button>)}
-{stores.length===0&&!loadingData&&<div style={{fontSize:12,color:"var(--faint)",padding:"8px 10px",lineHeight:1.5}}>Henüz mağaza yok. Aşağıdan ekle.</div>}</div>
-<button className="sa" onClick={onAddStore}>+ mağaza ekle</button>
-<div className="sf"><select className="cur-sel" value={settings.cur} onChange={e=>changeSettings({cur:e.target.value})}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
-<button className="btn" style={{fontSize:12,padding:"6px 10px"}} onClick={()=>sb.auth.signOut()}>Çıkış</button></div></aside>
-<main className="main"><div className="hero"><span className="mk">{title}</span><span className="store">{activeName}</span></div>
+const ALL_STORES=[
+{id:"a0",name:"00 BYDR (SnowflakeApparelUS)"},
+{id:"a1",name:"01 NEWCUSTOM (newcustomtee)"},
+{id:"a2",name:"02 BESBABA"},
+{id:"a3",name:"03 BHANDY"},
+{id:"a4",name:"04 CUSTOMHAN-TR"},
+{id:"a5",name:"05 GIFT"},
+{id:"a6",name:"06 FAMILY"},
+{id:"a7",name:"07 BEUTY"},
+{id:"a8",name:"08 SOFTQUALITY"},
+{id:"a9",name:"09 HAPPYSHIRTT"},
+{id:"a10",name:"10 TEECUSTOM"},
+{id:"a11",name:"11 VIRGINIA"},
+{id:"a12",name:"12 BLUEDREAM"},
+{id:"a13",name:"13 FAST"},
+{id:"a14",name:"14 NEWTRENDY"},
+{id:"a15",name:"15 DESIGN-TR"},
+];
+const[accounts,setAccounts]=useState(ALL_STORES);
+const[act,setAct]=useState("a1");
+const[settings,setSettings]=useState(DS);
+const[dm,setDm]=useState({});
+const[date,setDate]=useState(todayISO());
+const[tab,setTab]=useState("marketing");
+const[showPaste,setShowPaste]=useState(false);
+const[pt,setPt]=useState("");
+const[showSet,setShowSet]=useState(false);
+const[toast,setToast]=useState("");
+const[loaded,setLoaded]=useState(false);
+const[imgBusy,setImgBusy]=useState(false);
+const[imgMsg,setImgMsg]=useState("");
+const[imgErr,setImgErr]=useState("");
+const[dragO,setDragO]=useState(false);
+const[fPeriod,setFPeriod]=useState("last30");
+const[fStrategy,setFStrategy]=useState("all");
+const[fSearch,setFSearch]=useState("");
+const[gPeriod,setGPeriod]=useState("1ay");
+const[gmTok,setGmTok]=useState(null);
+const[gmUser,setGmUser]=useState(null);
+const[gmLoad,setGmLoad]=useState(false);
+const[gmData,setGmData]=useState(null);
+const[gmErr,setGmErr]=useState("");
+const tRef=useRef();
+const fRef=useRef();
+const hiRef=useRef();
+
+const key=`${act}|${date}`;
+const rows=dm[key]||[];
+const vkey=`V::${act}|${date}`;
+const vrows=dm[vkey]||[];
+
+useEffect(()=>{(async()=>{
+const a=await store.get("q:a",ALL_STORES);
+const s=await store.get("q:s",DS);
+const d=await store.get("q:d",{});
+const am0=a.map(x=>{
+const master=ALL_STORES.find(s=>s.id===x.id);
+if(master)return{...x,name:master.name};
+let n=x.name;if(n==="Mağaza 1")n="01 NEWCUSTOM";if(typeof n==="string"&&/^STORE\s/i.test(n))n=n.replace(/^STORE\s+(NO|NUMBER)\s+/i,"").trim();return{...x,name:n}});
+const ids=new Set(am0.map(x=>x.id));
+const am=[...am0,...ALL_STORES.filter(s=>!ids.has(s.id))];
+setAccounts(am);setAct((am[0]&&am[0].id)||"a0");
+const sr=s&&s.rules;
+const rules=(s&&s.rulesV===5&&Array.isArray(sr))?sr:DS.rules;
+const savedW=(s&&Array.isArray(s.warnings))?s.warnings:DS.warnings;
+const warnings=[...savedW];for(const dw of DS.warnings){if(!warnings.some(w=>w.id===dw.id))warnings.push(dw)}
+const savedD=(s&&Array.isArray(s.dzChecks))?s.dzChecks:DS.dzChecks;
+const dzChecks=[...savedD];for(const dd of DS.dzChecks){const ex=dzChecks.find(c=>c.id===dd.id);if(!ex)dzChecks.push(dd);else if(dd.close&&!ex.close)ex.close=true}
+const trendTopics=(s&&Array.isArray(s.trendTopics))?s.trendTopics:DS.trendTopics;
+setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5)?{}:{minImp:1000,minClicks:30})});setDm(d);setLoaded(true)})()},[]);
+
+useEffect(()=>{if(loaded)store.set("q:a",accounts)},[accounts,loaded]);
+useEffect(()=>{if(loaded)store.set("q:s",settings)},[settings,loaded]);
+useEffect(()=>{if(loaded)store.set("q:d",dm)},[dm,loaded]);
+
+const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
+const setRows=n=>setDm(m=>({...m,[key]:typeof n==="function"?n(m[key]||[]):n}));
+const setVRows=n=>setDm(m=>({...m,[vkey]:typeof n==="function"?n(m[vkey]||[]):n}));
+const upRow=(id,f,v)=>setRows(rs=>rs.map(r=>r.id===id?{...r,[f]:v}:r));
+const addRow=()=>setRows(rs=>[...rs,blankRow()]);
+const delRow=id=>setRows(rs=>rs.filter(r=>r.id!==id));
+const addV=()=>setVRows(rs=>[...rs,blankV()]);
+const upV=(id,f,v)=>setVRows(rs=>rs.map(r=>r.id===id?{...r,[f]:v}:r));
+const delV=id=>setVRows(rs=>rs.filter(r=>r.id!==id));
+const gkey=`G::${act}|${gPeriod}`;
+const gRows=dm[gkey]||[];
+const setGRows=n=>setDm(m=>({...m,[gkey]:typeof n==="function"?n(m[gkey]||[]):n}));
+const blankG=()=>({id:Math.random().toString(36).slice(2),name:"",category:"",keyword:"",views:"",position:"",note:""});
+const addGRow=()=>setGRows(rs=>[...rs,blankG()]);
+const upGRow=(id,f,v)=>setGRows(rs=>rs.map(r=>r.id===id?{...r,[f]:v}:r));
+const delGRow=id=>setGRows(rs=>rs.filter(r=>r.id!==id));
+
+/* ---- Otomatik konu tespiti ---- */
+const CATS=[
+{key:"embroidery",label:"Embroidery / Nakış",kw:/embroider|embroidered|embroidery|naki[sş]|monogram/i},
+{key:"disney",label:"Disney / Theme Park",kw:/disney|mickey|minnie|disneyland|pixar|princess|magic kingdom|epcot|inside out|core memory/i},
+{key:"family",label:"Family / Personalized",kw:/mom|dad|mama|papa|grandma|grandpa|bear|family|father|mother|parent|memorial|photo|senior|personali[sz]/i},
+{key:"travel",label:"Travel / Vacation",kw:/cruise|travel|vacation|trip|adventure|alaska|beach|island|hawaii|caribbean/i},
+{key:"holiday",label:"Holiday / Seasonal",kw:/4th of july|july 4|patriotic|usa|america|250th|christmas|halloween|valentine|easter|independence|memorial day/i},
+{key:"dance",label:"Dance / Activity",kw:/dance|ballet|cheer|gym|sport|yoga|fitness|team/i},
+{key:"nurse",label:"Healthcare / Profession",kw:/nurse|doctor|teacher|rn |medical|dental|vet/i},
+{key:"humor",label:"Humor / Novelty",kw:/funny|silly|goose|humor|sarcas|meme|joke|hot dog/i},
+{key:"pet",label:"Animal / Pet",kw:/dog|cat|pet|puppy|kitten|animal|paw/i},
+{key:"wedding",label:"Wedding / Event",kw:/wedding|bride|groom|bachelorette|birthday|baby shower|gender reveal/i},
+{key:"custom",label:"Custom Design / General",kw:/custom|embroidered|comfort colors|sweatshirt|hoodie|shirt|t-shirt|tank top|crewneck/i},
+];
+
+function categorize(listings){
+const map={};
+for(const r of listings){
+const nm=(r.name||"").toLowerCase();
+let found=false;
+for(const c of CATS){
+if(c.kw.test(nm)){
+if(!map[c.key])map[c.key]={category:c.label,listings:[],totalViews:0,keyword:""};
+map[c.key].listings.push(r.name);
+map[c.key].totalViews+=toNum(r.impressions);
+const kws=nm.match(c.kw);
+if(kws&&kws[0])map[c.key].keyword=kws[0];
+found=true;break}}
+if(!found){
+if(!map["other"])map["other"]={category:"Other",listings:[],totalViews:0,keyword:""};
+map["other"].listings.push(r.name);map["other"].totalViews+=toNum(r.impressions)}}
+return Object.values(map).map(g=>({
+id:Math.random().toString(36).slice(2),
+name:g.listings.length+" listing ("+g.listings[0].slice(0,30)+"…)",
+category:g.category,
+keyword:g.keyword,
+views:String(g.totalViews),
+position:"",
+note:g.listings.length>1?g.listings.length+t.listInTopic:"",
+}))}
+
+useEffect(()=>{
+if(!rows.length)return;
+const existing=dm[gkey]||[];
+if(existing.length>0)return;
+const cats=categorize(rows);
+if(cats.length)setGRows(cats);
+},[rows.length,gkey]);
+const upRule=(id,p)=>setSettings(s=>({...s,rules:(s.rules||[]).map(r=>r.id===id?{...r,...p}:r)}));
+const addRule=(type)=>{const rt=RULE_TYPES.find(t=>t.type===type);if(!rt)return;const nr={id:"r"+Date.now().toString(36),on:true,type,n:type==="roas_lt"?2:type==="ctr_lt"?1:type==="ctr_fix"?0.5:type==="acos_gt"?50:type==="conv_lt"?1:type==="rev_lt"?10:10,label:rt.label};setSettings(s=>({...s,rules:[...(s.rules||[]),nr]}))};
+const delRule=id=>setSettings(s=>({...s,rules:(s.rules||[]).filter(r=>r.id!==id)}));
+const toggleDz=id=>setSettings(s=>({...s,dzChecks:(s.dzChecks||[]).map(c=>c.id===id?{...c,on:!c.on}:c)}));
+const addWarn=()=>setSettings(s=>({...s,warnings:[...(s.warnings||[]),{id:"w"+Date.now().toString(36),text:""}]}));
+const upWarn=(id,text)=>setSettings(s=>({...s,warnings:(s.warnings||[]).map(w=>w.id===id?{...w,text}:w)}));
+const delWarn=id=>setSettings(s=>({...s,warnings:(s.warnings||[]).filter(w=>w.id!==id)}));
+const addTrend=()=>setSettings(s=>({...s,trendTopics:[...(s.trendTopics||[]),{id:"t"+Date.now().toString(36),name:"",m1:"",m3:"",y:""}]}));
+const upTrend=(id,f,v)=>setSettings(s=>({...s,trendTopics:(s.trendTopics||[]).map(t=>t.id===id?{...t,[f]:v}:t)}));
+const delTrend=id=>setSettings(s=>({...s,trendTopics:(s.trendTopics||[]).filter(t=>t.id!==id)}));
+const upTrendByName=(name,f,v)=>setSettings(s=>{const arr=(s.trendTopics||[]).map(x=>({...x}));const ex=arr.find(x=>(x.name||"").trim().toLowerCase()===(name||"").trim().toLowerCase());if(ex)ex[f]=v;else arr.push({id:"t"+Date.now().toString(36)+Math.floor(Math.random()*10000),name,m1:"",m3:"",y:"",[f]:v});return{...s,trendTopics:arr};});
+const fillTrendFromMarketing=()=>{
+const map={};
+for(const it of evals){const imp=it.e.imp;if(imp<=0)continue;const nm=(it.row.name||"").toLowerCase();let lab="Diğer / Sınıfsız";for(const c of CATS){if(c.kw.test(nm)){lab=c.label;break}}map[lab]=(map[lab]||0)+imp;}
+const cats=Object.keys(map);
+if(!cats.length){flash("Önce Marketing'e gösterim verisi yükle.");return;}
+setSettings(s=>{const arr=(s.trendTopics||[]).map(t=>({...t}));for(const lab of cats){const ex=arr.find(t=>(t.name||"").trim().toLowerCase()===lab.toLowerCase());if(ex)ex.m1=String(Math.round(map[lab]));else arr.push({id:"t"+Date.now().toString(36)+Math.floor(Math.random()*10000),name:lab,m1:String(Math.round(map[lab])),m3:"",y:""})}return{...s,trendTopics:arr};});
+flash(cats.length+" konu Marketing'ten çekildi — Son 1 Ay dolduruldu.");
+};
+
+const addAcct=()=>{const n=prompt("Yeni mağaza adı:",`0${accounts.length+1}`);if(!n)return;const id="a"+Date.now().toString(36);setAccounts(a=>[...a,{id,name:n}]);setAct(id)};
+const renAcct=id=>{const c=accounts.find(a=>a.id===id);const n=prompt("Mağaza adı:",(c&&c.name)||"");if(n)setAccounts(a=>a.map(x=>x.id===id?{...x,name:n}:x))};
+
+/* image handling */
+const handleImage=async(file)=>{
+if(!file)return;if(!/^image\//.test(file.type)){setImgErr("Görsel dosya seç (png/jpg).");return}
+setImgErr("");setImgBusy(true);setImgMsg("Görüntü okunuyor…");
+try{
+const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=()=>rej(new Error("Dosya okunamadı"));r.readAsDataURL(file)});
+const sys="Sen veri çıkarma asistanısın. Etsy Ads raporu ekran görüntüsündeki HER listing satırını oku. Yalnızca JSON dizisi döndür — markdown yok. "+
+'Her öğe: {"name":"metin","impressions":sayı,"clicks":sayı,"spend":sayı,"orders":sayı,"revenue":sayı}. '+
+"Sütun sırası: Views·Clicks·%·Orders·Revenue·Spend·ROAS. Revenue ile Spend karıştırma. % ve ROAS'ı yok say. $ ₺ kaldır, nokta kullan. Boş=0. Toplam satırlarını dahil etme.";
+const msgs=[{role:"user",content:[{type:"image",source:{type:"base64",media_type:file.type,data:b64}},{type:"text",text:"Tüm listingleri JSON dizisi olarak çıkar."}]}];
+const inC=typeof window!=="undefined"&&window.storage;
+const ak=(settings.apiKey||"").trim();
+if(!inC&&!ak){
+if(!window.Tesseract)throw new Error("OCR yüklenemedi — internet bağlıyken yenile.");
+setImgMsg("Cihazda OCR ile okunuyor…");
+const o=await window.Tesseract.recognize(file,"eng");const txt=(o&&o.data&&o.data.text)||"";
+const p=parseReport(txt);if(!p.length)throw new Error("Tablo okunamadı. '📋 Metin yapıştır' dene.");
+setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);flash(`${p.length} listing okundu (OCR).`);return}
+let resp;
+if(inC){resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:8000,system:sys,messages:msgs})})}
+else{resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":ak,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:8000,system:sys,messages:msgs})})}
+if(!resp.ok)throw new Error("API "+resp.status);
+const data=await resp.json();let txt=(data.content||[]).map(i=>i.type==="text"?i.text:"").join("").trim();
+txt=txt.replace(/```json|```/g,"").trim();const s=txt.indexOf("["),e=txt.lastIndexOf("]");if(s!==-1&&e!==-1)txt=txt.slice(s,e+1);
+const arr=JSON.parse(txt);if(!Array.isArray(arr)||!arr.length)throw new Error("Satır bulunamadı");
+const parsed=arr.map(o=>({id:Math.random().toString(36).slice(2),name:String(o.name||"Listing").trim()||"Listing",impressions:String(toNum(o.impressions)),clicks:String(toNum(o.clicks)),spend:String(toNum(o.spend)),orders:String(toNum(o.orders)),revenue:String(toNum(o.revenue))}));
+setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...parsed]);flash(`${parsed.length} listing okundu.`)}
+catch(err){setImgErr("Hata: "+(err&&err.message||"bilinmeyen")+". '📋 Metin yapıştır' dene.")}
+finally{setImgBusy(false);setImgMsg("");if(fRef.current)fRef.current.value=""}};
+
+hiRef.current=f=>handleImage(f);
+useEffect(()=>{const h=e=>{const it=e.clipboardData&&e.clipboardData.items;if(!it)return;for(const i of it){if(i.type&&i.type.indexOf("image")===0){const f=i.getAsFile();if(f){e.preventDefault();hiRef.current(f);break}}}};window.addEventListener("paste",h);return()=>window.removeEventListener("paste",h)},[]);
+
+const applyPaste=()=>{const p=parseReport(pt);if(!p.length){flash("Okunamadı.");return}setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);setPt("");setShowPaste(false);flash(`${p.length} listing eklendi.`)};
+const handleCSV=async(file)=>{if(!file)return;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
+try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);flash(`${p.length} listing CSV'den yüklendi.`)}
+catch(err){setImgErr("CSV hatası: "+(err&&err.message||"bilinmeyen"))}
+finally{const el=document.getElementById("csvInput");if(el)el.value=""}};
+
+const captureScreen=async()=>{if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){setImgErr("Ekran yakalama desteklenmiyor.");return}setImgErr("");
+try{const stream=await navigator.mediaDevices.getDisplayMedia({video:{cursor:"never"}});const v=document.createElement("video");v.srcObject=stream;await new Promise(r=>{v.onloadedmetadata=r});await v.play();const c=document.createElement("canvas");c.width=v.videoWidth;c.height=v.videoHeight;c.getContext("2d").drawImage(v,0,0);stream.getTracks().forEach(t=>t.stop());c.toBlob(async b=>{if(!b)return;await handleImage(new File([b],"screen.png",{type:"image/png"}))},"image/png")}
+catch(e){if(e&&e.name!=="NotAllowedError")setImgErr("Hata: "+(e&&e.message))}};
+
+/* Gmail */
+const gmLogin=()=>{const cid=(settings.googleClientId||"").trim();if(!cid){setGmErr("⚙ Ayarlar'dan Google Client ID gir.");return}if(!window.google){setGmErr("Google kütüphanesi yüklenemedi.");return}setGmErr("");
+window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",hint:"novaallemail@gmail.com",callback:r=>{if(r.error){setGmErr("Giriş başarısız: "+r.error);return}setGmTok(r.access_token);fetchGm(r.access_token)}}).requestAccessToken()};
+const gmLogout=()=>{setGmTok(null);setGmUser(null);setGmData(null)};
+const gGet=async(tok,url)=>{const r=await fetch(url,{headers:{Authorization:"Bearer "+tok}});if(!r.ok)throw new Error("Gmail API "+r.status);return r.json()};
+const fetchGm=async(tok)=>{setGmLoad(true);setGmErr("");
+try{const prof=await gGet(tok,"https://www.googleapis.com/gmail/v1/users/me/profile");setGmUser(prof.emailAddress);
+const since=Math.floor((Date.now()-7*864e5)/1000);const base="https://www.googleapis.com/gmail/v1/users/me/messages";
+const el=await gGet(tok,`${base}?q=from:auto-confirm@etsy.com after:${since}&maxResults=50`);
+const sl=await gGet(tok,`${base}?q=from:shipstation.com after:${since}&maxResults=50`);
+const det=async id=>{const d=await gGet(tok,`${base}/${id}?format=metadata&metadataHeaders=Subject,Date,From`);const h=(d.payload&&d.payload.headers)||[];const g=k=>(h.find(x=>x.name===k)||{}).value||"";return{subject:g("Subject"),date:g("Date"),id,snippet:d.snippet||""}};
+const ed=await Promise.all((el.messages||[]).slice(0,20).map(m=>det(m.id)));
+const sd=await Promise.all((sl.messages||[]).slice(0,20).map(m=>det(m.id)));
+const oc=ed.filter(m=>/new order|order confirmed/i.test(m.subject)).length;
+const sc=sd.filter(m=>/shipped|tracking|shipment/i.test(m.subject)).length;
+setGmData({email:prof.emailAddress,etsyAll:ed,ssAll:sd,orderCount:oc,shipCount:sc,fetchedAt:new Date().toLocaleTimeString("tr-TR")})}
+catch(e){setGmErr("Çekilemedi: "+(e.message||"hata"))}finally{setGmLoad(false)}};
+
+/* memos */
+const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,settings)})),[rows,settings]);
+const totals=useMemo(()=>{const t={spend:0,rev:0,imp:0,clk:0,ord:0,close:0,watch:0,grow:0};
+for(const{e}of evals){t.spend+=e.spend;t.rev+=e.rev;t.imp+=e.imp;t.clk+=e.clk;t.ord+=e.ord;if(e.verdict==="KAPAT")t.close++;if(e.verdict==="İZLE")t.watch++;if(e.verdict==="BÜYÜT")t.grow++}
+t.wasted=evals.filter(x=>x.e.verdict==="KAPAT").reduce((s,x)=>s+Math.max(x.e.spend-x.e.rev,0),0);
+t.net=t.rev-t.spend;t.roas=t.spend?t.rev/t.spend:0;t.acos=t.rev?t.spend/t.rev:0;t.ctr=t.imp?t.clk/t.imp:0;return t},[evals]);
+const budget=useMemo(()=>{const ls=evals.filter(x=>x.e.verdict==="KAPAT");const ws=evals.filter(x=>x.e.verdict==="BÜYÜT").sort((a,b)=>b.e.roas-a.e.roas);
+const freed=ls.reduce((s,x)=>s+x.e.spend,0);const moves=[];
+if(freed>0&&ws.length){const tr=ws.reduce((s,x)=>s+x.e.roas,0);ws.slice(0,4).forEach(w=>{const sh=tr?(w.e.roas/tr):1/ws.length;moves.push({to:w.row.name||"Listing",amt:freed*sh,roas:w.e.roas})})}
+return{freed,moves,losers:ls.length}},[evals]);
+const directive=useMemo(()=>{if(!evals.length)return"Ekran görüntüsünü yükle ya da raporu yapıştır.";const p=[];
+if(totals.close)p.push(`${totals.close} listing kapat`);if(totals.grow)p.push(`${totals.grow} listing büyüt`);if(totals.watch)p.push(`${totals.watch} listing izle`);
+let l=p.join(", ")+".";if(totals.wasted>0)l+=` ${money(totals.wasted,settings.cur)} boşa gidiyor.`;return l},[evals,totals,settings.cur]);
+const history=useMemo(()=>{const ds=Object.keys(dm).filter(k=>k.startsWith(act+"|")&&!k.startsWith("V::")&&(dm[k]||[]).length).map(k=>k.split("|")[1]);
+if(!ds.includes(date))ds.push(date);return[...new Set(ds)].sort().reverse().slice(0,8)},[dm,act,date]);
+const acctStats=useMemo(()=>{const m={};for(const a of accounts){const rs=dm[`${a.id}|${date}`]||[];let cl=0;for(const r of rs)if(evaluate(r,settings).verdict==="KAPAT")cl++;m[a.id]={count:rs.length,close:cl}}return m},[accounts,dm,date,settings]);
+const acctName=(accounts.find(a=>a.id===act)||{}).name||"";
+const pct=v=>(v*100).toFixed(2)+"%";
+const lang=settings.lang||"tr";
+const t=L[lang]||L.tr;
+
+return(
+<div>
+<style>{CSS}</style>
+<div className="shell">
+<aside className="sidebar">
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy reklam paneli · QM47</div></div>
+<button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
+</div>
+<div className="sf">
+<button className="btn" style={{fontSize:11,padding:"5px 10px",fontWeight:700,letterSpacing:".05em"}} onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
+<select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
+<button className="icon-btn" onClick={()=>setShowSet(true)} title={t.settings}>⚙</button>
+</div>
+</aside>
+
+<main className="main">
+<div className="hero"><span className="mk">{tab==="agent"?t.hAgent:tab==="rules"?t.hRules:tab==="trend"?t.hTrend:tab==="dikkat"?t.hDikkat:t.mktTitle}</span></div>
 <div className="tabs">
-<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>📊 MARKETING</button>
-<button className={tab==="rules"?"on":""} onClick={()=>setTab("rules")}>⚙ RULES</button>
-<button className={tab==="dikkat"?"on":""} onClick={()=>setTab("dikkat")}>⚠ DİKKAT</button>
-<button className={tab==="trend"?"on":""} onClick={()=>setTab("trend")}>📈 GÖSTERİM TRENDİ</button>
-<button className={tab==="agent"?"on":""} onClick={()=>setTab("agent")}>🤖 NOVA AGENT</button></div>
-{err&&<div className="err" style={{marginTop:14}}>⚠ {err}</div>}
-{(!activeStore&&(tab==="marketing"||tab==="trend"))?<div className="empty" style={{marginTop:30}}><div className="big">Önce bir mağaza ekle</div><p>Soldaki "+ mağaza ekle" ile başla.</p></div>:
-<React.Fragment>
-{tab==="marketing"&&<Marketing storeId={activeStore} settings={settings}/>}
-{tab==="rules"&&<Rules settings={settings} onChange={changeSettings}/>}
-{tab==="dikkat"&&<Dikkat settings={settings} onChange={changeSettings}/>}
-{tab==="trend"&&<Trend storeId={activeStore}/>}
-{tab==="agent"&&<Agent settings={settings}/>}
-</React.Fragment>}
-</main></div>);}
+<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>{t.tabMkt}</button>
+<button className={tab==="rules"?"on":""} onClick={()=>setTab("rules")}>{t.tabRules}</button>
+<button className={tab==="dikkat"?"on":""} onClick={()=>setTab("dikkat")}>{t.tabDikkat}</button>
+<button className={tab==="trend"?"on":""} onClick={()=>setTab("trend")}>{t.tabTrend}</button>
+<button className={tab==="agent"?"on":""} onClick={()=>setTab("agent")}>{t.tabAgent}</button>
+</div>
+
+
+{/* ===== MARKETING TAB ===== */}
+{tab==="marketing"&&(<>
+<div className={"dz"+(dragO?" over":"")} onClick={()=>fRef.current&&fRef.current.click()}
+onDragOver={e=>{e.preventDefault();setDragO(true)}} onDragLeave={()=>setDragO(false)}
+onDrop={e=>{e.preventDefault();setDragO(false);const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f){if(/\.csv$/i.test(f.name||"")||/csv/i.test(f.type||""))handleCSV(f);else handleImage(f)}}}>
+<div className="big">{t.dzTitle}</div>
+{t.dzSub}
+</div>
+<input id="csvInput" type="file" accept=".csv,text/csv" style={{display:"none"}} onChange={e=>handleCSV(e.target.files&&e.target.files[0])}/>
+<input ref={fRef} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handleImage(e.target.files&&e.target.files[0])}/>
+{imgErr&&<div className="err">⚠ {imgErr}</div>}
+{imgBusy&&<div className="busy"><span className="sp"/>{imgMsg}</div>}
+
+<div className="sec"><h2><span className="bar"/>{t.analysis}</h2>
+<div className="brow"><button className="btn" onClick={()=>{if(rows.length&&window.confirm(t.delAllQ))setRows([])}}>{t.delAll}</button></div></div>
+<div className="tw" style={{marginBottom:18}}><table><thead><tr>
+<th className="l">{t.cProduct}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>{t.cImpr}</th><th>{t.cClicks}</th><th>CTR</th><th>{t.cOrders}</th><th>{t.cRev}</th><th>{t.cSpend}</th><th>ROAS</th><th className="l">{t.cAction}</th><th></th>
+</tr></thead><tbody>
+{evals.filter(x=>x.e.imp||x.e.spend).length===0&&<tr><td colSpan={11}><div className="empty"><div className="big">{t.emptyT}</div><p>{t.emptyS}</p></div></td></tr>}
+{evals.filter(x=>x.e.imp||x.e.spend).map(x=>({...x,a:advise(x.e)})).sort((p,q)=>p.a.rank-q.a.rank||q.e.roas-p.e.roas).map(({row:r,e,a})=>{
+const softBg={"var(--green)":"var(--green-s)","var(--amber)":"var(--amber-s)","var(--orange)":"var(--orange-s)","var(--red)":"var(--red-s)","var(--faint)":"var(--panel2)"}[a.color]||"var(--panel2)";
+return(
+<tr key={r.id} style={{verticalAlign:"top"}}>
+<td className="l" style={{fontWeight:a.strong?700:600,whiteSpace:"normal",maxWidth:240,lineHeight:1.4,paddingTop:14}}>{r.name||"Listing"}</td>
+<td style={{paddingTop:11}}><input className="ci" style={{width:48,textAlign:"center"}} value={r.months||""} placeholder="—" onChange={ev=>upRow(r.id,"months",ev.target.value)}/></td>
+<td className="calc" style={{paddingTop:14}}>{numFmt(e.imp)}</td>
+<td className="calc" style={{paddingTop:14}}>{numFmt(e.clk)}</td>
+<td className="calc" style={{paddingTop:14}}>{e.imp?pct(e.ctr):"—"}</td>
+<td className="calc" style={{paddingTop:14}}>{numFmt(e.ord)}</td>
+<td className="calc" style={{paddingTop:14}}>{money(e.rev,settings.cur)}</td>
+<td className="calc" style={{paddingTop:14}}>{money(e.spend,settings.cur)}</td>
+<td className="calc s" style={{fontWeight:700,paddingTop:14,color:e.roas>=1.7?"var(--green)":e.roas<1?"var(--red)":"var(--ink)"}}>{e.spend?e.roas.toFixed(2)+"×":"—"}</td>
+<td className="l" style={{whiteSpace:"normal",paddingTop:11}}>
+<div style={{display:"flex",flexDirection:"column",gap:6,maxWidth:280}}>
+<span style={{display:"inline-flex",alignItems:"center",gap:7,alignSelf:"flex-start",fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:12.5,letterSpacing:".03em",color:a.color,background:softBg,border:"1.5px solid "+a.color,borderRadius:9,padding:"6px 12px",whiteSpace:"nowrap"}}>
+<span style={{width:9,height:9,borderRadius:"50%",background:a.color,display:"inline-block",flexShrink:0}}/>{(t[a.key]||a.label).toUpperCase()}</span>
+{e.reason&&<span style={{color:"var(--muted)",fontWeight:400,fontSize:11.5,lineHeight:1.5}}>{e.reason}</span>}
+</div>
+</td>
+<td style={{paddingTop:11}}><button className="dl" onClick={()=>delRow(r.id)} title={t.delOne}>✕</button></td>
+</tr>)})}
+</tbody></table></div>
+
+{(()=>{
+const totSpend=evals.reduce((s,x)=>s+x.e.spend,0);
+if(totSpend<=0)return null;
+const catOf=nm=>{const s=(nm||"").toLowerCase();for(const c of CATS){if(c.kw.test(s))return c.label}return t.spUncat;};
+const map={};
+for(const it of evals){if(it.e.spend<=0)continue;const k=catOf(it.row.name);if(!map[k])map[k]={label:k,spend:0,n:0};map[k].spend+=it.e.spend;map[k].n++;}
+const list=Object.values(map).sort((a,b)=>b.spend-a.spend);
+const emb=list.find(x=>/Embroidery/i.test(x.label));
+const embSpend=emb?emb.spend:0;const embPct=embSpend/totSpend*100;
+const pal=["var(--orange)","var(--green)","var(--amber)","var(--red)","var(--azure)","var(--faint)"];
+const colOf=(c,i)=>/Embroidery/i.test(c.label)?"var(--azure)":pal[i%pal.length];
+return(
+<div className="rules" style={{marginTop:0,marginBottom:18}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16}}>{t.spTitle}</span></div>
+<div style={{display:"flex",gap:10,flexWrap:"wrap",margin:"8px 0 16px"}}>
+<div style={{flex:1,minWidth:160,background:"rgba(31,122,224,.09)",border:"1px solid var(--azure)",borderRadius:11,padding:"12px 14px"}}>
+<div style={{fontSize:12,color:"var(--muted)"}}>{t.spEmb}</div>
+<div className="mono" style={{fontSize:23,fontWeight:700,color:"var(--azure)"}}>%{embPct.toFixed(1)}</div>
+<div className="mono" style={{fontSize:11.5,color:"var(--faint)"}}>{money(embSpend,settings.cur)}</div>
+</div>
+<div style={{flex:1,minWidth:160,background:"var(--panel2)",border:"1px solid var(--line2)",borderRadius:11,padding:"12px 14px"}}>
+<div style={{fontSize:12,color:"var(--muted)"}}>{t.spOther}</div>
+<div className="mono" style={{fontSize:23,fontWeight:700,color:"var(--ink)"}}>%{(100-embPct).toFixed(1)}</div>
+<div className="mono" style={{fontSize:11.5,color:"var(--faint)"}}>{money(totSpend-embSpend,settings.cur)}</div>
+</div>
+</div>
+<div style={{display:"flex",height:16,borderRadius:8,overflow:"hidden",border:"1px solid var(--line2)",marginBottom:16}}>
+{list.map((c,i)=>{const pct=c.spend/totSpend*100;return <div key={c.label} title={c.label} style={{width:pct+"%",background:colOf(c,i)}}/>;})}
+</div>
+<div style={{display:"flex",flexDirection:"column",gap:9}}>
+{list.map((c,i)=>{const pct=c.spend/totSpend*100;const col=colOf(c,i);return(
+<div key={c.label} style={{display:"flex",alignItems:"center",gap:12}}>
+<span style={{width:10,height:10,borderRadius:3,background:col,flexShrink:0}}/>
+<span style={{flex:"0 0 180px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{c.label} <span style={{color:"var(--faint)",fontWeight:400,fontSize:11.5}}>({c.n})</span></span>
+<div style={{flex:1,height:10,background:"var(--panel2)",borderRadius:6,overflow:"hidden"}}><div style={{width:pct+"%",height:"100%",background:col}}/></div>
+<span className="mono" style={{fontSize:12.5,fontWeight:700,minWidth:48,textAlign:"right"}}>%{pct.toFixed(1)}</span>
+<span className="mono" style={{fontSize:11.5,color:"var(--muted)",minWidth:72,textAlign:"right"}}>{money(c.spend,settings.cur)}</span>
+</div>);})}
+</div>
+<div style={{fontSize:11.5,color:"var(--faint)",marginTop:12,lineHeight:1.5}}>{t.spNote}</div>
+</div>);
+})()}
+</>)}
+
+
+{tab==="trend"&&(()=>{
+const mkt={};
+for(const it of evals){const imp=it.e.imp;if(imp<=0)continue;const nm=(it.row.name||"").toLowerCase();let lab=t.spUncat;for(const c of CATS){if(c.kw.test(nm)){lab=c.label;break}}mkt[lab]=(mkt[lab]||0)+imp;}
+const stored=settings.trendTopics||[];
+const findStored=nm=>stored.find(s=>(s.name||"").trim().toLowerCase()===(nm||"").trim().toLowerCase());
+const names=Object.keys(mkt);
+const calc=names.map(nm=>{
+const st=findStored(nm);
+const auto=mkt[nm]!==undefined;
+const m1=auto?mkt[nm]:toNum(st&&st.m1),m3=toNum(st&&st.m3),y=toNum(st&&st.y);
+const pace3=m3/3,paceY=y/12;
+const base=pace3>0?pace3:paceY;
+const hasData=m1>0||m3>0||y>0;
+const change=base>0?((m1-base)/base)*100:(m1>0?100:0);
+const dir=!hasData?"none":change>10?"up":change<-10?"down":"flat";
+return{id:(st&&st.id)||("auto_"+nm),name:nm,auto,m1,m3,y,pace3,paceY,change,dir};
+});
+const rising=calc.filter(x=>x.dir==="up").sort((a,b)=>b.change-a.change);
+const falling=calc.filter(x=>x.dir==="down").sort((a,b)=>a.change-b.change);
+const flat=calc.filter(x=>x.dir==="flat");
+const fp=v=>(v>0?"+":"")+Math.round(v)+"%";
+return(
+<div style={{padding:"8px 0 60px"}}>
+<div className="note" style={{marginBottom:16,fontSize:13,lineHeight:1.6}}>{t.trIntro}</div>
+
+<div className="tw" style={{marginBottom:12}}><table><thead><tr>
+<th className="l">{t.trTopic}</th><th>{t.trM1}</th><th>{t.trM3}</th><th>{t.trY}</th><th className="l">{t.trTrend}</th><th></th>
+</tr></thead><tbody>
+{calc.length===0&&<tr><td colSpan={6}><div className="empty"><div className="big">{t.trNoTopic}</div><p>{t.trAutoEmpty}</p></div></td></tr>}
+{calc.map(x=>(
+<tr key={x.id}>
+<td className="l" style={{fontWeight:600}}>{x.auto?<span>{x.name} <span style={{color:"var(--azure)",fontSize:11,fontWeight:700}} title={t.trAutoTip}>🔄</span></span>:<input className="ci nm" value={findStored(x.name)?findStored(x.name).name:x.name} placeholder={t.trTopicPh} onChange={e=>upTrend(x.id,"name",e.target.value)}/>}</td>
+<td className="calc" title={t.trAutoTip}>{x.m1?numFmt(x.m1):"—"}</td>
+<td><input className="ci" value={findStored(x.name)?findStored(x.name).m3:""} placeholder="0" onChange={e=>x.auto?upTrendByName(x.name,"m3",e.target.value):upTrend(x.id,"m3",e.target.value)}/></td>
+<td><input className="ci" value={findStored(x.name)?findStored(x.name).y:""} placeholder="0" onChange={e=>x.auto?upTrendByName(x.name,"y",e.target.value):upTrend(x.id,"y",e.target.value)}/></td>
+<td className="l">{x.dir==="up"?<span className="vd g">📈 {t.trRising} {fp(x.change)}</span>:x.dir==="down"?<span className="vd r">📉 {t.trFalling} {fp(x.change)}</span>:x.dir==="flat"?<span className="vd a">≈ {t.trStable}</span>:<span className="vd m">{t.trNoData}</span>}</td>
+<td>{!x.auto&&<button className="dl" onClick={()=>delTrend(x.id)} title={t.trDelTopic}>✕</button>}</td>
+</tr>))}
+</tbody></table></div>
+<div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:22}}><span style={{fontSize:12,color:"var(--faint)"}}>{t.trThreshCap}</span></div>
+
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:14}}>
+<div className="rules" style={{margin:0}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16}}>{t.trUp}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{rising.length}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{t.trUpDesc}</div>
+{rising.length===0&&<div className="empty" style={{padding:"20px"}}><p>{t.trUpEmpty}</p></div>}
+<div style={{display:"flex",flexDirection:"column",gap:9}}>
+{rising.map(x=>(
+<div key={x.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",border:"1px solid rgba(15,157,99,.25)",borderRadius:12,background:"var(--green-s)"}}>
+<span style={{fontSize:18}}>📈</span>
+<div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{x.name||"—"}</div><div className="mono" style={{fontSize:11.5,color:"var(--muted)",marginTop:2}}>{t.trLast1} {numFmt(x.m1)} · {t.trMo} {numFmt(Math.round(x.pace3))}</div></div>
+<span className="mono" style={{fontWeight:700,fontSize:15,color:"var(--green)"}}>{fp(x.change)}</span>
+</div>))}
+</div>
+</div>
+
+<div className="rules" style={{margin:0}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--red)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16}}>{t.trDown}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{falling.length}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{t.trDownDesc}</div>
+{falling.length===0&&<div className="empty" style={{padding:"20px"}}><p>{t.trDownEmpty}</p></div>}
+<div style={{display:"flex",flexDirection:"column",gap:9}}>
+{falling.map(x=>(
+<div key={x.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",border:"1px solid rgba(226,59,78,.25)",borderRadius:12,background:"var(--red-s)"}}>
+<span style={{fontSize:18}}>📉</span>
+<div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{x.name||"—"}</div><div className="mono" style={{fontSize:11.5,color:"var(--muted)",marginTop:2}}>{t.trLast1} {numFmt(x.m1)} · {t.trMo} {numFmt(Math.round(x.pace3))}</div></div>
+<span className="mono" style={{fontWeight:700,fontSize:15,color:"var(--red)"}}>{fp(x.change)}</span>
+</div>))}
+</div>
+</div>
+</div>
+
+{flat.length>0&&<div className="rules" style={{marginTop:14}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--amber)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16}}>{t.trFlat}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{flat.length}</span></div>
+<div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:6}}>
+{flat.map(x=><span key={x.id} className="vd m" style={{fontSize:13}}>{x.name||"—"} · {fp(x.change)}</span>)}
+</div>
+</div>}
+
+{(()=>{const yl=calc.filter(x=>x.y>0).sort((a,b)=>b.y-a.y);const totY=yl.reduce((s,x)=>s+x.y,0);return(
+<div className="rules" style={{marginTop:14}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16}}>{t.trYearHead}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{yl.length}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{t.trYearDesc}</div>
+{yl.length===0&&<div className="empty" style={{padding:"20px"}}><p>{t.trYearEmpty}</p></div>}
+<div style={{display:"flex",flexDirection:"column",gap:9}}>
+{yl.map((x,i)=>{const pct=totY?x.y/totY*100:0;return(
+<div key={x.id} style={{display:"flex",alignItems:"center",gap:12}}>
+<span style={{flex:"0 0 200px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}><span style={{color:"var(--azure)",fontWeight:700}}>{i+1}.</span> {x.name}</span>
+<div style={{flex:1,height:10,background:"var(--panel2)",borderRadius:6,overflow:"hidden"}}><div style={{width:pct+"%",height:"100%",background:"var(--azure)"}}/></div>
+<span className="mono" style={{fontSize:12.5,fontWeight:700,minWidth:74,textAlign:"right"}}>{numFmt(x.y)}</span>
+<span className="mono" style={{fontSize:11.5,color:"var(--muted)",minWidth:48,textAlign:"right"}}>%{pct.toFixed(1)}</span>
+</div>);})}
+</div>
+</div>);})()}
+</div>);
+})()}
+
+
+{tab==="rules"&&(
+<div style={{padding:"8px 0 40px"}}>
+
+<div className="note" style={{marginBottom:16,fontSize:13,lineHeight:1.6}}>{t.rSyncNote}</div>
+
+<div className="rules" style={{marginBottom:14}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16,letterSpacing:".03em"}}>{t.rFormulas}</span></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12,marginTop:8}}>
+<div style={{border:"1px solid var(--line2)",borderRadius:12,padding:"14px 16px",background:"var(--bg2)"}}>
+<div style={{fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:14,marginBottom:6}}>A · ROAS</div>
+<div className="mono" style={{fontSize:14.5,fontWeight:700,color:"var(--green)"}}>Gelir ÷ Reklam Harcaması</div>
+<div style={{fontSize:12.5,color:"var(--muted)",marginTop:8,lineHeight:1.5}}>1 $ reklamın kaç $ satış getirdiği. Örn: 300 $ ÷ 150 $ = <b>2,0×</b>. (Not: kâr değil; ürün maliyeti ayrı.)</div>
+<div style={{display:"flex",flexDirection:"column",gap:6,marginTop:10}}>
+<div className="fbul"><span style={{color:"var(--green)"}}>●</span><span><b style={{color:"var(--ink)"}}>2× ve üstü</b> → İYİ, <b style={{color:"var(--green)"}}>aç / büyüt</b></span></div>
+<div className="fbul"><span style={{color:"var(--amber)"}}>●</span><span><b style={{color:"var(--ink)"}}>1×–2× arası</b> → sınırda, <b style={{color:"var(--amber)"}}>izle</b></span></div>
+<div className="fbul"><span style={{color:"var(--red)"}}>●</span><span><b style={{color:"var(--ink)"}}>1× altı</b> → zayıf (harcadığından az kazanıyor), <b style={{color:"var(--red)"}}>kapat</b></span></div>
+</div>
+</div>
+<div style={{border:"1px solid var(--line2)",borderRadius:12,padding:"14px 16px",background:"var(--bg2)"}}>
+<div style={{fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:14,marginBottom:6}}>B · CTR</div>
+<div className="mono" style={{fontSize:14.5,fontWeight:700,color:"var(--azure)"}}>(Tıklama ÷ Görüntülenme) × 100</div>
+<div style={{fontSize:12.5,color:"var(--muted)",marginTop:8,lineHeight:1.5}}>Görenlerin yüzde kaçı tıkladı. Örn: 20 ÷ 1000 × 100 = <b>%2</b>.</div>
+<div style={{display:"flex",flexDirection:"column",gap:6,marginTop:10}}>
+<div className="fbul"><span style={{color:"var(--green)"}}>●</span><span><b style={{color:"var(--ink)"}}>%2 ve üstü</b> → İYİ, görsel/başlık çalışıyor</span></div>
+<div className="fbul"><span style={{color:"var(--amber)"}}>●</span><span><b style={{color:"var(--ink)"}}>%1–%2 arası</b> → orta, başlığı iyileştir</span></div>
+<div className="fbul"><span style={{color:"var(--red)"}}>●</span><span><b style={{color:"var(--ink)"}}>%1 altı</b> (1000+ gösterimde) → zayıf, <b style={{color:"var(--orange)"}}>görseli/başlığı düzelt</b> (kapatma)</span></div>
+</div>
+</div>
+<div style={{border:"1px solid var(--line2)",borderRadius:12,padding:"14px 16px",background:"var(--bg2)"}}>
+<div style={{fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:14,marginBottom:6}}>C · Dönüşüm</div>
+<div className="mono" style={{fontSize:14.5,fontWeight:700,color:"var(--orange)"}}>(Sipariş ÷ Tıklama) × 100</div>
+<div style={{fontSize:12.5,color:"var(--muted)",marginTop:8,lineHeight:1.5}}>Tıklayanların yüzde kaçı satın aldı. Örn: 3 ÷ 100 × 100 = <b>%3</b>.</div>
+<div style={{display:"flex",flexDirection:"column",gap:6,marginTop:10}}>
+<div className="fbul"><span style={{color:"var(--green)"}}>●</span><span><b style={{color:"var(--ink)"}}>%3 ve üstü</b> → İYİ, <b style={{color:"var(--green)"}}>aç / büyüt</b></span></div>
+<div className="fbul"><span style={{color:"var(--amber)"}}>●</span><span><b style={{color:"var(--ink)"}}>%1–%3 arası</b> → orta, fiyat/sayfa gözden geçir</span></div>
+<div className="fbul"><span style={{color:"var(--red)"}}>●</span><span><b style={{color:"var(--ink)"}}>%1 altı</b> → zayıf (tıklıyor ama almıyor), <b style={{color:"var(--red)"}}>kapat</b></span></div>
+</div>
+</div>
+<div style={{border:"1px solid var(--line2)",borderRadius:12,padding:"14px 16px",background:"var(--bg2)"}}>
+<div style={{fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:14,marginBottom:6}}>D · ACOS</div>
+<div className="mono" style={{fontSize:14.5,fontWeight:700,color:"var(--red)"}}>(Harcama ÷ Gelir) × 100</div>
+<div style={{fontSize:12.5,color:"var(--muted)",marginTop:8,lineHeight:1.5}}>ROAS'ın tersi — düşük = iyi. Örn: 150 $ ÷ 300 $ × 100 = <b>%50</b>.</div>
+<div style={{display:"flex",flexDirection:"column",gap:6,marginTop:10}}>
+<div className="fbul"><span style={{color:"var(--green)"}}>●</span><span><b style={{color:"var(--ink)"}}>%50 altı</b> → İYİ, <b style={{color:"var(--green)"}}>aç / büyüt</b></span></div>
+<div className="fbul"><span style={{color:"var(--amber)"}}>●</span><span><b style={{color:"var(--ink)"}}>%50–%100 arası</b> → sınırda, <b style={{color:"var(--amber)"}}>izle</b></span></div>
+<div className="fbul"><span style={{color:"var(--red)"}}>●</span><span><b style={{color:"var(--ink)"}}>%100 üstü</b> → zayıf (satıştan çok harcıyor), <b style={{color:"var(--red)"}}>kapat</b></span></div>
+</div>
+</div>
+</div>
+</div>
+
+<div className="rules" style={{marginBottom:14,background:"linear-gradient(135deg,#eef3ff 0%,#fdf1e9 100%)"}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16,letterSpacing:".03em"}}>{t.rThreshHead}</span></div>
+<div style={{fontSize:13,color:"var(--muted)",margin:"2px 0 12px",lineHeight:1.5}}>Bir reklam bu kadar <b>gösterim VEYA tıklama</b> biriktirmeden hiçbir karar verilmez ("Veri az" der).</div>
+<div style={{display:"flex",gap:18,flexWrap:"wrap",alignItems:"center"}}>
+<label style={{display:"flex",alignItems:"center",gap:8,fontSize:15,fontWeight:600}}>En az gösterim <input className="ri" style={{width:80}} value={settings.minImp||""} onChange={e=>setSettings(s=>({...s,minImp:e.target.value}))}/></label>
+<label style={{display:"flex",alignItems:"center",gap:8,fontSize:15,fontWeight:600}}>En az tıklama <input className="ri" style={{width:70}} value={settings.minClicks||""} onChange={e=>setSettings(s=>({...s,minClicks:e.target.value}))}/></label>
+</div>
+</div>
+
+<div className="rules">
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16,letterSpacing:".03em"}}>{t.rDecHead}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{(settings.rules||[]).filter(r=>r.on).length}/{(settings.rules||[]).length} {t.rOpen}</span></div>
+<div style={{display:"flex",flexDirection:"column",gap:10,marginTop:8}}>
+{(settings.rules||[]).map((rule,i)=>{const rt=RULE_TYPES.find(t=>t.type===rule.type);const unit=rt&&rt.unit==="cur"?settings.cur:rt?rt.unit:"";const fix=/DÜZELT/.test(rule.label);return(
+<div key={rule.id} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 14px",border:"1px solid "+(rule.on?"var(--line2)":"var(--line)"),borderRadius:12,background:rule.on?"var(--bg2)":"var(--panel2)",opacity:rule.on?1:.6,flexWrap:"wrap"}}>
+<button className={"sw"+(rule.on?" on":"")} onClick={()=>upRule(rule.id,{on:!rule.on})} style={{flexShrink:0}}><span className="kn"/></button>
+<span className="num" style={{flexShrink:0}}>{i+1}.</span>
+<span style={{flex:1,fontSize:15,minWidth:170}}>{rule.label.split(/→.*/)[0].split("X").map((part,j,arr)=>j<arr.length-1?<React.Fragment key={j}>{part}<input className="ri" value={rule.n} onChange={e=>upRule(rule.id,{n:e.target.value})}/>{unit?<span style={{fontSize:12,color:"var(--faint)"}}>{unit} </span>:null}</React.Fragment>:part)}</span>
+<span className={"vd "+(fix?"a":"r")} style={{flexShrink:0}}>→ {fix?"DÜZELT":"KAPAT"}</span>
+<button className="dl" onClick={()=>delRule(rule.id)} title="Kuralı sil">✕</button>
+</div>)})}
+</div>
+<div style={{display:"flex",gap:8,alignItems:"center",marginTop:14,paddingTop:14,borderTop:"1px solid var(--line)"}}>
+<select className="cur-sel" id="newrule" defaultValue="" style={{flex:1,fontSize:13}}>
+<option value="" disabled>{t.rAddRule}</option>
+{RULE_TYPES.map(rt=><option key={rt.type} value={rt.type}>{rt.label}</option>)}
+</select>
+<button className="btn pri" onClick={()=>{const sel=document.getElementById("newrule");if(sel.value){addRule(sel.value);sel.value=""}}}>{t.rAdd}</button>
+</div>
+</div>
+
+<div className="rules" style={{marginTop:14}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--amber)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16,letterSpacing:".03em"}}>{t.rFixHead}</span></div>
+<div style={{fontSize:13,color:"var(--muted)",margin:"2px 0 12px",lineHeight:1.5}}>Bir reklam DÜZELT'e düşünce olası sebebi aç/kapat ile işaretle:</div>
+<div style={{display:"flex",flexDirection:"column",gap:9}}>
+{(settings.dzChecks||[]).map(c=>(
+<div key={c.id} style={{display:"flex",alignItems:"center",gap:13,padding:"11px 14px",border:"1px solid var(--line2)",borderRadius:12,background:c.on?"var(--amber-s)":"var(--panel2)",opacity:c.on?1:.62}}>
+<button className={"sw"+(c.on?" on":"")} onClick={()=>toggleDz(c.id)} style={{flexShrink:0}}><span className="kn"/></button>
+<span style={{flex:1,fontSize:14}}>{c.label}</span>
+{c.close&&<button onClick={()=>toggleDz(c.id)} style={{flexShrink:0,fontFamily:"'JetBrains Mono'",fontSize:11.5,fontWeight:700,letterSpacing:".04em",padding:"6px 13px",borderRadius:8,border:"1px solid var(--red)",background:c.on?"var(--red)":"var(--red-s)",color:c.on?"#fff":"var(--red)",cursor:"pointer"}}>{c.on?"✓ KAPATILDI":"KAPAT"}</button>}
+</div>))}
+</div>
+</div>
+
+<div className="rules" style={{marginTop:14}}>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--faint)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16,letterSpacing:".03em"}}>{t.rCtrHead}</span></div>
+<ul style={{listStyle:"none",padding:0,margin:"4px 0 0",display:"flex",flexDirection:"column",gap:9}}>
+<li style={{display:"flex",gap:10,alignItems:"baseline",fontSize:13.5,color:"var(--muted)",lineHeight:1.5}}><span style={{color:"var(--amber)",fontWeight:800,flexShrink:0}}>1</span><span><b style={{color:"var(--ink)"}}>1000 gösterimde 5'ten az tıklama</b> → GÖRSEL + BAŞLIK DÜZELT <span style={{color:"var(--faint)",fontSize:12}}>(CTR %0,5 altı)</span></span></li>
+<li style={{display:"flex",gap:10,alignItems:"baseline",fontSize:13.5,color:"var(--muted)",lineHeight:1.5}}><span style={{color:"var(--amber)",fontWeight:800,flexShrink:0}}>2</span><span><b style={{color:"var(--ink)"}}>2000 gösterimde 10'dan az tıklama</b> → ANA FOTOĞRAFI DEĞİŞTİR <span style={{color:"var(--faint)",fontSize:12}}>(kesin sorun)</span></span></li>
+<li style={{display:"flex",gap:10,alignItems:"baseline",fontSize:13.5,color:"var(--muted)",lineHeight:1.5}}><span style={{color:"var(--green)",fontWeight:800,flexShrink:0}}>✓</span><span>İyi referans: <b style={{color:"var(--ink)"}}>1000 gösterimde ~20 tıklama</b> <span style={{color:"var(--faint)",fontSize:12}}>(CTR %2)</span></span></li>
+</ul>
+<div className="rf">CTR düşük = tıklama yok = para gitmiyor → <b>asla kapatma, sadece görsel/başlık düzelt.</b></div>
+</div>
+
+</div>)}
+
+{tab==="agent"&&(
+<div style={{padding:"8px 0 60px"}}>
+<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}><span style={{fontFamily:"'Space Grotesk'",fontSize:15,fontWeight:700,color:"var(--red)",letterSpacing:".03em"}}>{t.agMine}</span><span className="mono" style={{fontSize:11,color:"var(--faint)"}}>{AGENTS.length} {t.agCount}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",marginBottom:18,lineHeight:1.6}}>{t.agIntro}</div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:14}}>
+{AGENTS.map(a=>(
+<div key={a.id} style={{background:"var(--panel)",border:"1px solid var(--line)",borderRadius:16,padding:"16px 16px 14px",position:"relative",overflow:"hidden"}}>
+<div style={{position:"absolute",left:0,top:0,bottom:0,width:4,background:a.color}}/>
+<div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:12}}>
+<div style={{width:36,height:36,borderRadius:9,background:a.color,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{a.icon}</div>
+<div style={{flex:1}}><div style={{fontFamily:"'Space Grotesk'",fontSize:16,fontWeight:700,lineHeight:1.2}}>{a.name}</div><div className="mono" style={{fontSize:10,color:"var(--faint)",marginTop:3}}>{a.id}</div></div>
+<span style={{fontSize:10,fontWeight:700,padding:"4px 9px",borderRadius:999,textTransform:"uppercase",letterSpacing:".04em",background:a.status==="on"?"var(--green-s)":"var(--amber-s)",color:a.status==="on"?"var(--green)":"var(--amber)"}}>{a.status==="on"?t.agActive:t.agDraft}</span>
+</div>
+<div style={{display:"flex",alignItems:"center",gap:8,background:"var(--azure-s)",border:"1px solid rgba(31,122,224,.2)",color:"var(--azure)",borderRadius:9,padding:"7px 10px",fontSize:12.5,fontWeight:600,marginBottom:12}}>⏱ {a.schedule}</div>
+<div className="mono" style={{fontSize:9.5,letterSpacing:".14em",color:"var(--faint)",textTransform:"uppercase",marginBottom:7}}>{t.agTodo}</div>
+<ul style={{listStyle:"none",display:"flex",flexDirection:"column",gap:6,padding:0,margin:0}}>
+{a.todo.map((td,i)=><li key={i} style={{display:"flex",gap:8,fontSize:12.5,color:"var(--muted)",lineHeight:1.4}}><span style={{color:"var(--orange)",fontWeight:800}}>›</span><span>{td}</span></li>)}
+</ul>
+</div>))}
+<div style={{border:"2px dashed var(--line2)",borderRadius:16,minHeight:180,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,color:"var(--faint)",fontFamily:"'Space Grotesk'",fontWeight:600,fontSize:14}}><span style={{fontSize:32}}>+</span>{t.agNew}</div>
+</div>
+</div>)}
+
+{tab==="dikkat"&&(
+<div style={{padding:"8px 0 60px"}}>
+<div className="note" style={{marginBottom:16,fontSize:13,lineHeight:1.6}}>{t.dkNote}</div>
+<div className="rules">
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--red)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16,letterSpacing:".03em"}}>{t.dkHead}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{(settings.warnings||[]).length} {t.dkCount}</span></div>
+<div style={{display:"flex",flexDirection:"column",gap:10,marginTop:8}}>
+{(settings.warnings||[]).map((w,i)=>(
+<div key={w.id} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"12px 14px",border:"1px solid var(--line2)",borderRadius:12,background:"var(--bg2)"}}>
+<span style={{fontFamily:"'Space Grotesk'",fontWeight:700,color:"var(--red)",fontSize:15,flexShrink:0,marginTop:8}}>{i+1}.</span>
+<textarea value={w.text} placeholder={t.dkPh} onChange={e=>upWarn(w.id,e.target.value)} style={{flex:1,minHeight:46,resize:"vertical",background:"var(--panel)",border:"1px solid var(--line2)",borderRadius:9,padding:"10px 12px",color:"var(--ink)",fontFamily:"'Inter'",fontSize:14,lineHeight:1.55}}/>
+<button className="dl" onClick={()=>delWarn(w.id)} title={t.dkDel} style={{marginTop:8}}>✕</button>
+</div>))}
+{(settings.warnings||[]).length===0&&<div className="empty"><p>{t.dkEmpty}</p></div>}
+</div>
+<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid var(--line)"}}>
+<button className="btn pri" onClick={addWarn}>{t.dkAdd}</button>
+</div>
+</div>
+</div>)}
+
+</main>
+</div>
+
+{/* SETTINGS */}
+{showSet&&<div className="ov" onClick={()=>setShowSet(false)}><div className="mod" onClick={e=>e.stopPropagation()}>
+<h3>Ayarlar</h3><p className="desc">Kapat/izle/büyüt kararları bu eşiklere göre verilir.</p>
+<NF label="Hedef ROAS (BÜYÜT)" hint="Üstündeki → bütçe artır." v={settings.targetRoas} set={v=>setSettings(s=>({...s,targetRoas:v}))} step={.1}/>
+<NF label="Alt ROAS (KAPAT)" hint="Altındaki → kapat." v={settings.watchRoas} set={v=>setSettings(s=>({...s,watchRoas:v}))} step={.1}/>
+<NF label="Min tıklama" hint="Bu birikene kadar 'veri az'." v={settings.minClicks} set={v=>setSettings(s=>({...s,minClicks:v}))} step={1}/>
+<NF label={`Min harcama (${settings.cur})`} hint="Bu kadar harcamada 0 satış → kapat." v={settings.minSpend} set={v=>setSettings(s=>({...s,minSpend:v}))} step={1}/>
+<div className="fld"><label>Anthropic API anahtarı (opsiyonel)</label><div className="ht">Görüntü okuma için. Tarayıcıda kalır.</div>
+<input type="password" placeholder="sk-ant-..." value={settings.apiKey||""} onChange={e=>setSettings(s=>({...s,apiKey:e.target.value}))}/></div>
+<div className="fld"><label>Google Client ID (Gmail sekmesi için)</label><div className="ht">Gmail'e bağlanmak için Google Cloud Console'dan alınır.</div>
+<input placeholder="xxxxxxxx.apps.googleusercontent.com" value={settings.googleClientId||""} onChange={e=>setSettings(s=>({...s,googleClientId:e.target.value}))}/></div>
+<div className="ma"><button className="btn pri" onClick={()=>{setShowSet(false);flash("Kaydedildi.")}}>Tamam</button>
+<button className="btn ghost" onClick={()=>setSettings(s=>({...DS,cur:s.cur,apiKey:s.apiKey,googleClientId:s.googleClientId}))}>Varsayılana dön</button></div>
+</div></div>}
+
+{toast&&<div className="toast">{toast}</div>}
+</div>)}
+
+function NF({label,hint,v,set,step}){return(<div className="fld"><label>{label}</label>{hint&&<div className="ht">{hint}</div>}<input type="number" step={step} value={v} onChange={e=>set(parseFloat(e.target.value)||0)}/></div>)}
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
