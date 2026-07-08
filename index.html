@@ -301,7 +301,7 @@ return out}
 function evaluate(r,s){
 const imp=toNum(r.impressions),clk=toNum(r.clicks),spend=toNum(r.spend),ord=toNum(r.orders),rev=toNum(r.revenue);
 const ctr=imp?clk/imp:0,cpc=clk?spend/clk:0,conv=clk?ord/clk:0,roas=spend?rev/spend:0,acos=rev?spend/rev:(spend>0?Infinity:0),net=rev-spend;
-const _minImp=toNum(s.minImp)||1000,_minClk=toNum(s.minClicks)||30;
+const _minImp=(s.enMinImp===false)?0:(toNum(s.minImp)||1000),_minClk=(s.enMinClk===false)?0:(toNum(s.minClicks)||30);
 if(imp<_minImp&&clk<_minClk)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"VERİ AZ",tone:"muted",reason:`Yeterli veri yok — en az ${numFmt(_minImp)} gösterim veya ${_minClk} tıklama biriksin.`};
 const R=s.rules||[];
 if(Array.isArray(R)){for(const rule of R){if(!rule.on)continue;const rv=toNum(rule.n);
@@ -317,10 +317,11 @@ if(rule.type==="acos_gt"&&rev>0&&acos*100>rv)return{imp,clk,spend,ord,rev,ctr,cp
 if(rule.type==="conv_lt"&&clk>0&&conv*100<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: dönüşüm ${(conv*100).toFixed(2)}% < ${rv}% — kapat.`};
 }}
 let verdict="VERİ AZ",tone="muted",reason="";
-if(clk<s.minClicks&&spend<s.minSpend){reason=`Sadece ${numFmt(clk)} tıklama / ${money(spend,s.cur)} harcama. En az ${s.minClicks} tıklama biriksin.`}
+const _mClk=(s.enMinClk===false)?0:s.minClicks,_mSpend=(s.enMinSpend===false)?0:s.minSpend;
+if(clk<_mClk&&spend<_mSpend){reason=`Sadece ${numFmt(clk)} tıklama / ${money(spend,s.cur)} harcama. En az ${s.minClicks} tıklama biriksin.`}
 else if(spend>0&&rev<=0){verdict="KAPAT";tone="red";reason=`${money(spend,s.cur)} harcandı, 0 satış — kapat.`}
-else if(roas<s.watchRoas){verdict="KAPAT";tone="red";reason=`ROAS ${roas.toFixed(2)}× — alt sınırın (${s.watchRoas}×) altında.`}
-else if(roas<s.targetRoas){verdict="İZLE";tone="amber";reason=`ROAS ${roas.toFixed(2)}× — hedefin altında ama sınırda. İzle.`}
+else if(s.enWatch!==false&&roas<s.watchRoas){verdict="KAPAT";tone="red";reason=`ROAS ${roas.toFixed(2)}× — alt sınırın (${s.watchRoas}×) altında.`}
+else if(s.enTarget!==false&&roas<s.targetRoas){verdict="İZLE";tone="amber";reason=`ROAS ${roas.toFixed(2)}× — hedefin altında ama sınırda. İzle.`}
 else{verdict="BÜYÜT";tone="green";reason=`ROAS ${roas.toFixed(2)}× — kârlı. Bütçe artır.`}
 return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict,tone,reason}}
 
@@ -818,7 +819,7 @@ const Step=({v,set,st,unit})=><span style={{display:"inline-flex",alignItems:"ce
 <button onClick={()=>set(Math.round((v+st)*100)/100)} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,lineHeight:1,color:"var(--green)"}}>+</button></span>;
 const Toggle=({on,set})=><button onClick={()=>set(!on)} style={{width:46,height:26,borderRadius:999,border:"none",cursor:"pointer",background:on?"var(--green)":"var(--line2)",position:"relative",transition:".15s",flex:"none"}}><span style={{position:"absolute",top:3,left:on?23:3,width:20,height:20,borderRadius:"50%",background:"#fff",transition:".15s"}}/></button>;
 return(<div className="rules" style={{marginBottom:14}}>
-<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("Kurallar — Marketing Parametreleri","Rules — Marketing Parameters")}</span>{periodLabel&&<span className="vd" style={{marginLeft:"auto",background:"var(--azure-s,var(--panel2))",color:"var(--azure)"}}>📅 {periodLabel}</span>}</div>
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("Kurallar — Marketing Parametreleri","Rules — Marketing Parameters")}</span></div>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametreyi aç/kapat ve eşiğini −/+ ile ayarla. Kurallar seçili döneme ve tüm listinglere uygulanır.","Toggle each parameter on/off and adjust its threshold with −/+. Rules apply to the selected period and all listings.")}</div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
@@ -832,11 +833,12 @@ return(<div className="rules" style={{marginBottom:14}}>
 </div>);})}
 </div>
 <div className="rh" style={{marginTop:14}}><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📈 {TT("ROAS eşikleri & minimumlar","ROAS thresholds & minimums")}</span></div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:10,marginTop:8}}>
-{[[TT("Hedef ROAS (üstü → BÜYÜT)","Target ROAS (above → GROW)"),"targetRoas",0.1,"×"],[TT("Alt ROAS (altı → KAPAT)","Watch ROAS (below → CLOSE)"),"watchRoas",0.1,"×"],[TT("Min tıklama","Min clicks"),"minClicks",5,""],[TT("Min gösterim","Min impressions"),"minImp",100,""],[TT("Min harcama","Min spend"),"minSpend",5,settings.cur||"$"]].map(([lb,k,st,unit])=>
-<div key={k} style={{border:"1px solid var(--line2)",borderRadius:12,padding:"11px 13px",background:"var(--bg2)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
-<span style={{fontSize:12.5,fontWeight:600,flex:1}}>{lb}</span>
-<Step v={toNum(settings[k])} set={v=>setNum(k,v)} st={st} unit={unit==="×"?"×":""}/></div>)}
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:10,marginTop:8}}>
+{[[TT("Hedef ROAS (üstü → BÜYÜT)","Target ROAS (above → GROW)"),"targetRoas","enTarget",0.1,"×"],[TT("Alt ROAS (altı → KAPAT)","Watch ROAS (below → CLOSE)"),"watchRoas","enWatch",0.1,"×"],[TT("Min tıklama (altında VERİ AZ)","Min clicks (below = LOW DATA)"),"minClicks","enMinClk",5,""],[TT("Min gösterim","Min impressions"),"minImp","enMinImp",100,""],[TT("Min harcama","Min spend"),"minSpend","enMinSpend",5,settings.cur||"$"]].map(([lb,k,ek,st,unit])=>{const on=settings[ek]!==false;return(
+<div key={k} style={{border:"1px solid "+(on?"var(--green)":"var(--line2)"),borderRadius:12,padding:"11px 13px",background:on?"var(--green-s)":"var(--bg2)"}}>
+<div style={{display:"flex",alignItems:"center",gap:10}}><Toggle on={on} set={v=>setSettings(s=>({...s,[ek]:v}))}/><span style={{fontSize:13,fontWeight:700,flex:1}}>{lb}</span></div>
+<div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:10,marginTop:8,opacity:on?1:0.5}}><Step v={toNum(settings[k])} set={v=>setNum(k,v)} st={st} unit={unit==="×"?"×":""}/></div>
+</div>);})}
 </div>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler anında uygulanır ve buluta kaydedilir.","Changes apply instantly and are saved to the cloud.")}</div>
 </div>);}
@@ -1225,7 +1227,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM33 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM35 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
