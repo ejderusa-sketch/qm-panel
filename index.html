@@ -315,6 +315,10 @@ if(rule.type==="spend_no_sale"&&spend>=rv&&ord<=0)return{imp,clk,spend,ord,rev,c
 if(rule.type==="rev_lt"&&spend>0&&rev<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: gelir ${money(rev,s.cur)} < ${money(rv,s.cur)} eşiği — kapat.`};
 if(rule.type==="acos_gt"&&rev>0&&acos*100>rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ACOS ${(acos*100).toFixed(1)}% > ${rv}% — kapat.`};
 if(rule.type==="conv_lt"&&clk>0&&conv*100<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: dönüşüm ${(conv*100).toFixed(2)}% < ${rv}% — kapat.`};
+if(rule.type==="cpa_gt"&&ord>0&&(spend/ord)>rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: sipariş maliyeti ${money(spend/ord,s.cur)} > ${money(rv,s.cur)} — kapat.`};
+if(rule.type==="cpc_gt"&&clk>0&&cpc>rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: tık maliyeti ${money(cpc,s.cur)} > ${money(rv,s.cur)} — kapat.`};
+if(rule.type==="ord_lt"&&spend>0&&ord<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: sipariş ${numFmt(ord)} < ${rv} — kapat.`};
+if(rule.type==="aov_lt"&&ord>0&&(rev/ord)<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"İZLE",tone:"amber",reason:`Kural: ortalama sepet ${money(rev/ord,s.cur)} < ${money(rv,s.cur)} — izle.`};
 }}
 let verdict="VERİ AZ",tone="muted",reason="";
 const _mClk=(s.enMinClk===false)?0:s.minClicks,_mSpend=(s.enMinSpend===false)?0:s.minSpend;
@@ -805,13 +809,19 @@ const rules=Array.isArray(settings.rules)?settings.rules:[];
 const getR=type=>rules.find(r=>r.type===type)||{type,on:false,n:0};
 const setR=(type,patch)=>setSettings(s=>{const rs=Array.isArray(s.rules)?s.rules.map(r=>({...r})):[];const i=rs.findIndex(r=>r.type===type);const cur=i>=0?rs[i]:{id:type,type,on:false,n:0};const nx={...cur,...patch};if(i>=0)rs[i]=nx;else rs.push(nx);return{...s,rules:rs};});
 const setNum=(k,v)=>setSettings(s=>({...s,[k]:Math.max(0,v)}));
+const cur=settings.cur||"$";
 const PARAMS=[
- {type:"ctr_fix",tr:"CTR düşük → DÜZELT",en:"Low CTR → FIX",unit:"%",st:0.1,hint:TT("1000+ gösterimde CTR bu %'nin altındaysa: görsel/başlık düzelt (kapatma).","With 1000+ impressions, if CTR is below this %: fix image/title (don't close).")},
- {type:"ctr_lt",tr:"CTR çok düşük → KAPAT",en:"Very low CTR → CLOSE",unit:"%",st:0.1,hint:TT("CTR bu %'nin altındaysa reklamı kapat.","Close ads if CTR is below this %.")},
- {type:"spend_no_sale",tr:"Harcama var, 0 satış → KAPAT",en:"Spend, 0 sales → CLOSE",unit:settings.cur||"$",st:5,hint:TT("Bu kadar harcanıp 0 satış varsa kapat.","Close if this much is spent with 0 sales.")},
- {type:"clk_no_sale",tr:"Tıklama var, 0 satış → KAPAT",en:"Clicks, 0 sales → CLOSE",unit:TT("tık","clk"),st:5,hint:TT("Bu kadar tıklama olup 0 satış varsa kapat.","Close if this many clicks with 0 sales.")},
- {type:"conv_lt",tr:"Dönüşüm (CVR) düşük → KAPAT",en:"Low conversion → CLOSE",unit:"%",st:0.5,hint:TT("Sipariş/tıklama oranı bu %'nin altındaysa kapat.","Close if order/click rate is below this %.")},
- {type:"acos_gt",tr:"ACOS yüksek → KAPAT",en:"High ACOS → CLOSE",unit:"%",st:5,hint:TT("Reklam/gelir oranı (ACOS) bu %'nin üstündeyse kapat.","Close if ad/revenue ratio (ACOS) is above this %.")},
+ {type:"roas_lt",tr:"1 · ROAS",en:"1 · ROAS",unit:"×",st:0.1,hint:TT("Gelir ÷ Harcama. Bu değerin altındaysa zarar → KAPAT.","Revenue ÷ Spend. Below this = loss → CLOSE.")},
+ {type:"acos_gt",tr:"2 · ACOS",en:"2 · ACOS",unit:"%",st:5,hint:TT("Harcama ÷ Gelir ×100. Bu %'nin üstündeyse → KAPAT.","Spend ÷ Revenue ×100. Above this % → CLOSE.")},
+ {type:"cpa_gt",tr:"3 · CPA (sipariş maliyeti)",en:"3 · CPA (cost/order)",unit:cur,st:1,hint:TT("Harcama ÷ Sipariş. Sipariş başı maliyet bu değerin üstündeyse → KAPAT.","Spend ÷ Orders. Above this cost per order → CLOSE.")},
+ {type:"conv_lt",tr:"4 · CVR (dönüşüm)",en:"4 · CVR (conversion)",unit:"%",st:0.5,hint:TT("Sipariş ÷ Tıklama ×100. Bu %'nin altındaysa → KAPAT.","Orders ÷ Clicks ×100. Below this % → CLOSE.")},
+ {type:"ctr_fix",tr:"5 · CTR",en:"5 · CTR",unit:"%",st:0.1,hint:TT("Tıklama ÷ Gösterim ×100. 1000+ gösterimde bunun altındaysa → DÜZELT (kapatma).","Clicks ÷ Impressions ×100. Below this with 1000+ impressions → FIX (don't close).")},
+ {type:"cpc_gt",tr:"6 · CPC (tık maliyeti)",en:"6 · CPC (cost/click)",unit:cur,st:0.1,hint:TT("Harcama ÷ Tıklama. Tık başı maliyet bu değerin üstündeyse → KAPAT.","Spend ÷ Clicks. Above this cost per click → CLOSE.")},
+ {type:"ord_lt",tr:"7 · Sipariş (reklamdan)",en:"7 · Orders from ads",unit:"",st:1,hint:TT("Harcama var ama sipariş bu sayının altındaysa → KAPAT.","Spending but orders below this count → CLOSE.")},
+ {type:"rev_lt",tr:"8 · Gelir (reklamdan)",en:"8 · Revenue from ads",unit:cur,st:5,hint:TT("Reklam geliri bu değerin altındaysa → KAPAT.","Ad revenue below this → CLOSE.")},
+ {type:"spend_gte",tr:"9 · Harcama (Spend)",en:"9 · Spend",unit:cur,st:5,hint:TT("Harcama bu değeri geçtiyse → KAPAT (bütçe sınırı).","Spend reached this amount → CLOSE (budget cap).")},
+ {type:"imp_no_clk",tr:"10 · Gösterim (Impressions)",en:"10 · Impressions / Ad views",unit:"",st:100,hint:TT("Bu kadar gösterimde 0 tıklama varsa → KAPAT.","This many impressions with 0 clicks → CLOSE.")},
+ {type:"aov_lt",tr:"11 · AOV (ortalama sepet)",en:"11 · AOV (avg order value)",unit:cur,st:5,hint:TT("Gelir ÷ Sipariş. Ortalama sepet bu değerin altındaysa → İZLE.","Revenue ÷ Orders. Below this avg basket → WATCH.")},
 ];
 const Step=({v,set,st,unit})=><span style={{display:"inline-flex",alignItems:"center",gap:6}}>
 <button onClick={()=>set(Math.max(0,Math.round((v-st)*100)/100))} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,lineHeight:1,color:"var(--red)"}}>−</button>
@@ -821,22 +831,15 @@ const Toggle=({on,set})=><button onClick={()=>set(!on)} style={{width:46,height:
 return(<div className="rules" style={{marginBottom:14}}>
 <div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("Kurallar — Marketing Parametreleri","Rules — Marketing Parameters")}</span></div>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametreyi aç/kapat ve eşiğini −/+ ile ayarla. Kurallar seçili döneme ve tüm listinglere uygulanır.","Toggle each parameter on/off and adjust its threshold with −/+. Rules apply to the selected period and all listings.")}</div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:10}}>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
 <div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:12,padding:"11px 13px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
 <div style={{display:"flex",alignItems:"center",gap:10}}>
 <Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/>
-<span style={{fontSize:13.5,fontWeight:700,flex:1}}>{TT(p.tr,p.en)}</span></div>
-<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginTop:8,opacity:r.on?1:0.5}}>
-<span style={{fontSize:11.5,color:"var(--muted)",lineHeight:1.4,flex:1}}>{p.hint}</span>
-<Step v={toNum(r.n)} set={v=>setR(p.type,{n:v})} st={p.st} unit={p.unit==="%"||p.unit==="×"?p.unit:""}/></div>
-</div>);})}
-</div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:10,marginTop:10}}>
-{[[TT("Hedef ROAS (üstü → BÜYÜT)","Target ROAS (above → GROW)"),"targetRoas","enTarget",0.1,"×",TT("ROAS bu değerin üstündeyse kârlı → bütçeyi artır (BÜYÜT).","If ROAS is above this it's profitable → increase budget (GROW).")],[TT("Alt ROAS (altı → KAPAT)","Watch ROAS (below → CLOSE)"),"watchRoas","enWatch",0.1,"×",TT("ROAS bu değerin altındaysa zarar → kesin kapat.","If ROAS is below this it's a loss → close.")],[TT("Min tıklama (altında VERİ AZ)","Min clicks (below = LOW DATA)"),"minClicks","enMinClk",5,"",TT("Bu kadar tıklama birikmeden karar verme (veri az).","Don't decide until this many clicks accumulate (low data).")],[TT("Min gösterim","Min impressions"),"minImp","enMinImp",100,"",TT("Bu kadar gösterim birikmeden karar verme (veri az).","Don't decide until this many impressions accumulate (low data).")],[TT("Min harcama","Min spend"),"minSpend","enMinSpend",5,settings.cur||"$",TT("Bu kadar harcanmadan karar verme (veri az sayılır).","Don't decide until this much is spent (counts as low data).")]].map(([lb,k,ek,st,unit,hint])=>{const on=settings[ek]!==false;return(
-<div key={k} style={{border:"1px solid "+(on?"var(--green)":"var(--line2)"),borderRadius:12,padding:"11px 13px",background:on?"var(--green-s)":"var(--bg2)"}}>
-<div style={{display:"flex",alignItems:"center",gap:10}}><Toggle on={on} set={v=>setSettings(s=>({...s,[ek]:v}))}/><span style={{fontSize:13,fontWeight:700,flex:1}}>{lb}</span></div>
-<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginTop:8,opacity:on?1:0.5}}><span style={{fontSize:11.5,color:"var(--muted)",lineHeight:1.4,flex:1}}>{hint}</span><Step v={toNum(settings[k])} set={v=>setNum(k,v)} st={st} unit={unit==="×"?"×":""}/></div>
+<span style={{fontSize:13,fontWeight:700,flex:1}}>{TT(p.tr,p.en)}</span></div>
+<div style={{fontSize:11.5,color:"var(--muted)",lineHeight:1.4,marginTop:6,opacity:r.on?1:0.6}}>{p.hint}</div>
+<div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",marginTop:8,opacity:r.on?1:0.5}}>
+<Step v={toNum(r.n)} set={v=>setR(p.type,{n:v})} st={p.st} unit={p.unit}/></div>
 </div>);})}
 </div>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler anında uygulanır ve buluta kaydedilir.","Changes apply instantly and are saved to the cloud.")}</div>
@@ -1226,7 +1229,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM38 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM39 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
