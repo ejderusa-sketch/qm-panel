@@ -834,10 +834,10 @@ return(<div className="rules" style={{marginBottom:14}}>
 </div>
 <div className="rh" style={{marginTop:14}}><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📈 {TT("ROAS eşikleri & minimumlar","ROAS thresholds & minimums")}</span></div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:10,marginTop:8}}>
-{[[TT("Hedef ROAS (üstü → BÜYÜT)","Target ROAS (above → GROW)"),"targetRoas","enTarget",0.1,"×"],[TT("Alt ROAS (altı → KAPAT)","Watch ROAS (below → CLOSE)"),"watchRoas","enWatch",0.1,"×"],[TT("Min tıklama (altında VERİ AZ)","Min clicks (below = LOW DATA)"),"minClicks","enMinClk",5,""],[TT("Min gösterim","Min impressions"),"minImp","enMinImp",100,""],[TT("Min harcama","Min spend"),"minSpend","enMinSpend",5,settings.cur||"$"]].map(([lb,k,ek,st,unit])=>{const on=settings[ek]!==false;return(
+{[[TT("Hedef ROAS (üstü → BÜYÜT)","Target ROAS (above → GROW)"),"targetRoas","enTarget",0.1,"×",TT("ROAS bu değerin üstündeyse kârlı → bütçeyi artır (BÜYÜT).","If ROAS is above this it's profitable → increase budget (GROW).")],[TT("Alt ROAS (altı → KAPAT)","Watch ROAS (below → CLOSE)"),"watchRoas","enWatch",0.1,"×",TT("ROAS bu değerin altındaysa zarar → kesin kapat.","If ROAS is below this it's a loss → close.")],[TT("Min tıklama (altında VERİ AZ)","Min clicks (below = LOW DATA)"),"minClicks","enMinClk",5,"",TT("Bu kadar tıklama birikmeden karar verme (veri az).","Don't decide until this many clicks accumulate (low data).")],[TT("Min gösterim","Min impressions"),"minImp","enMinImp",100,"",TT("Bu kadar gösterim birikmeden karar verme (veri az).","Don't decide until this many impressions accumulate (low data).")],[TT("Min harcama","Min spend"),"minSpend","enMinSpend",5,settings.cur||"$",TT("Bu kadar harcanmadan karar verme (veri az sayılır).","Don't decide until this much is spent (counts as low data).")]].map(([lb,k,ek,st,unit,hint])=>{const on=settings[ek]!==false;return(
 <div key={k} style={{border:"1px solid "+(on?"var(--green)":"var(--line2)"),borderRadius:12,padding:"11px 13px",background:on?"var(--green-s)":"var(--bg2)"}}>
 <div style={{display:"flex",alignItems:"center",gap:10}}><Toggle on={on} set={v=>setSettings(s=>({...s,[ek]:v}))}/><span style={{fontSize:13,fontWeight:700,flex:1}}>{lb}</span></div>
-<div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:10,marginTop:8,opacity:on?1:0.5}}><Step v={toNum(settings[k])} set={v=>setNum(k,v)} st={st} unit={unit==="×"?"×":""}/></div>
+<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginTop:8,opacity:on?1:0.5}}><span style={{fontSize:11.5,color:"var(--muted)",lineHeight:1.4,flex:1}}>{hint}</span><Step v={toNum(settings[k])} set={v=>setNum(k,v)} st={st} unit={unit==="×"?"×":""}/></div>
 </div>);})}
 </div>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler anında uygulanır ve buluta kaydedilir.","Changes apply instantly and are saved to the cloud.")}</div>
@@ -1227,7 +1227,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM35 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM36 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
