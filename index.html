@@ -1042,7 +1042,7 @@ try{window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://
 if(r.error){setToast(TT("Bağlantı iptal edildi.","Connection cancelled."));return;}
 gmStoreTok.current[acc.id]=r.access_token;
 try{const prof=await gGet(r.access_token,"https://www.googleapis.com/gmail/v1/users/me/profile");
-setAccounts(x=>x.map(s=>s.id===acc.id?{...s,email:prof.emailAddress,gmailConnected:true}:s));
+setAccounts(x=>x.map(s=>{if(s.id!==acc.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=((prof.emailAddress||"").split("@")[0]||"").trim();return{...s,email:prof.emailAddress,gmailConnected:true,name:(def&&lp)?lp.toUpperCase():s.name}}));
 setToast("✓ "+prof.emailAddress+" "+TT("bağlandı","connected"));}
 catch(e){setToast(TT("Profil alınamadı: ","Profile error: ")+(e.message||""));}
 }}).requestAccessToken();}
@@ -1100,7 +1100,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM24 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM25 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1116,7 +1116,7 @@ return(
 <span className="sn">{a.name}</span>
 {st.count>0&&<span className={"sb"+(st.close?" red":"")}>{st.count}</span>}
 </div>
-<input value={a.email||""} placeholder={lang==="tr"?"✉️ e-posta ekle…":"✉️ add email…"} onClick={e=>e.stopPropagation()} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>s.id===a.id?{...s,email:v}:s))}} style={{width:"100%",fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 7px",background:"var(--panel)",color:"var(--ink)"}}/>
+<input value={a.email||""} placeholder={lang==="tr"?"✉️ e-posta ekle…":"✉️ add email…"} onClick={e=>e.stopPropagation()} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>{if(s.id!==a.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=(v.split("@")[0]||"").trim();return{...s,email:v,name:(def&&lp)?lp.toUpperCase():s.name}}))}} style={{width:"100%",fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 7px",background:"var(--panel)",color:"var(--ink)"}}/>
 {a.email&&(a.gmailConnected?
 <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}} onClick={e=>e.stopPropagation()}>
 <span style={{fontSize:10,fontWeight:800,color:"var(--green)"}}>✓ {TT("Bağlı","Connected")}</span>
