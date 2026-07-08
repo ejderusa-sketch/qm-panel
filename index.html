@@ -717,26 +717,10 @@ return(<div style={{padding:"8px 0 40px"}}>
 </tbody></table></div></div>
 </div>);}
 function App(){
-const ALL_STORES=[
-{id:"a0",name:"00 BYDR (SnowflakeApparelUS)"},
-{id:"a1",name:"01 NEWCUSTOM (newcustomtee)"},
-{id:"a2",name:"02 BESBABA"},
-{id:"a3",name:"03 BHANDY"},
-{id:"a4",name:"04 CUSTOMHAN-TR"},
-{id:"a5",name:"05 GIFT"},
-{id:"a6",name:"06 FAMILY"},
-{id:"a7",name:"07 BEUTY"},
-{id:"a8",name:"08 SOFTQUALITY"},
-{id:"a9",name:"09 HAPPYSHIRTT"},
-{id:"a10",name:"10 TEECUSTOM"},
-{id:"a11",name:"11 VIRGINIA"},
-{id:"a12",name:"12 BLUEDREAM"},
-{id:"a13",name:"13 FAST"},
-{id:"a14",name:"14 NEWTRENDY"},
-{id:"a15",name:"15 DESIGN-TR"},
-];
-const[accounts,setAccounts]=useState(ALL_STORES);
-const[act,setAct]=useState("a1");
+const ALL_STORES=[];
+const DEMO_IDS=new Set(["a0","a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13","a14","a15"]);
+const[accounts,setAccounts]=useState([]);
+const[act,setAct]=useState(null);
 const[settings,setSettings]=useState(DS);
 const[dm,setDm]=useState({});
 const[date,setDate]=useState(todayISO());
@@ -774,16 +758,11 @@ const vkey=`V::${act}|${date}`;
 const vrows=dm[vkey]||[];
 
 useEffect(()=>{(async()=>{
-const a=await store.get("q:a",ALL_STORES);
+const a=await store.get("q:a",[]);
 const s=await store.get("q:s",DS);
 const d=await store.get("q:d",{});
-const am0=a.map(x=>{
-const master=ALL_STORES.find(s=>s.id===x.id);
-if(master)return{...x,name:master.name};
-let n=x.name;if(n==="Mağaza 1")n="01 NEWCUSTOM";if(typeof n==="string"&&/^STORE\s/i.test(n))n=n.replace(/^STORE\s+(NO|NUMBER)\s+/i,"").trim();return{...x,name:n}});
-const ids=new Set(am0.map(x=>x.id));
-const am=[...am0,...ALL_STORES.filter(s=>!ids.has(s.id))];
-setAccounts(am);setAct((am[0]&&am[0].id)||"a0");
+const am=(Array.isArray(a)?a:[]).filter(x=>x&&x.id&&!DEMO_IDS.has(x.id));
+setAccounts(am);setAct((am[0]&&am[0].id)||null);
 const sr=s&&s.rules;
 const rules=(s&&s.rulesV===5&&Array.isArray(sr))?sr:DS.rules;
 const savedW=(s&&Array.isArray(s.warnings))?s.warnings:DS.warnings;
@@ -882,8 +861,8 @@ setSettings(s=>{const arr=(s.trendTopics||[]).map(t=>({...t}));for(const lab of 
 flash(cats.length+" konu Marketing'ten çekildi — Son 1 Ay dolduruldu.");
 };
 
-const addAcct=()=>{const n=prompt("Yeni mağaza adı:",`0${accounts.length+1}`);if(!n)return;const id="a"+Date.now().toString(36);setAccounts(a=>[...a,{id,name:n}]);setAct(id)};
-const renAcct=id=>{const c=accounts.find(a=>a.id===id);const n=prompt("Mağaza adı:",(c&&c.name)||"");if(n)setAccounts(a=>a.map(x=>x.id===id?{...x,name:n}:x))};
+const addAcct=()=>{const n=prompt(TT("Mağaza adı (ör. 01 MYSHOP):","Store name (e.g. 01 MYSHOP):"),`0${accounts.length+1}`);if(!n)return;const id="a"+Date.now().toString(36);setAccounts(a=>[...a,{id,name:n.trim()}]);setAct(id)};
+const renAcct=id=>{const c=accounts.find(a=>a.id===id);const n=prompt(TT("Mağaza adı:","Store name:"),(c&&c.name)||"");if(n)setAccounts(a=>a.map(x=>x.id===id?{...x,name:n}:x))};
 
 /* image handling */
 const handleImage=async(file)=>{
@@ -957,7 +936,7 @@ const allShownSelected=shownEvals.length>0&&shownEvals.every(x=>sel.has(x.row.id
 const selAll=()=>setSel(allShownSelected?new Set():new Set(shownEvals.map(x=>x.row.id)));
 const bulkAds=on=>{setRows(rs=>rs.map(r=>sel.has(r.id)?{...r,ads:on?"on":"off"}:r));};
 const bulkDelete=()=>{if(!sel.size)return;if(!window.confirm(sel.size+" listing silinsin?"))return;setRows(rs=>rs.filter(r=>!sel.has(r.id)));setSel(new Set());};
-const FILTERS=[["all",TT("Hepsi","All")],["BÜYÜT",TT("BÜYÜT","GROW")],["İZLE",TT("İZLE","WATCH")],["DÜZELT",TT("DÜZELT","FIX")],["KAPAT",TT("KAPAT","CLOSE")],["VERİ AZ",TT("VERİ AZ","LOW DATA")]];
+const FILTERS=[["all","A1 · "+TT("VARSAYILAN","DEFAULT")],["BÜYÜT",TT("BÜYÜT","GROW")],["İZLE",TT("İZLE","WATCH")],["DÜZELT","B · "+TT("DÜZELT","FIX")],["KAPAT","C · "+TT("KAPAT","CLOSE")],["VERİ AZ","D · "+TT("VERİ AZ","LOW DATA")]];
 const totals=useMemo(()=>{const t={spend:0,rev:0,imp:0,clk:0,ord:0,close:0,watch:0,grow:0};
 for(const{e}of evals){t.spend+=e.spend;t.rev+=e.rev;t.imp+=e.imp;t.clk+=e.clk;t.ord+=e.ord;if(e.verdict==="KAPAT")t.close++;if(e.verdict==="İZLE")t.watch++;if(e.verdict==="BÜYÜT")t.grow++}
 t.wasted=evals.filter(x=>x.e.verdict==="KAPAT").reduce((s,x)=>s+Math.max(x.e.spend-x.e.rev,0),0);
@@ -982,7 +961,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM16 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM17 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1002,8 +981,9 @@ return(
 {a.email&&<a href={gmailUrl} target="_blank" rel="noopener noreferrer" style={{fontSize:11,color:"var(--azure)",textDecoration:"none",fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}>📥 {lang==="tr"?"e-postadan çek":"fetch from email"}</a>}
 </div>);
 })}
+{accounts.length===0&&<div style={{padding:"16px 10px 6px",textAlign:"center",color:"var(--faint)",fontSize:12,lineHeight:1.6}}>{TT("Henüz mağaza yok.","No stores yet.")}<br/>{TT("Aşağıdan bağla.","Connect below.")}</div>}
 </div>
-<button className="sa" onClick={addAcct}>+ {lang==="tr"?"mağaza ekle":"add store"}</button>
+<button className="sa" onClick={addAcct} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5,padding:"18px 12px",border:"2px dashed var(--red)",borderRadius:13,background:"var(--panel)",cursor:"pointer",width:"100%",marginTop:6}}><span style={{fontSize:32,lineHeight:1,color:"var(--red)",fontWeight:800}}>＋</span><span style={{fontSize:12.5,fontWeight:700,color:"var(--ink)"}}>{TT("E-posta veya Mağaza Bağla","Connect Email or Store")}</span></button>
 <div className="sf">
 <button className="btn" style={{fontSize:11,padding:"5px 10px",fontWeight:700,letterSpacing:".05em"}} onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 <select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
