@@ -582,7 +582,7 @@ function MOD(){return{
 function SectionOutline({m}){return(<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}><div className="rh"><span style={{fontSize:16}}>{m.title}</span><span className="vd" style={{marginLeft:"auto",background:"var(--amber-s)",color:"var(--amber)"}}>{TT("Yakında","Coming soon")}</span></div><div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{m.intro}</div></div>
 <div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{TT("Bu bölümde olacaklar","What this section will include")}</span></div>
-<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>{m.items.map((it,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span>{it[1]}</span>{it[0]}</div>)}</div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:8,marginTop:8}}>{m.items.map((it,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span>{it[1]}</span>{it[0]}</div>)}</div>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>{TT("Bu bölüm planın sıradaki fazlarında adım adım doldurulacak.","This section will be filled in step by step in the plan's upcoming phases.")}</div></div>
 </div>);}
 function SettingsPanel({settings,setSettings}){
@@ -597,19 +597,21 @@ const upP=(k,v)=>setProf(p=>({...p,[k]:v}));
 const flash=m=>{setSaved(m);setTimeout(()=>setSaved(""),1600);};
 const saveP=async()=>{await saveProfile(prof);flash(TT("Profil kaydedildi.","Profile saved."));};
 const saveA=async()=>{await saveAccountInfo({company_name:acc.company_name});flash(TT("Şirket bilgisi kaydedildi.","Company info saved."));};
-const SUBS=[["profil","👤 "+TT("Profil","Profile")],["abonelik","💳 "+TT("Abonelik","Subscription")],["baglanti","🔗 "+TT("Bağlantı","Connection")],["kaynak","📥 "+TT("Veri Kaynakları","Data Sources")],["dil","🌐 "+TT("Dil","Language")]];
-const inp=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={prof[k]||""} placeholder={ph||""} onChange={e=>upP(k,e.target.value)} style={{display:"block",width:"100%",maxWidth:360,marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
+const SUBS=[["profil","Q1 · 👤 "+TT("Profil","Profile")],["abonelik","Q2 · 💳 "+TT("Abonelik","Subscription")],["baglanti","Q3 · 🔗 "+TT("Bağlantı","Connection")],["kaynak","Q4 · 📥 "+TT("Veri Kaynakları","Data Sources")],["dil","Q5 · 🌐 "+TT("Dil","Language")]];
+const inp=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={prof[k]||""} placeholder={ph||""} onChange={e=>upP(k,e.target.value)} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
 const DS=[["📷 "+TT("Screenshot yükle","Upload screenshot"),"ready"],["📄 "+TT("CSV yükle","Upload CSV"),"ready"],["📋 "+TT("Kopyala-yapıştır","Copy-paste"),"ready"],["⌨️ "+TT("Elle giriş","Manual entry"),"ready"],["📎 "+TT("Doküman yükle","Upload document"),"soon"],["✉️ "+TT("Bağlı e-posta (Gmail)","Connected email (Gmail)"),"soon"],["🔌 "+TT("API (Etsy/Amazon)","API (Etsy/Amazon)"),"soon"]];
 return(<div style={{padding:"8px 0 40px"}}>
 <div className="tabs" style={{marginBottom:14}}>{SUBS.map(([k,lb])=><button key={k} className={sub===k?"on":""} onClick={()=>setSub(k)}>{lb}</button>)}</div>
 {saved&&<div className="busy" style={{background:"var(--green-s)",borderColor:"rgba(15,157,99,.3)",color:"var(--green)"}}>{saved}</div>}
 {sub==="profil"&&<div className="rules">
 <div className="rh"><span style={{fontSize:15}}>👤 {TT("Profil","Profile")}</span></div>
-<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("E-posta","Email")}<input value={prof.email||""} disabled style={{display:"block",width:"100%",maxWidth:360,marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5,background:"var(--panel2)",color:"var(--faint)"}}/></label>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:"4px 20px"}}>
+<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("E-posta","Email")}<input value={prof.email||""} disabled style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5,background:"var(--panel2)",color:"var(--faint)"}}/></label>
 {inp(TT("Ad Soyad","Full name"),"full_name",TT("Adın Soyadın","Your full name"))}
 {inp(TT("Telefon","Phone"),"phone","+1 ...")}
 {inp(TT("Ülke","Country"),"country","US / TR ...")}
 {inp(TT("Saat dilimi","Timezone"),"timezone","America/New_York")}
+</div>
 <div><button className="btn pri" style={{marginTop:16}} onClick={saveP}>{TT("Profili kaydet","Save profile")}</button></div>
 {isAdmin&&<div style={{marginTop:20,paddingTop:16,borderTop:"1px solid var(--line)"}}>
 <div style={{fontSize:13,fontWeight:600,marginBottom:6}}>{TT("Şirket / Hesap adı (Admin)","Company / Account name (Admin)")}</div>
@@ -630,7 +632,7 @@ return(<div style={{padding:"8px 0 40px"}}>
 {sub==="kaynak"&&<div className="rules">
 <div className="rh"><span style={{fontSize:15}}>📥 {TT("Veri Kaynakları","Data Sources")}</span></div>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 8px"}}>{TT("QM'ye veri şu yollarla girer:","Data enters QM in these ways:")}</div>
-<div style={{display:"flex",flexDirection:"column",gap:8}}>{DS.map((d,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>{d[0]}</span><span className="vd" style={d[1]==="ready"?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{d[1]==="ready"?TT("hazır","ready"):TT("yakında","soon")}</span></div>)}</div></div>}
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:8}}>{DS.map((d,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>{d[0]}</span><span className="vd" style={d[1]==="ready"?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{d[1]==="ready"?TT("hazır","ready"):TT("yakında","soon")}</span></div>)}</div></div>}
 {sub==="dil"&&<div className="rules">
 <div className="rh"><span style={{fontSize:15}}>🌐 {TT("Dil","Language")}</span></div>
 <div style={{display:"flex",gap:8,marginTop:10}}>
@@ -980,7 +982,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM15 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM16 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
