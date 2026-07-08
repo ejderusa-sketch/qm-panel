@@ -335,7 +335,23 @@ const SB_URL="https://pepvzsffeyvzhxvlliex.supabase.co";
 const SB_KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
-let _shared=null, currentAccountId=null, currentRole=null;
+let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null;
+/* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
+const PERMS=[
+ {key:"viewMarketing",label:"Marketing görüntüle"},
+ {key:"uploadData",label:"Veri yükle (CSV/görsel)"},
+ {key:"deleteData",label:"Veri sil"},
+ {key:"editRules",label:"RULES / kuralları düzenle"},
+ {key:"viewDikkat",label:"Dikkat notları"},
+ {key:"viewTrend",label:"Gösterim trendi"},
+ {key:"viewAgent",label:"Nova Agent"},
+ {key:"manageTeam",label:"Ekip yönetimi"},
+];
+function defaultPerms(role){
+ if(role==="user")return{viewMarketing:true,uploadData:true,editRules:true,viewDikkat:true,viewTrend:true,viewAgent:true,manageTeam:false,deleteData:false};
+ return{viewMarketing:true,uploadData:true,deleteData:false,editRules:false,viewDikkat:true,viewTrend:true,viewAgent:false,manageTeam:false};
+}
+function can(key){ if(currentRole==="admin"||currentPermissions===null)return true; return !!(currentPermissions&&currentPermissions[key]); }
 /* Hesap bootstrap: ilk giriş yapan Admin olur; davetli manager kendi hesabına bağlanır */
 async function bootstrap(){
   const u=(await sb.auth.getUser()).data.user;
@@ -344,7 +360,7 @@ async function bootstrap(){
   try{await sb.from("members").update({user_id:u.id}).is("user_id",null).eq("email",email);}catch(e){}
   let owned=[],mems=[];
   try{owned=((await sb.from("accounts").select("id").eq("owner_id",u.id)).data)||[];}catch(e){}
-  try{mems=((await sb.from("members").select("account_id,role").eq("user_id",u.id).eq("status","active")).data)||[];}catch(e){}
+  try{mems=((await sb.from("members").select("account_id,role,permissions").eq("user_id",u.id).eq("status","active")).data)||[];}catch(e){}
   if(!owned.length && !mems.length){
     try{
       const insRes=await sb.from("accounts").insert({owner_id:u.id,company_name:email.split("@")[0]});
@@ -354,13 +370,14 @@ async function bootstrap(){
         if(aid){
           await sb.from("members").insert({account_id:aid,user_id:u.id,email:email,name:email,role:"admin"});
           await sb.from("profiles").upsert({user_id:u.id});
-          currentAccountId=aid; currentRole="admin";
+          currentAccountId=aid; currentRole="admin"; currentPermissions=null;
         }
       }
     }catch(e){}
   }else{
     currentAccountId = owned.length ? owned[0].id : mems[0].account_id;
     currentRole = owned.length ? "admin" : (mems[0].role||"user");
+    currentPermissions = owned.length ? null : (mems[0].permissions||{});
   }
   _shared=null;
   return currentAccountId;
@@ -381,9 +398,10 @@ async set(k,v){const col=COLMAP[k];if(!col)return;try{_shared=_shared||{};_share
 
 /* ===== Ekip (members) veri fonksiyonları ===== */
 async function listMembers(){if(!currentAccountId)return[];try{const{data}=await sb.from("members").select("*").eq("account_id",currentAccountId).order("created_at",{ascending:true});return data||[];}catch(e){return[];}}
-async function addMember(email,role){if(!currentAccountId)return{error:{message:"Hesap yok"}};return await sb.from("members").insert({account_id:currentAccountId,email:(email||"").toLowerCase(),name:email,role:role});}
+async function addMember(email,role){if(!currentAccountId)return{error:{message:"Hesap yok"}};return await sb.from("members").insert({account_id:currentAccountId,email:(email||"").toLowerCase(),name:email,role:role,permissions:defaultPerms(role)});}
 async function removeMember(id){return await sb.from("members").delete().eq("id",id);}
-async function updateMemberRole(id,role){return await sb.from("members").update({role}).eq("id",id);}
+async function updateMemberRole(id,role){return await sb.from("members").update({role,permissions:defaultPerms(role)}).eq("id",id);}
+async function updateMemberPerms(id,perms){return await sb.from("members").update({permissions:perms}).eq("id",id);}
 
 /* ========== i18n ========== */
 const L={
@@ -550,6 +568,7 @@ const[role,setRole]=useState("shop_manager");
 const[busy,setBusy]=useState(false);
 const[err,setErr]=useState("");
 const[msg,setMsg]=useState("");
+const[openId,setOpenId]=useState(null);
 const load=()=>listMembers().then(setMembers);
 useEffect(()=>{load()},[]);
 const add=async()=>{const e=email.trim();if(!e)return;setBusy(true);setErr("");setMsg("");
@@ -576,11 +595,20 @@ return(<div style={{padding:"8px 0 40px"}}>
 <div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>👥 Ekip üyeleri</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{members.length}</span></div>
 <div className="tw" style={{marginTop:8}}><table style={{minWidth:520}}><thead><tr><th className="l">E-posta</th><th className="l">Rol</th><th className="l">Durum</th><th></th></tr></thead><tbody>
 {members.length===0&&<tr><td colSpan={4}><div className="empty" style={{padding:24}}><p>Henüz üye yok. Yukarıdan davet et.</p></div></td></tr>}
-{members.map(m=>(<tr key={m.id}>
+{members.map(m=>(<React.Fragment key={m.id}>
+<tr>
 <td className="l" style={{fontWeight:600}}>{m.email}</td>
 <td className="l">{isAdmin?<select className="cur-sel" value={m.role} onChange={e=>chRole(m.id,e.target.value)}>{roleOpts}</select>:(ROLE_TR[m.role]||m.role)}</td>
 <td className="l"><span className="vd" style={m.user_id?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{m.user_id?"Katıldı":"Davet bekliyor"}</span></td>
-<td>{isAdmin&&<button className="dl" onClick={()=>del(m.id)} title="Çıkar">✕</button>}</td></tr>))}
+<td><span style={{display:"flex",gap:6,justifyContent:"flex-end",alignItems:"center"}}>{isAdmin&&m.role!=="admin"&&<button className="btn" style={{fontSize:11,padding:"3px 9px"}} onClick={()=>setOpenId(openId===m.id?null:m.id)}>İzinler {openId===m.id?"▴":"▾"}</button>}{isAdmin&&<button className="dl" onClick={()=>del(m.id)} title="Çıkar">✕</button>}</span></td></tr>
+{isAdmin&&m.role!=="admin"&&openId===m.id&&<tr><td colSpan={4} style={{background:"var(--bg2)",padding:"12px 14px"}}>
+<div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>Bu üyenin görebileceği/yapabileceği işlemler (aç/kapat):</div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:8}}>
+{PERMS.map(p=>{const on=!!(m.permissions&&m.permissions[p.key]);return(
+<label key={p.key} style={{display:"flex",alignItems:"center",gap:8,fontSize:13,cursor:"pointer",padding:"6px 8px",border:"1px solid var(--line2)",borderRadius:8,background:on?"var(--green-s)":"var(--panel)"}}>
+<input type="checkbox" checked={on} onChange={async()=>{const np={...(m.permissions||{}),[p.key]:!on};await updateMemberPerms(m.id,np);load();}}/>{p.label}</label>);})}
+</div></td></tr>}
+</React.Fragment>))}
 </tbody></table></div></div>
 </div>);}
 function App(){
@@ -608,6 +636,8 @@ const[settings,setSettings]=useState(DS);
 const[dm,setDm]=useState({});
 const[date,setDate]=useState(todayISO());
 const[tab,setTab]=useState("marketing");
+const TAB_PERM={marketing:"viewMarketing",rules:"editRules",dikkat:"viewDikkat",trend:"viewTrend",agent:"viewAgent",ekip:"manageTeam"};
+useEffect(()=>{if(!can(TAB_PERM[tab])){const first=["marketing","rules","dikkat","trend","agent","ekip"].find(x=>can(TAB_PERM[x]));if(first&&first!==tab)setTab(first);}},[tab]);
 const[showPaste,setShowPaste]=useState(false);
 const[pt,setPt]=useState("");
 const[showSet,setShowSet]=useState(false);
@@ -834,7 +864,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM5 ☁️</b> · ekip + hesap</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM6 ☁️</b> · yetkiler</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -867,12 +897,12 @@ return(
 <main className="main">
 <div className="hero"><span className="mk">{tab==="ekip"?"EKİP YÖNETİMİ":tab==="agent"?t.hAgent:tab==="rules"?t.hRules:tab==="trend"?t.hTrend:tab==="dikkat"?t.hDikkat:t.mktTitle}</span></div>
 <div className="tabs">
-<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>{t.tabMkt}</button>
-<button className={tab==="rules"?"on":""} onClick={()=>setTab("rules")}>{t.tabRules}</button>
-<button className={tab==="dikkat"?"on":""} onClick={()=>setTab("dikkat")}>{t.tabDikkat}</button>
-<button className={tab==="trend"?"on":""} onClick={()=>setTab("trend")}>{t.tabTrend}</button>
-<button className={tab==="agent"?"on":""} onClick={()=>setTab("agent")}>{t.tabAgent}</button>
-<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}>👥 EKİP</button>
+{can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>{t.tabMkt}</button>}
+{can("editRules")&&<button className={tab==="rules"?"on":""} onClick={()=>setTab("rules")}>{t.tabRules}</button>}
+{can("viewDikkat")&&<button className={tab==="dikkat"?"on":""} onClick={()=>setTab("dikkat")}>{t.tabDikkat}</button>}
+{can("viewTrend")&&<button className={tab==="trend"?"on":""} onClick={()=>setTab("trend")}>{t.tabTrend}</button>}
+{can("viewAgent")&&<button className={tab==="agent"?"on":""} onClick={()=>setTab("agent")}>{t.tabAgent}</button>}
+{can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}>👥 EKİP</button>}
 </div>
 
 {tab==="ekip"&&<EkipPanel/>}
