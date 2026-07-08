@@ -631,6 +631,30 @@ return(<div style={{padding:"8px 0 40px"}}>
 <button className={"btn"+(((settings&&settings.lang)||"tr")!=="en"?" pri":"")} onClick={()=>setSettings(s=>({...s,lang:"tr"}))}>🇹🇷 Türkçe</button>
 <button className={"btn"+((settings&&settings.lang==="en")?" pri":"")} onClick={()=>setSettings(s=>({...s,lang:"en"}))}>🇬🇧 English</button></div></div>}
 </div>);}
+function FinanceTab({dm,act,accounts,settings,setSettings}){
+const storeName=(accounts.find(a=>a.id===act)||{}).name||"—";
+const cur=settings.cur;const fin=settings.finance||{};
+const setDashRev=(p,v)=>setSettings(s=>({...s,finance:{...(s.finance||{}),[act+"|"+p]:{dashRev:v}}}));
+const PER=[["1ay","1 AY"],["3ay","3 AY"],["6ay","6 AY"],["1yil","1 YIL"]];
+const rowsFor=p=>dm[act+"|"+p]||[];
+return(<div style={{padding:"8px 0 40px"}}>
+<div className="rules" style={{background:"var(--panel2)"}}>
+<div className="rh"><span style={{fontSize:16}}>💰 B — FINANCE</span><span className="store" style={{marginLeft:"auto"}}>{storeName}</span></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>Marketing Ratio = Reklam Gideri ÷ Dashboard Cirosu × 100. Reklam gideri marketing verinden otomatik gelir; <b>Dashboard cirosunu</b> (mağazanın toplam cirosu) sen girersin.</div></div>
+<div className="tw"><table style={{minWidth:640}}><thead><tr>
+<th className="l">Dönem</th><th>Dashboard Ciro</th><th>Reklam Gideri</th><th>Marketing Ratio</th><th>Reklam Geliri</th>
+</tr></thead><tbody>
+{PER.map(([p,lb])=>{const rs=rowsFor(p);const spend=rs.reduce((s,r)=>s+toNum(r.spend),0);const rev=rs.reduce((s,r)=>s+toNum(r.revenue),0);const dash=toNum((fin[act+"|"+p]||{}).dashRev);const ratio=dash>0?spend/dash*100:0;const rc=ratio<=15?"var(--green)":ratio<=30?"var(--amber)":"var(--red)";return(
+<tr key={p}>
+<td className="l" style={{fontWeight:600}}>{lb}</td>
+<td><input className="ci" value={(fin[act+"|"+p]||{}).dashRev||""} placeholder="0" onChange={e=>setDashRev(p,e.target.value)} style={{width:110,border:"1px solid var(--line2)"}}/></td>
+<td className="calc">{money(spend,cur)}</td>
+<td className="calc s" style={{fontWeight:700,color:dash>0?rc:"var(--faint)"}}>{dash>0?"%"+ratio.toFixed(1):"—"}</td>
+<td className="calc">{money(rev,cur)}</td>
+</tr>);})}
+</tbody></table></div>
+<div style={{fontSize:12,color:"var(--faint)",marginTop:8}}>Yeşil ≤%15 · sarı %15–30 · kırmızı &gt;%30 (reklam gideri/ciro oranı). İleride: kargo, ürün maliyeti, net kâr eklenecek.</div>
+</div>);}
 const ROLE_TR={admin:"Yönetici",user:"Kullanıcı",shop_manager:"Mağaza Müdürü"};
 function EkipPanel(){
 const[members,setMembers]=useState([]);
@@ -948,7 +972,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM8 ☁️</b> · tüm bölümler</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM9 ☁️</b> · Finance</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -996,7 +1020,7 @@ return(
 </div>
 
 {tab==="ekip"&&<EkipPanel/>}
-{tab==="finance"&&<SectionOutline m={MODULES.finance}/>}
+{tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
 {tab==="trademark"&&<SectionOutline m={MODULES.trademark}/>}
 {tab==="visibility"&&<SectionOutline m={MODULES.visibility}/>}
 {tab==="dashboard"&&<SectionOutline m={MODULES.dashboard}/>}
