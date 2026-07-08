@@ -1050,6 +1050,7 @@ catch(e){setToast(TT("Bağlanılamadı: ","Connect error: ")+(e.message||""));}}
 const disconnectStore=(acc)=>{delete gmStoreTok.current[acc.id];setAccounts(x=>x.map(s=>s.id===acc.id?{...s,gmailConnected:false}:s));};
 const fetchStoreCSV=async(acc)=>{const tok=gmStoreTok.current[acc.id];
 if(!tok){setToast(TT("Önce bu mağazayı Google ile bağla.","Connect this store with Google first."));return;}
+setAct(acc.id);
 setToast(TT("Gmail'den çekiliyor…","Fetching from Gmail…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
 const list=await gGet(tok,base+"?q="+encodeURIComponent("has:attachment filename:csv newer_than:30d")+"&maxResults=10");
@@ -1100,7 +1101,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM25 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM26 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1113,7 +1114,7 @@ return(
 <div key={a.id} className={"si"+(on?" on":"")} style={{flexDirection:"column",alignItems:"stretch",gap:6}}>
 <div style={{display:"flex",alignItems:"center",gap:9,cursor:"pointer"}} onClick={()=>setAct(a.id)} onDoubleClick={()=>renAcct(a.id)} title={lang==="tr"?"Çift tık = adı değiştir":"Double-click = rename"}>
 <span className="ic">{String(i+1).padStart(2,"0")}</span>
-<span className="sn">{a.name}</span>
+<input value={a.name||""} onClick={e=>e.stopPropagation()} onFocus={()=>setAct(a.id)} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>s.id===a.id?{...s,name:v}:s))}} placeholder={lang==="tr"?"Mağaza adı…":"Store name…"} title={lang==="tr"?"Adı elle düzenle":"Edit name manually"} style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,fontFamily:"'Inter'",border:"1px solid var(--line2)",borderRadius:6,padding:"3px 6px",background:"var(--panel)",color:"var(--ink)"}}/>
 {st.count>0&&<span className={"sb"+(st.close?" red":"")}>{st.count}</span>}
 </div>
 <input value={a.email||""} placeholder={lang==="tr"?"✉️ e-posta ekle…":"✉️ add email…"} onClick={e=>e.stopPropagation()} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>{if(s.id!==a.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=(v.split("@")[0]||"").trim();return{...s,email:v,name:(def&&lp)?lp.toUpperCase():s.name}}))}} style={{width:"100%",fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 7px",background:"var(--panel)",color:"var(--ink)"}}/>
