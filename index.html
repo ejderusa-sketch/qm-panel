@@ -627,8 +627,11 @@ return(<div style={{padding:"8px 0 40px"}}>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>{TT("Ödeme & yükseltme yakında. Şu an tüm özellikler açık (geliştirme sürümü).","Payment & upgrades coming soon. All features are currently open (development build).")}</div></div>}
 {sub==="baglanti"&&<div className="rules">
 <div className="rh"><span style={{fontSize:15}}>🔗 {TT("Bağlantı (Connect)","Connection")}</span></div>
-<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6,marginTop:6}}>{TT("Her mağazanın e-postasını sol taraftaki mağaza listesinden ekle (mağaza altındaki \"e-posta ekle\"). Bağlı e-posta hem iletişim kanalı hem veri kaynağıdır.","Add each store's email from the store list on the left (\"add email\" under the store). The connected email is both a communication channel and a data source.")}</div>
-<div style={{marginTop:10,padding:"10px 13px",border:"1px dashed var(--line2)",borderRadius:10,fontSize:13,color:"var(--faint)"}}>🔌 {TT("Etsy / Amazon API bağlantısı — yakında (planın Phase 10).","Etsy / Amazon API connection — coming soon (plan Phase 10).")}</div></div>}
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6,marginTop:6}}>{TT("Her mağazanın e-postasını sol taraftaki mağaza listesinden ekle, sonra \"Google ile Bağlan\"a bas. Şifre GİRME — Google izin ekranı açılır, sadece okuma yetkisi verirsin.","Add each store's email from the store list on the left, then click \"Connect with Google\". Do NOT enter a password — Google's own consent screen opens and you grant read-only access.")}</div>
+<label style={{display:"block",fontSize:12.5,fontWeight:700,marginTop:14}}>Google OAuth Client ID
+<input value={settings.googleClientId||""} placeholder="xxxxx.apps.googleusercontent.com" onChange={e=>setSettings(s=>({...s,googleClientId:e.target.value}))} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:12.5}}/></label>
+<div style={{fontSize:11.5,color:"var(--faint)",marginTop:6,lineHeight:1.6}}>{TT("Google Cloud Console → APIs & Services → Credentials → OAuth Client ID (Web). İzinli JavaScript origin olarak https://ejderusa-sketch.github.io ekle. Gmail API'yi aç. Test kullanıcısına kendi e-postanı ekle.","Google Cloud Console → APIs & Services → Credentials → OAuth Client ID (Web). Add https://ejderusa-sketch.github.io as an authorized JavaScript origin. Enable the Gmail API. Add your email as a test user.")}</div>
+<div style={{marginTop:10,padding:"10px 13px",border:"1px dashed var(--line2)",borderRadius:10,fontSize:13,color:"var(--faint)"}}>🔌 {TT("Etsy / Amazon API bağlantısı — yakında (planın Faz 10).","Etsy / Amazon API connection — coming soon (plan Phase 10).")}</div></div>}
 {sub==="kaynak"&&<div className="rules">
 <div className="rh"><span style={{fontSize:15}}>📥 {TT("Veri Kaynakları","Data Sources")}</span></div>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 8px"}}>{TT("QM'ye veri şu yollarla girer:","Data enters QM in these ways:")}</div>
@@ -751,6 +754,7 @@ const[gmErr,setGmErr]=useState("");
 const tRef=useRef();
 const fRef=useRef();
 const hiRef=useRef();
+const gmStoreTok=useRef({});
 
 const key=`${act}|${date}`;
 const rows=dm[key]||[];
@@ -925,6 +929,36 @@ const sc=sd.filter(m=>/shipped|tracking|shipment/i.test(m.subject)).length;
 setGmData({email:prof.emailAddress,etsyAll:ed,ssAll:sd,orderCount:oc,shipCount:sc,fetchedAt:new Date().toLocaleTimeString("tr-TR")})}
 catch(e){setGmErr("Çekilemedi: "+(e.message||"hata"))}finally{setGmLoad(false)}};
 
+/* QM19: mağaza başına Gmail bağlantısı */
+const connectStore=(acc)=>{const cid=(settings.googleClientId||"").trim();
+if(!cid){setToast(TT("Önce Ayarlar → Q3 Bağlantı'dan Google Client ID gir.","First enter the Google Client ID in Settings → Q3 Connection."));setShowSet(true);return;}
+if(!window.google||!window.google.accounts){setToast(TT("Google kütüphanesi yüklenemedi.","Google library not loaded."));return;}
+try{window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",login_hint:acc.email||"",callback:async r=>{
+if(r.error){setToast(TT("Bağlantı iptal edildi.","Connection cancelled."));return;}
+gmStoreTok.current[acc.id]=r.access_token;
+try{const prof=await gGet(r.access_token,"https://www.googleapis.com/gmail/v1/users/me/profile");
+setAccounts(x=>x.map(s=>s.id===acc.id?{...s,email:prof.emailAddress,gmailConnected:true}:s));
+setToast("✓ "+prof.emailAddress+" "+TT("bağlandı","connected"));}
+catch(e){setToast(TT("Profil alınamadı: ","Profile error: ")+(e.message||""));}
+}}).requestAccessToken();}
+catch(e){setToast(TT("Bağlanılamadı: ","Connect error: ")+(e.message||""));}};
+const disconnectStore=(acc)=>{delete gmStoreTok.current[acc.id];setAccounts(x=>x.map(s=>s.id===acc.id?{...s,gmailConnected:false}:s));};
+const fetchStoreCSV=async(acc)=>{const tok=gmStoreTok.current[acc.id];
+if(!tok){setToast(TT("Önce bu mağazayı Google ile bağla.","Connect this store with Google first."));return;}
+setToast(TT("Gmail'den çekiliyor…","Fetching from Gmail…"));
+try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
+const list=await gGet(tok,base+"?q="+encodeURIComponent("has:attachment filename:csv newer_than:30d")+"&maxResults=10");
+const msgs=list.messages||[];if(!msgs.length){setToast(TT("Son 30 günde CSV eki bulunamadı.","No CSV attachment found in the last 30 days."));return;}
+for(const m of msgs){const d=await gGet(tok,base+"/"+m.id+"?format=full");
+const collect=(pl,out)=>{if(!pl)return;if(pl.filename&&/\.csv$/i.test(pl.filename)&&pl.body&&pl.body.attachmentId)out.push(pl);if(pl.parts)pl.parts.forEach(p=>collect(p,out));};
+const parts=[];collect(d.payload,parts);
+if(parts.length){const cp=parts[0];const at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);
+const b64=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(b64)));}catch(_){txt=atob(b64);}
+const file=new File([txt],"gmail.csv",{type:"text/csv"});handleCSV(file);
+setToast(TT("CSV Gmail'den içeri alındı.","CSV imported from Gmail."));return;}}
+setToast(TT("CSV eki okunamadı.","Could not read CSV attachment."));}
+catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
+
 /* memos */
 const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,settings)})),[rows,settings]);
 /* QM7: ShipStation tarzı filtre/arama/seçim */
@@ -961,7 +995,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM18 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM19 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -978,7 +1012,14 @@ return(
 {st.count>0&&<span className={"sb"+(st.close?" red":"")}>{st.count}</span>}
 </div>
 <input value={a.email||""} placeholder={lang==="tr"?"✉️ e-posta ekle…":"✉️ add email…"} onClick={e=>e.stopPropagation()} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>s.id===a.id?{...s,email:v}:s))}} style={{width:"100%",fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 7px",background:"var(--panel)",color:"var(--ink)"}}/>
-{a.email&&<a href={gmailUrl} target="_blank" rel="noopener noreferrer" style={{fontSize:11,color:"var(--azure)",textDecoration:"none",fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}>📥 {lang==="tr"?"e-postadan çek":"fetch from email"}</a>}
+{a.email&&(a.gmailConnected?
+<div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}} onClick={e=>e.stopPropagation()}>
+<span style={{fontSize:10,fontWeight:800,color:"var(--green)"}}>✓ {TT("Bağlı","Connected")}</span>
+<button onClick={()=>fetchStoreCSV(a)} style={{fontSize:10.5,fontWeight:700,color:"var(--azure)",background:"var(--panel)",border:"1px solid var(--line2)",borderRadius:6,padding:"3px 7px",cursor:"pointer"}}>📥 {TT("Şimdi çek","Fetch now")}</button>
+<button onClick={()=>disconnectStore(a)} title={TT("Bağlantıyı kes","Disconnect")} style={{fontSize:10.5,color:"var(--faint)",background:"none",border:"none",cursor:"pointer"}}>✕</button>
+</div>
+:<button onClick={e=>{e.stopPropagation();connectStore(a)}} style={{fontSize:10.5,fontWeight:700,color:"#fff",background:"#1b2a6b",border:"none",borderRadius:6,padding:"4px 9px",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5,alignSelf:"flex-start"}}>🔗 {TT("Google ile Bağlan","Connect with Google")}</button>
+)}
 </div>);
 })}
 {accounts.length===0&&<div style={{padding:"16px 10px 6px",textAlign:"center",color:"var(--faint)",fontSize:12,lineHeight:1.6}}>{TT("Henüz mağaza yok.","No stores yet.")}<br/>{TT("Aşağıdan bağla.","Connect below.")}</div>}
