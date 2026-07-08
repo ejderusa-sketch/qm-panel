@@ -402,6 +402,11 @@ async function addMember(email,role){if(!currentAccountId)return{error:{message:
 async function removeMember(id){return await sb.from("members").delete().eq("id",id);}
 async function updateMemberRole(id,role){return await sb.from("members").update({role,permissions:defaultPerms(role)}).eq("id",id);}
 async function updateMemberPerms(id,perms){return await sb.from("members").update({permissions:perms}).eq("id",id);}
+/* ===== Profil / Hesap bilgisi ===== */
+async function getProfile(){const u=(await sb.auth.getUser()).data.user;if(!u)return{email:""};try{const{data}=await sb.from("profiles").select("*").eq("user_id",u.id).maybeSingle();return{...(data||{}),email:u.email||""};}catch(e){return{email:u.email||""};}}
+async function saveProfile(p){const u=(await sb.auth.getUser()).data.user;if(!u)return;return await sb.from("profiles").upsert({user_id:u.id,full_name:p.full_name||null,phone:p.phone||null,country:p.country||null,timezone:p.timezone||null});}
+async function getAccountInfo(){if(!currentAccountId)return{};try{const{data}=await sb.from("accounts").select("*").eq("id",currentAccountId).maybeSingle();return data||{};}catch(e){return{};}}
+async function saveAccountInfo(p){if(!currentAccountId)return;return await sb.from("accounts").update(p).eq("id",currentAccountId);}
 
 /* ========== i18n ========== */
 const L={
@@ -560,6 +565,72 @@ const blankRow=()=>({id:Math.random().toString(36).slice(2),name:"",impressions:
 const blankV=()=>({id:Math.random().toString(36).slice(2),name:"",category:"",keyword:"",position:"",views:"",note:""});
 
 /* ========== APP ========== */
+/* ===== Plan modülleri (bölüm taslakları) ===== */
+const MODULES={
+ finance:{title:"💰 B — FINANCE",intro:"Dashboard cirosu, reklam gideri ve Marketing oranını net gösterir.",items:[["Dashboard Revenue (ciro)","🔜"],["Ads Spend (reklam gideri)","🔜"],["Marketing Ratio = Ads ÷ Ciro × 100","🔜"],["Tarihsel görünüm (günlük/haftalık/aylık/yıllık)","🔜"],["Önceki dönemle karşılaştırma","🔜"]]},
+ trademark:{title:"⚖️ C — TRADEMARK & COPYRIGHT",intro:"Bağlı Gmail'den gelen ihlal bildirimlerini takip eden canlı Case merkezi.",items:[["IP Summary sayaçları (notice/removed/restored)","🔜"],["Trademark & Copyright bildirimleri","🔜"],["Canlı e-posta izleme → Case oluşturma","🔜"],["Response Center (reply, withdrawal, counter notice)","🔜"],["Case durumları & tam geçmiş","🔜"]]},
+ visibility:{title:"📈 D — ETSY GÖRÜNÜRLÜK & UPLOAD",intro:"Etsy şu an neyi daha çok gösteriyor, buna göre ne yüklenmeli?",items:[["Visibility Summary","🔜"],["Günlük görünürlük çizelgesi","🔜"],["Kategori / tema tespiti","🔜"],["Ne yükleyelim? tavsiyesi (STRONG/HOLD…)","🔜"],["Upload Gap (fırsat vs. mevcut listing)","🔜"]]},
+ dashboard:{title:"✅ X — SHOP MANAGER DASHBOARD",intro:"Manager'ın günlük iş merkezi: bugün ne yapmalı?",items:[["Bugünün görevleri & tavsiyeler","🔜"],["Dikkat gerektirenler (öncelikli)","🔜"],["Etsy Listing takvimi (sezonluk plan)","🔜"],["Görev atama & durum","🔜"],["Haftalık manager raporu","🔜"]]},
+ zidentity:{title:"🆔 Z — STORE KİMLİK & DOĞRULAMA",intro:"Her mağazanın doğrulanmış kimlik ve referans dosyası (dış yazışmada güvenli kaynak).",items:[["Store adı, URL, ID, ülke, para birimi","🔜"],["Legal owner / şirket / iletişim","🔜"],["Connected email & payment reference (maskeli)","🔜"],["Doğrulama durumu (Verified/Missing/Outdated)","🔜"],["Değişiklik geçmişi","🔜"]]},
+};
+function SectionOutline({m}){return(<div style={{padding:"8px 0 40px"}}>
+<div className="rules" style={{background:"var(--panel2)"}}><div className="rh"><span style={{fontSize:16}}>{m.title}</span><span className="vd" style={{marginLeft:"auto",background:"var(--amber-s)",color:"var(--amber)"}}>Yakında</span></div><div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{m.intro}</div></div>
+<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>Bu bölümde olacaklar</span></div>
+<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>{m.items.map((it,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span>{it[1]}</span>{it[0]}</div>)}</div>
+<div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>Bu bölüm planın sıradaki fazlarında adım adım doldurulacak.</div></div>
+</div>);}
+function SettingsPanel({settings,setSettings}){
+const[sub,setSub]=useState("profil");
+const[prof,setProf]=useState(null);
+const[acc,setAcc]=useState(null);
+const[saved,setSaved]=useState("");
+useEffect(()=>{getProfile().then(setProf);getAccountInfo().then(setAcc);},[]);
+if(!prof||!acc)return <div id="boot" style={{minHeight:180}}>Yükleniyor…</div>;
+const isAdmin=currentRole==="admin";
+const upP=(k,v)=>setProf(p=>({...p,[k]:v}));
+const flash=m=>{setSaved(m);setTimeout(()=>setSaved(""),1600);};
+const saveP=async()=>{await saveProfile(prof);flash("Profil kaydedildi.");};
+const saveA=async()=>{await saveAccountInfo({company_name:acc.company_name});flash("Şirket bilgisi kaydedildi.");};
+const SUBS=[["profil","👤 Profil"],["abonelik","💳 Abonelik"],["baglanti","🔗 Bağlantı"],["kaynak","📥 Veri Kaynakları"],["dil","🌐 Dil"]];
+const inp=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={prof[k]||""} placeholder={ph||""} onChange={e=>upP(k,e.target.value)} style={{display:"block",width:"100%",maxWidth:360,marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
+const DS=[["📷 Screenshot yükle","hazır"],["📄 CSV yükle","hazır"],["📋 Kopyala-yapıştır","hazır"],["⌨️ Elle giriş","hazır"],["📎 Doküman yükle","yakında"],["✉️ Bağlı e-posta (Gmail)","yakında"],["🔌 API (Etsy/Amazon)","yakında"]];
+return(<div style={{padding:"8px 0 40px"}}>
+<div className="tabs" style={{marginBottom:14}}>{SUBS.map(([k,lb])=><button key={k} className={sub===k?"on":""} onClick={()=>setSub(k)}>{lb}</button>)}</div>
+{saved&&<div className="busy" style={{background:"var(--green-s)",borderColor:"rgba(15,157,99,.3)",color:"var(--green)"}}>{saved}</div>}
+{sub==="profil"&&<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>👤 Profil</span></div>
+<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>E-posta<input value={prof.email||""} disabled style={{display:"block",width:"100%",maxWidth:360,marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5,background:"var(--panel2)",color:"var(--faint)"}}/></label>
+{inp("Ad Soyad","full_name","Adın Soyadın")}
+{inp("Telefon","phone","+1 ...")}
+{inp("Ülke","country","US / TR ...")}
+{inp("Saat dilimi","timezone","America/New_York")}
+<div><button className="btn pri" style={{marginTop:16}} onClick={saveP}>Profili kaydet</button></div>
+{isAdmin&&<div style={{marginTop:20,paddingTop:16,borderTop:"1px solid var(--line)"}}>
+<div style={{fontSize:13,fontWeight:600,marginBottom:6}}>Şirket / Hesap adı (Admin)</div>
+<input value={acc.company_name||""} onChange={e=>setAcc(a=>({...a,company_name:e.target.value}))} style={{width:"100%",maxWidth:360,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5}}/>
+<div><button className="btn" style={{marginTop:10}} onClick={saveA}>Şirket bilgisini kaydet</button></div></div>}
+</div>}
+{sub==="abonelik"&&<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>💳 Abonelik</span><span className="vd" style={{marginLeft:"auto",background:"var(--green-s)",color:"var(--green)"}}>{(acc.subscription_plan||"beginner").toUpperCase()}</span></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:12,marginTop:10}}>
+{[["BEGINNER","Küçük işletme","Sınırlı mağaza & manager, temel Marketing/Finance, screenshot upload"],["STANDARD","Büyüyen işletme","Daha fazla mağaza & manager, yetki sistemi, CSV, e-posta, karşılaştırma"],["GOLDEN","Büyük hesap","Yüksek limitler, e-posta otomasyonu, API entegrasyonları, gelişmiş rapor"]].map(p=><div key={p[0]} style={{border:"1px solid var(--line2)",borderRadius:12,padding:14,background:(acc.subscription_plan||"beginner")===p[0].toLowerCase()?"var(--green-s)":"var(--bg2)"}}>
+<div style={{fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:15}}>{p[0]}</div><div style={{fontSize:12,color:"var(--muted)",margin:"2px 0 8px"}}>{p[1]}</div><div style={{fontSize:12.5,lineHeight:1.5}}>{p[2]}</div></div>)}
+</div>
+<div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>Ödeme & yükseltme yakında. Şu an tüm özellikler açık (geliştirme sürümü).</div></div>}
+{sub==="baglanti"&&<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>🔗 Bağlantı (Connect)</span></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6,marginTop:6}}>Her mağazanın e-postasını <b>sol taraftaki mağaza listesinden</b> ekle (mağaza altındaki "e-posta ekle"). Bağlı e-posta hem iletişim kanalı hem veri kaynağıdır.</div>
+<div style={{marginTop:10,padding:"10px 13px",border:"1px dashed var(--line2)",borderRadius:10,fontSize:13,color:"var(--faint)"}}>🔌 Etsy / Amazon API bağlantısı — <b>yakında</b> (planın Phase 10).</div></div>}
+{sub==="kaynak"&&<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>📥 Veri Kaynakları</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 8px"}}>QM'ye veri şu yollarla girer:</div>
+<div style={{display:"flex",flexDirection:"column",gap:8}}>{DS.map((d,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>{d[0]}</span><span className="vd" style={d[1]==="hazır"?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{d[1]}</span></div>)}</div></div>}
+{sub==="dil"&&<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>🌐 Dil</span></div>
+<div style={{display:"flex",gap:8,marginTop:10}}>
+<button className={"btn"+(((settings&&settings.lang)||"tr")!=="en"?" pri":"")} onClick={()=>setSettings(s=>({...s,lang:"tr"}))}>🇹🇷 Türkçe</button>
+<button className={"btn"+((settings&&settings.lang==="en")?" pri":"")} onClick={()=>setSettings(s=>({...s,lang:"en"}))}>🇬🇧 English</button></div></div>}
+</div>);}
 const ROLE_TR={admin:"Yönetici",user:"Kullanıcı",shop_manager:"Mağaza Müdürü"};
 function EkipPanel(){
 const[members,setMembers]=useState([]);
@@ -637,7 +708,7 @@ const[dm,setDm]=useState({});
 const[date,setDate]=useState(todayISO());
 const[tab,setTab]=useState("marketing");
 const TAB_PERM={marketing:"viewMarketing",rules:"editRules",dikkat:"viewDikkat",trend:"viewTrend",agent:"viewAgent",ekip:"manageTeam"};
-useEffect(()=>{if(!can(TAB_PERM[tab])){const first=["marketing","rules","dikkat","trend","agent","ekip"].find(x=>can(TAB_PERM[x]));if(first&&first!==tab)setTab(first);}},[tab]);
+useEffect(()=>{if(TAB_PERM[tab]&&!can(TAB_PERM[tab])){const first=["marketing","rules","dikkat","trend","agent","ekip"].find(x=>can(TAB_PERM[x]));if(first&&first!==tab)setTab(first);}},[tab]);
 const[mktFilter,setMktFilter]=useState("all");
 const[mktSearch,setMktSearch]=useState("");
 const[sel,setSel]=useState(()=>new Set());
@@ -877,7 +948,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM7 ☁️</b> · operasyon</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM8 ☁️</b> · tüm bölümler</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -908,7 +979,7 @@ return(
 </aside>
 
 <main className="main">
-<div className="hero"><span className="mk">{tab==="ekip"?"EKİP YÖNETİMİ":tab==="agent"?t.hAgent:tab==="rules"?t.hRules:tab==="trend"?t.hTrend:tab==="dikkat"?t.hDikkat:t.mktTitle}</span></div>
+<div className="hero"><span className="mk">{tab==="ayarlar"?"AYARLAR":tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?"D — GÖRÜNÜRLÜK":tab==="dashboard"?"X — DASHBOARD":tab==="zidentity"?"Z — STORE KİMLİK":tab==="ekip"?"EKİP YÖNETİMİ":tab==="agent"?t.hAgent:tab==="rules"?t.hRules:tab==="trend"?t.hTrend:tab==="dikkat"?t.hDikkat:t.mktTitle}</span></div>
 <div className="tabs">
 {can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>{t.tabMkt}</button>}
 {can("editRules")&&<button className={tab==="rules"?"on":""} onClick={()=>setTab("rules")}>{t.tabRules}</button>}
@@ -916,9 +987,21 @@ return(
 {can("viewTrend")&&<button className={tab==="trend"?"on":""} onClick={()=>setTab("trend")}>{t.tabTrend}</button>}
 {can("viewAgent")&&<button className={tab==="agent"?"on":""} onClick={()=>setTab("agent")}>{t.tabAgent}</button>}
 {can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}>👥 EKİP</button>}
+<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}>💰 FINANCE</button>
+<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}>⚖️ TRADEMARK</button>
+<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}>📈 GÖRÜNÜRLÜK</button>
+<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}>✅ DASHBOARD</button>
+<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}>🆔 Z-KİMLİK</button>
+<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}>⚙ AYARLAR</button>
 </div>
 
 {tab==="ekip"&&<EkipPanel/>}
+{tab==="finance"&&<SectionOutline m={MODULES.finance}/>}
+{tab==="trademark"&&<SectionOutline m={MODULES.trademark}/>}
+{tab==="visibility"&&<SectionOutline m={MODULES.visibility}/>}
+{tab==="dashboard"&&<SectionOutline m={MODULES.dashboard}/>}
+{tab==="zidentity"&&<SectionOutline m={MODULES.zidentity}/>}
+{tab==="ayarlar"&&<SettingsPanel settings={settings} setSettings={setSettings}/>}
 
 {/* ===== MARKETING TAB ===== */}
 {tab==="marketing"&&(<>
