@@ -363,13 +363,17 @@ async function bootstrap(){
 }
 async function _loadShared(){
   if(_shared)return _shared;
-  if(!currentAccountId){_shared={};return _shared;}
-  try{const{data}=await sb.from("account_state").select("*").eq("account_id",currentAccountId).maybeSingle();_shared=data||{};}catch(e){_shared={};}
+  try{
+    let data;
+    if(currentAccountId){({data}=await sb.from("account_state").select("*").eq("account_id",currentAccountId).maybeSingle());}
+    else{({data}=await sb.from("shared_state").select("*").eq("id","main").maybeSingle());}
+    _shared=data||{};
+  }catch(e){_shared={};}
   return _shared;
 }
 const store={
 async get(k,d){try{const row=await _loadShared();const col=COLMAP[k];if(!col)return d;const v=row[col];return v!=null?v:d}catch(e){return d}},
-async set(k,v){const col=COLMAP[k];if(!col||!currentAccountId)return;try{_shared=_shared||{};_shared[col]=v;await sb.from("account_state").upsert({account_id:currentAccountId,[col]:v,updated_at:new Date().toISOString()})}catch(e){}}};
+async set(k,v){const col=COLMAP[k];if(!col)return;try{_shared=_shared||{};_shared[col]=v;if(currentAccountId){await sb.from("account_state").upsert({account_id:currentAccountId,[col]:v,updated_at:new Date().toISOString()});}else{await sb.from("shared_state").upsert({id:"main",[col]:v,updated_at:new Date().toISOString()});}}catch(e){}}};
 
 /* ========== i18n ========== */
 const L={
