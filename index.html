@@ -798,6 +798,46 @@ return(<div style={{padding:"8px 0 40px"}}>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:6}}>{TT("Mesajlar hesabın tüm üyelerine görünür ve buluta kaydedilir.","Messages are visible to all account members and saved to the cloud.")}</div>
 </div>
 </div>);}
+function RulesPanel({settings,setSettings}){
+const rules=Array.isArray(settings.rules)?settings.rules:[];
+const getR=type=>rules.find(r=>r.type===type)||{type,on:false,n:0};
+const setR=(type,patch)=>setSettings(s=>{const rs=Array.isArray(s.rules)?s.rules.map(r=>({...r})):[];const i=rs.findIndex(r=>r.type===type);const cur=i>=0?rs[i]:{id:type,type,on:false,n:0};const nx={...cur,...patch};if(i>=0)rs[i]=nx;else rs.push(nx);return{...s,rules:rs};});
+const setNum=(k,v)=>setSettings(s=>({...s,[k]:Math.max(0,v)}));
+const PARAMS=[
+ {type:"ctr_fix",tr:"CTR düşük → DÜZELT",en:"Low CTR → FIX",unit:"%",st:0.1,hint:TT("1000+ gösterimde CTR bu %'nin altındaysa: görsel/başlık düzelt (kapatma).","With 1000+ impressions, if CTR is below this %: fix image/title (don't close).")},
+ {type:"ctr_lt",tr:"CTR çok düşük → KAPAT",en:"Very low CTR → CLOSE",unit:"%",st:0.1,hint:TT("CTR bu %'nin altındaysa reklamı kapat.","Close ads if CTR is below this %.")},
+ {type:"roas_lt",tr:"ROAS düşük → KAPAT",en:"Low ROAS → CLOSE",unit:"×",st:0.1,hint:TT("ROAS bu değerin altındaysa kapat.","Close if ROAS is below this value.")},
+ {type:"spend_no_sale",tr:"Harcama var, 0 satış → KAPAT",en:"Spend, 0 sales → CLOSE",unit:settings.cur||"$",st:5,hint:TT("Bu kadar harcanıp 0 satış varsa kapat.","Close if this much is spent with 0 sales.")},
+ {type:"clk_no_sale",tr:"Tıklama var, 0 satış → KAPAT",en:"Clicks, 0 sales → CLOSE",unit:TT("tık","clk"),st:5,hint:TT("Bu kadar tıklama olup 0 satış varsa kapat.","Close if this many clicks with 0 sales.")},
+];
+const Step=({v,set,st,unit})=><span style={{display:"inline-flex",alignItems:"center",gap:6}}>
+<button onClick={()=>set(Math.max(0,Math.round((v-st)*100)/100))} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,lineHeight:1,color:"var(--red)"}}>−</button>
+<span style={{minWidth:56,textAlign:"center",fontFamily:"'JetBrains Mono'",fontWeight:700,fontSize:14}}>{v}{unit}</span>
+<button onClick={()=>set(Math.round((v+st)*100)/100)} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,lineHeight:1,color:"var(--green)"}}>+</button></span>;
+const Toggle=({on,set})=><button onClick={()=>set(!on)} style={{width:46,height:26,borderRadius:999,border:"none",cursor:"pointer",background:on?"var(--green)":"var(--line2)",position:"relative",transition:".15s",flex:"none"}}><span style={{position:"absolute",top:3,left:on?23:3,width:20,height:20,borderRadius:"50%",background:"#fff",transition:".15s"}}/></button>;
+return(<div className="rules" style={{marginBottom:14}}>
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("Kurallar — Marketing Parametreleri","Rules — Marketing Parameters")}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametreyi aç/kapat ve eşiğini −/+ ile ayarla. Kurallar tüm listinglere uygulanır.","Toggle each parameter on/off and adjust its threshold with −/+. Rules apply to all listings.")}</div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:10}}>
+{PARAMS.map(p=>{const r=getR(p.type);return(
+<div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:12,padding:"11px 13px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
+<div style={{display:"flex",alignItems:"center",gap:10}}>
+<Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/>
+<span style={{fontSize:13.5,fontWeight:700,flex:1}}>{TT(p.tr,p.en)}</span></div>
+<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginTop:8,opacity:r.on?1:0.5}}>
+<span style={{fontSize:11.5,color:"var(--muted)",lineHeight:1.4,flex:1}}>{p.hint}</span>
+<Step v={toNum(r.n)} set={v=>setR(p.type,{n:v})} st={p.st} unit={p.unit==="%"||p.unit==="×"?p.unit:""}/></div>
+</div>);})}
+</div>
+<div className="rh" style={{marginTop:14}}><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📈 {TT("ROAS eşikleri & minimumlar","ROAS thresholds & minimums")}</span></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:10,marginTop:8}}>
+{[[TT("Hedef ROAS (üstü → BÜYÜT)","Target ROAS (above → GROW)"),"targetRoas",0.1,"×"],[TT("Alt ROAS (altı → KAPAT)","Watch ROAS (below → CLOSE)"),"watchRoas",0.1,"×"],[TT("Min tıklama","Min clicks"),"minClicks",5,""],[TT("Min gösterim","Min impressions"),"minImp",100,""],[TT("Min harcama","Min spend"),"minSpend",5,settings.cur||"$"]].map(([lb,k,st,unit])=>
+<div key={k} style={{border:"1px solid var(--line2)",borderRadius:12,padding:"11px 13px",background:"var(--bg2)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+<span style={{fontSize:12.5,fontWeight:600,flex:1}}>{lb}</span>
+<Step v={toNum(settings[k])} set={v=>setNum(k,v)} st={st} unit={unit==="×"?"×":""}/></div>)}
+</div>
+<div style={{fontSize:11.5,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler anında uygulanır ve buluta kaydedilir.","Changes apply instantly and are saved to the cloud.")}</div>
+</div>);}
 function ZKimlik({accounts,act,setAccounts}){
 const acc=accounts.find(a=>a.id===act);
 if(!acc)return(<div style={{padding:"8px 0 40px"}}><div className="rules" style={{background:"var(--panel2)"}}>{TT("Önce soldan bir mağaza ekle/seç.","Add or select a store on the left first.")}</div></div>);
@@ -915,6 +955,7 @@ const[mktFilter,setMktFilter]=useState("all");
 const[mktSearch,setMktSearch]=useState("");
 const[sel,setSel]=useState(()=>new Set());
 const[showPaste,setShowPaste]=useState(false);
+const[showRules,setShowRules]=useState(false);
 const[pt,setPt]=useState("");
 const[showSet,setShowSet]=useState(false);
 const[toast,setToast]=useState("");
@@ -1178,7 +1219,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM28 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM29 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1258,6 +1299,9 @@ return(
 <input ref={fRef} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handleImage(e.target.files&&e.target.files[0])}/>
 {imgErr&&<div className="err">⚠ {imgErr}</div>}
 {imgBusy&&<div className="busy"><span className="sp"/>{imgMsg}</div>}
+
+<div style={{margin:"2px 0 12px"}}><button className={"btn"+(showRules?" pri":"")} onClick={()=>setShowRules(v=>!v)} style={{fontWeight:700}}>⚙ {TT("Kurallar (RULES)","Rules (RULES)")} {showRules?"▴":"▾"}</button></div>
+{showRules&&<RulesPanel settings={settings} setSettings={setSettings}/>}
 
 <div className="sec"><h2><span className="bar"/>{t.analysis}</h2>
 <div className="brow">{can("deleteData")&&<button className="btn" onClick={()=>{if(rows.length&&window.confirm(t.delAllQ)){setRows([]);setSel(new Set());}}}>{t.delAll}</button>}</div></div>
