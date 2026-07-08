@@ -244,6 +244,7 @@ tbody tr:hover{background:var(--bg2)}
 
 /* ========== HELPERS ========== */
 const todayISO=()=>new Date().toISOString().slice(0,10);
+const PERIODS=[["today","Bugün","Today"],["yesterday","Dün","Yesterday"],["thismonth","Bu ay","This month"],["lastmonth","Geçen ay","Last month"],["last30","Son 30 gün","Last 30 days"],["thisyear","Bu yıl","This year"],["custom","Özel","Custom"]];
 const numFmt=(v,d=0)=>new Intl.NumberFormat("tr-TR",{minimumFractionDigits:d,maximumFractionDigits:d}).format(v||0);
 const CUR={"₺":{s:"₺",p:true},"$":{s:"$",p:false},"€":{s:"€",p:true}};
 function money(v,c){const x=CUR[c]||CUR["$"];const s=numFmt(v,2);return x.p?`${s} ${x.s}`:`${x.s}${s}`}
@@ -798,7 +799,7 @@ return(<div style={{padding:"8px 0 40px"}}>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:6}}>{TT("Mesajlar hesabın tüm üyelerine görünür ve buluta kaydedilir.","Messages are visible to all account members and saved to the cloud.")}</div>
 </div>
 </div>);}
-function RulesPanel({settings,setSettings}){
+function RulesPanel({settings,setSettings,periodLabel}){
 const rules=Array.isArray(settings.rules)?settings.rules:[];
 const getR=type=>rules.find(r=>r.type===type)||{type,on:false,n:0};
 const setR=(type,patch)=>setSettings(s=>{const rs=Array.isArray(s.rules)?s.rules.map(r=>({...r})):[];const i=rs.findIndex(r=>r.type===type);const cur=i>=0?rs[i]:{id:type,type,on:false,n:0};const nx={...cur,...patch};if(i>=0)rs[i]=nx;else rs.push(nx);return{...s,rules:rs};});
@@ -806,7 +807,6 @@ const setNum=(k,v)=>setSettings(s=>({...s,[k]:Math.max(0,v)}));
 const PARAMS=[
  {type:"ctr_fix",tr:"CTR düşük → DÜZELT",en:"Low CTR → FIX",unit:"%",st:0.1,hint:TT("1000+ gösterimde CTR bu %'nin altındaysa: görsel/başlık düzelt (kapatma).","With 1000+ impressions, if CTR is below this %: fix image/title (don't close).")},
  {type:"ctr_lt",tr:"CTR çok düşük → KAPAT",en:"Very low CTR → CLOSE",unit:"%",st:0.1,hint:TT("CTR bu %'nin altındaysa reklamı kapat.","Close ads if CTR is below this %.")},
- {type:"roas_lt",tr:"ROAS düşük → KAPAT",en:"Low ROAS → CLOSE",unit:"×",st:0.1,hint:TT("ROAS bu değerin altındaysa kapat.","Close if ROAS is below this value.")},
  {type:"spend_no_sale",tr:"Harcama var, 0 satış → KAPAT",en:"Spend, 0 sales → CLOSE",unit:settings.cur||"$",st:5,hint:TT("Bu kadar harcanıp 0 satış varsa kapat.","Close if this much is spent with 0 sales.")},
  {type:"clk_no_sale",tr:"Tıklama var, 0 satış → KAPAT",en:"Clicks, 0 sales → CLOSE",unit:TT("tık","clk"),st:5,hint:TT("Bu kadar tıklama olup 0 satış varsa kapat.","Close if this many clicks with 0 sales.")},
 ];
@@ -816,8 +816,8 @@ const Step=({v,set,st,unit})=><span style={{display:"inline-flex",alignItems:"ce
 <button onClick={()=>set(Math.round((v+st)*100)/100)} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,lineHeight:1,color:"var(--green)"}}>+</button></span>;
 const Toggle=({on,set})=><button onClick={()=>set(!on)} style={{width:46,height:26,borderRadius:999,border:"none",cursor:"pointer",background:on?"var(--green)":"var(--line2)",position:"relative",transition:".15s",flex:"none"}}><span style={{position:"absolute",top:3,left:on?23:3,width:20,height:20,borderRadius:"50%",background:"#fff",transition:".15s"}}/></button>;
 return(<div className="rules" style={{marginBottom:14}}>
-<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("Kurallar — Marketing Parametreleri","Rules — Marketing Parameters")}</span></div>
-<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametreyi aç/kapat ve eşiğini −/+ ile ayarla. Kurallar tüm listinglere uygulanır.","Toggle each parameter on/off and adjust its threshold with −/+. Rules apply to all listings.")}</div>
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("Kurallar — Marketing Parametreleri","Rules — Marketing Parameters")}</span>{periodLabel&&<span className="vd" style={{marginLeft:"auto",background:"var(--azure-s,var(--panel2))",color:"var(--azure)"}}>📅 {periodLabel}</span>}</div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametreyi aç/kapat ve eşiğini −/+ ile ayarla. Kurallar seçili döneme ve tüm listinglere uygulanır.","Toggle each parameter on/off and adjust its threshold with −/+. Rules apply to the selected period and all listings.")}</div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
 <div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:12,padding:"11px 13px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
@@ -948,6 +948,7 @@ const[act,setAct]=useState(null);
 const[settings,setSettings]=useState(DS);
 const[dm,setDm]=useState({});
 const[date,setDate]=useState(todayISO());
+const[period,setPeriod]=useState("last30");
 const[tab,setTab]=useState("marketing");
 const TAB_PERM={marketing:"viewMarketing",finance:"viewFinance",trademark:"viewTrademark",visibility:"viewVisibility",dashboard:"viewDashboard",zidentity:"viewIdentity",ekip:"manageTeam"};
 useEffect(()=>{if(TAB_PERM[tab]&&!can(TAB_PERM[tab])){const first=["marketing","finance","trademark","visibility","dashboard","zidentity"].find(x=>can(TAB_PERM[x]));setTab(first||"ayarlar");}},[tab]);
@@ -978,7 +979,7 @@ const fRef=useRef();
 const hiRef=useRef();
 const gmStoreTok=useRef({});
 
-const key=`${act}|${date}`;
+const key=`${act}|${period}`;
 const rows=dm[key]||[];
 const vkey=`V::${act}|${date}`;
 const vrows=dm[vkey]||[];
@@ -998,7 +999,10 @@ const warnings=[...savedW];for(const dw of DS.warnings){if(!warnings.some(w=>w.i
 const savedD=(s&&Array.isArray(s.dzChecks))?s.dzChecks:DS.dzChecks;
 const dzChecks=[...savedD];for(const dd of DS.dzChecks){const ex=dzChecks.find(c=>c.id===dd.id);if(!ex)dzChecks.push(dd);else if(dd.close&&!ex.close)ex.close=true}
 const trendTopics=(s&&Array.isArray(s.trendTopics))?s.trendTopics:DS.trendTopics;
-setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5)?{}:{minImp:1000,minClicks:30})});setDm(dmSaved);setLoaded(true)})()},[]);
+setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5)?{}:{minImp:1000,minClicks:30})});
+const mig={};Object.keys(dmSaved||{}).forEach(k=>{if(!/\|\d{4}-\d{2}-\d{2}$/.test(k)||k.startsWith("V::"))mig[k]=dmSaved[k];});
+Object.keys(dmSaved||{}).forEach(k=>{const mm=k.match(/^(.+)\|(\d{4}-\d{2}-\d{2})$/);if(mm&&!k.startsWith("V::")){const nk=mm[1]+"|last30";const add=dmSaved[k]||[];const ex=mig[nk]||[];if((add.length||0)>(ex.length||0))mig[nk]=add;}});
+setDm(mig);setLoaded(true)})()},[]);
 
 useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:d",{__v:2,dm,accts:accounts}),600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
 useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:s",settings),600);return()=>clearTimeout(t)},[settings,loaded]);
@@ -1208,7 +1212,7 @@ if(totals.close)p.push(`${totals.close} listing kapat`);if(totals.grow)p.push(`$
 let l=p.join(", ")+".";if(totals.wasted>0)l+=` ${money(totals.wasted,settings.cur)} boşa gidiyor.`;return l},[evals,totals,settings.cur]);
 const history=useMemo(()=>{const ds=Object.keys(dm).filter(k=>k.startsWith(act+"|")&&!k.startsWith("V::")&&(dm[k]||[]).length).map(k=>k.split("|")[1]);
 if(!ds.includes(date))ds.push(date);return[...new Set(ds)].sort().reverse().slice(0,8)},[dm,act,date]);
-const acctStats=useMemo(()=>{const m={};for(const a of accounts){const rs=dm[`${a.id}|${date}`]||[];let cl=0;for(const r of rs)if(evaluate(r,settings).verdict==="KAPAT")cl++;m[a.id]={count:rs.length,close:cl}}return m},[accounts,dm,date,settings]);
+const acctStats=useMemo(()=>{const m={};for(const a of accounts){const rs=dm[`${a.id}|${period}`]||[];let cl=0;for(const r of rs)if(evaluate(r,settings).verdict==="KAPAT")cl++;m[a.id]={count:rs.length,close:cl}}return m},[accounts,dm,period,settings]);
 const acctName=(accounts.find(a=>a.id===act)||{}).name||"";
 const pct=v=>(v*100).toFixed(2)+"%";
 const lang=settings.lang||"tr";uiLang=lang;
@@ -1219,7 +1223,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM30 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM32 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1297,6 +1301,13 @@ return(
 {tab==="marketing"&&(<>
 <input id="csvInput" type="file" accept=".csv,text/csv" style={{display:"none"}} onChange={e=>handleCSV(e.target.files&&e.target.files[0])}/>
 <input ref={fRef} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handleImage(e.target.files&&e.target.files[0])}/>
+<div style={{display:"flex",alignItems:"center",gap:10,margin:"2px 0 12px",flexWrap:"wrap"}}>
+<span style={{fontSize:12.5,fontWeight:700,color:"var(--ink)"}}>📅 {TT("Dönem","Period")}:</span>
+<select value={period} onChange={e=>setPeriod(e.target.value)} className="cur-sel" style={{fontFamily:"'Inter'",fontSize:13,padding:"8px 12px",fontWeight:600}}>
+{PERIODS.map(([k,tr,en])=><option key={k} value={k}>{TT(tr,en)}{k==="thisyear"?" ("+new Date().getFullYear()+")":""}</option>)}
+</select>
+<span style={{fontSize:11.5,color:"var(--faint)"}}>{TT("Tüm oranlar bu döneme göre hesaplanır. Etsy'den bu dönemi seçip veri çek.","All ratios are computed for this period. Select this period on Etsy when exporting data.")}</span>
+</div>
 {imgErr&&<div className="err">⚠ {imgErr}</div>}
 {imgBusy&&<div className="busy"><span className="sp"/>{imgMsg}</div>}
 
@@ -1314,8 +1325,7 @@ return(
 </div>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:8}}>{TT("Örn: ROAS 3× altı bekle, 2× altı kesin kapat, 3× üstü kapatma (büyüt). Anında uygulanır.","E.g. ROAS below 3× hold, below 2× close, above 3× keep (grow). Applied instantly.")}</div>
 </div>);})()}
-<div style={{margin:"2px 0 12px"}}><button className={"btn"+(showRules?" pri":"")} onClick={()=>setShowRules(v=>!v)} style={{fontWeight:700}}>⚙ {TT("Diğer kurallar (CTR, harcama…)","Other rules (CTR, spend…)")} {showRules?"▴":"▾"}</button></div>
-{showRules&&<RulesPanel settings={settings} setSettings={setSettings}/>}
+<RulesPanel settings={settings} setSettings={setSettings} periodLabel={(()=>{const p=PERIODS.find(x=>x[0]===period);return p?TT(p[1],p[2]):"";})()}/>
 
 <div className="sec"><h2><span className="bar"/>{t.analysis}</h2>
 <div className="brow">{can("deleteData")&&<button className="btn" onClick={()=>{if(rows.length&&window.confirm(t.delAllQ)){setRows([]);setSel(new Set());}}}>{t.delAll}</button>}</div></div>
