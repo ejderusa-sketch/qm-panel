@@ -753,6 +753,31 @@ return(<div style={{padding:"8px 0 40px"}}>
 <label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("Notlar","Notes")}<textarea value={z.notes||""} onChange={e=>up("notes",e.target.value)} rows={3} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/></label>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
 </div></div>);}
+function DGorunurluk({accounts,act,setAccounts}){
+const acc=accounts.find(a=>a.id===act);
+if(!acc)return(<div style={{padding:"8px 0 40px"}}><div className="rules" style={{background:"var(--panel2)"}}>{TT("Önce soldan bir mağaza ekle/seç.","Add or select a store on the left first.")}</div></div>);
+const d=acc.d||{};
+const up=(k,v)=>setAccounts(x=>x.map(s=>s.id===act?{...s,d:{...(s.d||{}),[k]:v}}:s));
+const rec=d.rec||"hold";
+const recC=rec==="strong"?"var(--green)":rec==="skip"?"var(--red)":"var(--amber)";
+const recBg=rec==="strong"?"var(--green-s)":rec==="skip"?"var(--red-s)":"var(--amber-s)";
+const ta=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<textarea value={d[k]||""} placeholder={ph||""} onChange={e=>up(k,e.target.value)} rows={2} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/></label>;
+return(<div style={{padding:"8px 0 40px"}}>
+<div className="rules" style={{background:"var(--panel2)"}}>
+<div className="rh"><span style={{fontSize:16}}>📈 D — {TT("ETSY GÖRÜNÜRLÜK & UPLOAD","ETSY VISIBILITY & UPLOAD")}</span><span className="store" style={{marginLeft:"auto"}}>{acc.name}</span></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{TT("Etsy şu an neyi daha çok gösteriyor, buna göre ne yüklenmeli? Manager gözlemlerini buraya kaydeder.","What is Etsy showing more of right now, and what should be uploaded? The manager records observations here.")}</div></div>
+<div className="rules">
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{TT("Görünürlük & tavsiye","Visibility & recommendation")}</span>
+<span className="vd" style={{marginLeft:"auto",background:recBg,color:recC}}>{rec==="strong"?"STRONG":rec==="skip"?"SKIP":"HOLD"}</span></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:"4px 20px"}}>
+<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("Kategori / tema","Category / theme")}<input value={d.theme||""} onChange={e=>up("theme",e.target.value)} placeholder={TT("ör. embroidery, retro tişört…","e.g. embroidery, retro tee…")} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>
+<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("Yükleme tavsiyesi","Upload recommendation")}<select value={rec} onChange={e=>up("rec",e.target.value)} className="cur-sel" style={{display:"block",marginTop:5,padding:"9px 12px",width:"100%"}}><option value="strong">STRONG — {TT("hemen yükle","upload now")}</option><option value="hold">HOLD — {TT("bekle/izle","wait/watch")}</option><option value="skip">SKIP — {TT("yükleme","don't upload")}</option></select></label>
+</div>
+{ta(TT("Etsy şu an ne gösteriyor?","What is Etsy showing now?"),"showing",TT("Gözlemlerini yaz…","Write your observations…"))}
+{ta(TT("Ne yükleyelim? (fırsatlar)","What to upload? (opportunities)"),"upload",TT("Fırsat listelerini yaz…","List opportunities…"))}
+{ta(TT("Upload Gap (fırsat vs. mevcut)","Upload Gap (opportunity vs. current)"),"gap","...")}
+<div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
+</div></div>);}
 function App(){
 const ALL_STORES=[];
 const DEMO_IDS=new Set(["a0","a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13","a14","a15"]);
@@ -812,8 +837,8 @@ const dzChecks=[...savedD];for(const dd of DS.dzChecks){const ex=dzChecks.find(c
 const trendTopics=(s&&Array.isArray(s.trendTopics))?s.trendTopics:DS.trendTopics;
 setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5)?{}:{minImp:1000,minClicks:30})});setDm(dmSaved);setLoaded(true)})()},[]);
 
-useEffect(()=>{if(loaded)store.set("q:d",{__v:2,dm,accts:accounts})},[accounts,dm,loaded]);
-useEffect(()=>{if(loaded)store.set("q:s",settings)},[settings,loaded]);
+useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:d",{__v:2,dm,accts:accounts}),600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
+useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:s",settings),600);return()=>clearTimeout(t)},[settings,loaded]);
 
 const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
 const setRows=n=>setDm(m=>({...m,[key]:typeof n==="function"?n(m[key]||[]):n}));
@@ -1030,7 +1055,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM22 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM23 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1084,7 +1109,7 @@ return(
 {tab==="ekip"&&<EkipPanel/>}
 {tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
 {tab==="trademark"&&<SectionOutline m={MOD().trademark}/>}
-{tab==="visibility"&&<SectionOutline m={MOD().visibility}/>}
+{tab==="visibility"&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
 {tab==="dashboard"&&<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
 <div className="rh"><span style={{fontSize:16}}>✅ X — {TT("SHOP MANAGER · Bugün","SHOP MANAGER · Today")}</span><span className="store" style={{marginLeft:"auto"}}>{(accounts.find(a=>a.id===act)||{}).name||"—"}</span></div>
