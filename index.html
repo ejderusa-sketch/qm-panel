@@ -638,6 +638,9 @@ const[date,setDate]=useState(todayISO());
 const[tab,setTab]=useState("marketing");
 const TAB_PERM={marketing:"viewMarketing",rules:"editRules",dikkat:"viewDikkat",trend:"viewTrend",agent:"viewAgent",ekip:"manageTeam"};
 useEffect(()=>{if(!can(TAB_PERM[tab])){const first=["marketing","rules","dikkat","trend","agent","ekip"].find(x=>can(TAB_PERM[x]));if(first&&first!==tab)setTab(first);}},[tab]);
+const[mktFilter,setMktFilter]=useState("all");
+const[mktSearch,setMktSearch]=useState("");
+const[sel,setSel]=useState(()=>new Set());
 const[showPaste,setShowPaste]=useState(false);
 const[pt,setPt]=useState("");
 const[showSet,setShowSet]=useState(false);
@@ -840,6 +843,16 @@ catch(e){setGmErr("Çekilemedi: "+(e.message||"hata"))}finally{setGmLoad(false)}
 
 /* memos */
 const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,settings)})),[rows,settings]);
+/* QM7: ShipStation tarzı filtre/arama/seçim */
+const baseEvals=evals.filter(x=>x.e.imp||x.e.spend);
+const verdictCounts=useMemo(()=>{const c={all:0,"BÜYÜT":0,"İZLE":0,"DÜZELT":0,"KAPAT":0,"VERİ AZ":0};for(const x of baseEvals){c.all++;if(c[x.e.verdict]!=null)c[x.e.verdict]++;}return c;},[rows,settings]);
+const shownEvals=baseEvals.filter(x=>(mktFilter==="all"||x.e.verdict===mktFilter)).filter(x=>{const q=mktSearch.trim().toLowerCase();return!q||(x.row.name||"").toLowerCase().includes(q);}).map(x=>({...x,a:advise(x.e)})).sort((p,q)=>p.a.rank-q.a.rank||q.e.roas-p.e.roas);
+const toggleSel=id=>setSel(s=>{const n=new Set(s);n.has(id)?n.delete(id):n.add(id);return n;});
+const allShownSelected=shownEvals.length>0&&shownEvals.every(x=>sel.has(x.row.id));
+const selAll=()=>setSel(allShownSelected?new Set():new Set(shownEvals.map(x=>x.row.id)));
+const bulkAds=on=>{setRows(rs=>rs.map(r=>sel.has(r.id)?{...r,ads:on?"on":"off"}:r));};
+const bulkDelete=()=>{if(!sel.size)return;if(!window.confirm(sel.size+" listing silinsin?"))return;setRows(rs=>rs.filter(r=>!sel.has(r.id)));setSel(new Set());};
+const FILTERS=[["all","Hepsi"],["BÜYÜT","BÜYÜT"],["İZLE","İZLE"],["DÜZELT","DÜZELT"],["KAPAT","KAPAT"],["VERİ AZ","VERİ AZ"]];
 const totals=useMemo(()=>{const t={spend:0,rev:0,imp:0,clk:0,ord:0,close:0,watch:0,grow:0};
 for(const{e}of evals){t.spend+=e.spend;t.rev+=e.rev;t.imp+=e.imp;t.clk+=e.clk;t.ord+=e.ord;if(e.verdict==="KAPAT")t.close++;if(e.verdict==="İZLE")t.watch++;if(e.verdict==="BÜYÜT")t.grow++}
 t.wasted=evals.filter(x=>x.e.verdict==="KAPAT").reduce((s,x)=>s+Math.max(x.e.spend-x.e.rev,0),0);
@@ -864,7 +877,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM6 ☁️</b> · yetkiler</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM7 ☁️</b> · operasyon</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -921,17 +934,38 @@ onDrop={e=>{e.preventDefault();setDragO(false);const f=e.dataTransfer.files&&e.d
 {imgBusy&&<div className="busy"><span className="sp"/>{imgMsg}</div>}
 
 <div className="sec"><h2><span className="bar"/>{t.analysis}</h2>
-<div className="brow"><button className="btn" onClick={()=>{if(rows.length&&window.confirm(t.delAllQ))setRows([])}}>{t.delAll}</button></div></div>
-<div className="tw" style={{marginBottom:18}}><table><thead><tr>
-<th className="l">{t.cProduct}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>{t.cImpr}</th><th>{t.cClicks}</th><th>CTR</th><th>{t.cOrders}</th><th>{t.cRev}</th><th>{t.cSpend}</th><th>ROAS</th><th className="l">{t.cAction}</th><th></th>
+<div className="brow">{can("deleteData")&&<button className="btn" onClick={()=>{if(rows.length&&window.confirm(t.delAllQ)){setRows([]);setSel(new Set());}}}>{t.delAll}</button>}</div></div>
+
+<div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
+{FILTERS.map(([k,lb])=>{const cnt=verdictCounts[k]||0;const on=mktFilter===k;const col=k==="BÜYÜT"?"var(--green)":k==="İZLE"?"var(--amber)":k==="DÜZELT"?"var(--orange)":k==="KAPAT"?"var(--red)":k==="VERİ AZ"?"var(--faint)":"var(--azure)";return(
+<button key={k} onClick={()=>setMktFilter(k)} style={{fontFamily:"'Space Grotesk'",fontSize:12.5,fontWeight:600,padding:"7px 13px",borderRadius:9,cursor:"pointer",border:"1px solid "+(on?col:"var(--line2)"),background:on?col:"var(--panel)",color:on?"#fff":"var(--ink)"}}>{lb} <span style={{opacity:.75,fontFamily:"'JetBrains Mono'"}}>{cnt}</span></button>);})}
+</div>
+
+<div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:10}}>
+<input value={mktSearch} onChange={e=>setMktSearch(e.target.value)} placeholder="🔎 Listing ara…" style={{flex:1,minWidth:180,padding:"8px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13,fontFamily:"'Inter'"}}/>
+{sel.size>0&&<React.Fragment>
+<span style={{fontSize:12.5,color:"var(--muted)",fontFamily:"'JetBrains Mono'"}}>{sel.size} seçili</span>
+<button className="btn" style={{borderColor:"var(--green)",color:"var(--green)"}} onClick={()=>bulkAds(true)}>▶ Reklamı AÇ</button>
+<button className="btn" style={{borderColor:"var(--red)",color:"var(--red)"}} onClick={()=>bulkAds(false)}>⏸ Reklamı KAPAT</button>
+{can("deleteData")&&<button className="btn" onClick={bulkDelete}>🗑 Sil</button>}
+<button className="btn ghost" onClick={()=>setSel(new Set())}>Temizle</button>
+</React.Fragment>}
+</div>
+
+<div className="tw" style={{marginBottom:18}}><table style={{minWidth:1000}}><thead><tr>
+<th style={{width:34}}><input type="checkbox" checked={allShownSelected} onChange={selAll}/></th>
+<th className="l">{t.cProduct}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>Reklam</th><th>{t.cImpr}</th><th>{t.cClicks}</th><th>CTR</th><th>{t.cOrders}</th><th>{t.cRev}</th><th>{t.cSpend}</th><th>ROAS</th><th className="l">{t.cAction}</th><th></th>
 </tr></thead><tbody>
-{evals.filter(x=>x.e.imp||x.e.spend).length===0&&<tr><td colSpan={11}><div className="empty"><div className="big">{t.emptyT}</div><p>{t.emptyS}</p></div></td></tr>}
-{evals.filter(x=>x.e.imp||x.e.spend).map(x=>({...x,a:advise(x.e)})).sort((p,q)=>p.a.rank-q.a.rank||q.e.roas-p.e.roas).map(({row:r,e,a})=>{
+{shownEvals.length===0&&<tr><td colSpan={13}><div className="empty"><div className="big">{baseEvals.length?"Bu filtrede listing yok":t.emptyT}</div><p>{baseEvals.length?"Farklı bir durum sekmesi seç ya da aramayı temizle.":t.emptyS}</p></div></td></tr>}
+{shownEvals.map(({row:r,e,a})=>{
 const softBg={"var(--green)":"var(--green-s)","var(--amber)":"var(--amber-s)","var(--orange)":"var(--orange-s)","var(--red)":"var(--red-s)","var(--faint)":"var(--panel2)"}[a.color]||"var(--panel2)";
+const adsOn=(r.ads||"on")!=="off";const isSel=sel.has(r.id);
 return(
-<tr key={r.id} style={{verticalAlign:"top"}}>
+<tr key={r.id} style={{verticalAlign:"top",background:isSel?"rgba(31,122,224,.06)":undefined,opacity:adsOn?1:0.6}}>
+<td style={{paddingTop:13}}><input type="checkbox" checked={isSel} onChange={()=>toggleSel(r.id)}/></td>
 <td className="l" style={{fontWeight:a.strong?700:600,whiteSpace:"normal",maxWidth:240,lineHeight:1.4,paddingTop:14}}>{r.name||"Listing"}</td>
 <td style={{paddingTop:11}}><input className="ci" style={{width:48,textAlign:"center"}} value={r.months||""} placeholder="—" onChange={ev=>upRow(r.id,"months",ev.target.value)}/></td>
+<td style={{paddingTop:11}}><button onClick={()=>upRow(r.id,"ads",adsOn?"off":"on")} title="Reklam AÇ/KAPAT" style={{fontFamily:"'Space Grotesk'",fontSize:11,fontWeight:700,padding:"4px 9px",borderRadius:7,cursor:"pointer",whiteSpace:"nowrap",border:"1px solid "+(adsOn?"var(--green)":"var(--line2)"),background:adsOn?"var(--green-s)":"var(--panel2)",color:adsOn?"var(--green)":"var(--faint)"}}>{adsOn?"● AÇIK":"○ KAPALI"}</button></td>
 <td className="calc" style={{paddingTop:14}}>{numFmt(e.imp)}</td>
 <td className="calc" style={{paddingTop:14}}>{numFmt(e.clk)}</td>
 <td className="calc" style={{paddingTop:14}}>{e.imp?pct(e.ctr):"—"}</td>
@@ -946,7 +980,7 @@ return(
 {e.reason&&<span style={{color:"var(--muted)",fontWeight:400,fontSize:11.5,lineHeight:1.5}}>{e.reason}</span>}
 </div>
 </td>
-<td style={{paddingTop:11}}><button className="dl" onClick={()=>delRow(r.id)} title={t.delOne}>✕</button></td>
+<td style={{paddingTop:11}}>{can("deleteData")&&<button className="dl" onClick={()=>delRow(r.id)} title={t.delOne}>✕</button>}</td>
 </tr>)})}
 </tbody></table></div>
 
