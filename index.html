@@ -1160,7 +1160,7 @@ setGmData({email:prof.emailAddress,etsyAll:ed,ssAll:sd,orderCount:oc,shipCount:s
 catch(e){setGmErr("Çekilemedi: "+(e.message||"hata"))}finally{setGmLoad(false)}};
 
 /* QM19: mağaza başına Gmail bağlantısı */
-const connectStore=(acc)=>{const cid=(settings.googleClientId||DEFAULT_GCID||"").trim();
+const connectStore=(acc,andFetch)=>{const cid=(settings.googleClientId||DEFAULT_GCID||"").trim();
 if(!cid){setToast(TT("Google Client ID bulunamadı.","Google Client ID not found."));setShowSet(true);return;}
 if(!window.google||!window.google.accounts){setToast(TT("Google kütüphanesi yüklenemedi.","Google library not loaded."));return;}
 try{window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",login_hint:acc.email||"",callback:async r=>{
@@ -1168,13 +1168,13 @@ if(r.error){setToast(TT("Bağlantı iptal edildi.","Connection cancelled."));ret
 gmStoreTok.current[acc.id]=r.access_token;
 try{const prof=await gGet(r.access_token,"https://www.googleapis.com/gmail/v1/users/me/profile");
 setAccounts(x=>x.map(s=>{if(s.id!==acc.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=((prof.emailAddress||"").split("@")[0]||"").trim();return{...s,email:prof.emailAddress,gmailConnected:true,name:(def&&lp)?lp.toUpperCase():s.name}}));
-setToast("✓ "+prof.emailAddress+" "+TT("bağlandı","connected"));}
+setToast("✓ "+prof.emailAddress+" "+TT("bağlandı","connected"));if(andFetch)setTimeout(()=>fetchStoreCSV(acc),400);}
 catch(e){setToast(TT("Profil alınamadı: ","Profile error: ")+(e.message||""));}
 }}).requestAccessToken();}
 catch(e){setToast(TT("Bağlanılamadı: ","Connect error: ")+(e.message||""));}};
 const disconnectStore=(acc)=>{delete gmStoreTok.current[acc.id];setAccounts(x=>x.map(s=>s.id===acc.id?{...s,gmailConnected:false}:s));};
 const fetchStoreCSV=async(acc)=>{const tok=gmStoreTok.current[acc.id];
-if(!tok){setToast(TT("Önce bu mağazayı Google ile bağla.","Connect this store with Google first."));return;}
+if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,true);return;}
 setAct(acc.id);
 setToast(TT("Gmail'den çekiliyor…","Fetching from Gmail…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
@@ -1226,7 +1226,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM37 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM38 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
