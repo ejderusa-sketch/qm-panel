@@ -753,6 +753,51 @@ return(<div style={{padding:"8px 0 40px"}}>
 <label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("Notlar","Notes")}<textarea value={z.notes||""} onChange={e=>up("notes",e.target.value)} rows={3} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/></label>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
 </div></div>);}
+function CTrademark({settings,setSettings,accounts}){
+const cases=Array.isArray(settings.cases)?settings.cases:[];
+const setCases=(fn)=>setSettings(s=>({...s,cases:fn(Array.isArray(s.cases)?s.cases:[])}));
+const blank=()=>({title:"",type:"trademark",status:"notice",store:"",date:new Date().toISOString().slice(0,10),notes:""});
+const[form,setForm]=useState(blank());
+const add=()=>{if(!form.title.trim())return;const id="c"+Date.now().toString(36);setCases(cs=>[{...form,id},...cs]);setForm(blank());};
+const del=id=>setCases(cs=>cs.filter(c=>c.id!==id));
+const chStatus=(id,v)=>setCases(cs=>cs.map(c=>c.id===id?{...c,status:v}:c));
+const cnt=st=>cases.filter(c=>c.status===st).length;
+const stL=st=>({notice:TT("Bildirim","Notice"),responded:TT("Yanıtlandı","Responded"),removed:TT("Kaldırıldı","Removed"),restored:TT("Geri alındı","Restored")}[st]||st);
+const iS={display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5};
+const lS={display:"block",fontSize:12.5,fontWeight:600,marginTop:12};
+return(<div style={{padding:"8px 0 40px"}}>
+<div className="rules" style={{background:"var(--panel2)"}}>
+<div className="rh"><span style={{fontSize:16}}>⚖️ C — TRADEMARK & COPYRIGHT</span></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{TT("IP/telif ihlal bildirimlerini takip eden vaka merkezi. Bağlı Gmail'den gelen bildirimleri buraya kaydet.","A case center tracking IP/copyright infringement notices. Log notices from the connected Gmail here.")}</div></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12,margin:"2px 0 12px"}}>
+{[[stL("notice"),cnt("notice"),"var(--amber)"],[stL("removed"),cnt("removed"),"var(--red)"],[stL("restored"),cnt("restored"),"var(--green)"],[stL("responded"),cnt("responded"),"var(--azure)"]].map((c,i)=><div key={i} className="rules" style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:c[2]}}>{c[1]}</div><div style={{fontSize:12,color:"var(--muted)"}}>{c[0]}</div></div>)}
+</div>
+<div className="rules">
+<div className="rh"><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>➕ {TT("Yeni vaka","New case")}</span></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:"4px 16px"}}>
+<label style={lS}>{TT("Başlık","Title")}<input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder={TT("ör. Listing X — marka ihlali","e.g. Listing X — trademark claim")} style={iS}/></label>
+<label style={lS}>{TT("Tür","Type")}<select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))} className="cur-sel" style={{display:"block",marginTop:5,padding:"9px 12px",width:"100%"}}><option value="trademark">Trademark</option><option value="copyright">Copyright</option></select></label>
+<label style={lS}>{TT("Mağaza","Store")}<select value={form.store} onChange={e=>setForm(f=>({...f,store:e.target.value}))} className="cur-sel" style={{display:"block",marginTop:5,padding:"9px 12px",width:"100%"}}><option value="">—</option>{accounts.map(a=><option key={a.id} value={a.name}>{a.name}</option>)}</select></label>
+<label style={lS}>{TT("Tarih","Date")}<input type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))} style={iS}/></label>
+</div>
+<label style={lS}>{TT("Notlar","Notes")}<textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} rows={2} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/></label>
+<div><button className="btn pri" style={{marginTop:12}} onClick={add}>{TT("Vaka ekle","Add case")}</button></div>
+</div>
+<div className="rules">
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📋 {TT("Vakalar","Cases")}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{cases.length}</span></div>
+<div className="tw" style={{marginTop:8}}><table style={{minWidth:680}}><thead><tr><th className="l">{TT("Başlık","Title")}</th><th className="l">{TT("Tür","Type")}</th><th className="l">{TT("Mağaza","Store")}</th><th className="l">{TT("Tarih","Date")}</th><th className="l">{TT("Durum","Status")}</th><th></th></tr></thead><tbody>
+{cases.length===0&&<tr><td colSpan={6}><div className="empty" style={{padding:24}}><p>{TT("Henüz vaka yok. Yukarıdan ekle.","No cases yet. Add one above.")}</p></div></td></tr>}
+{cases.map(c=><tr key={c.id}>
+<td className="l" style={{fontWeight:600,whiteSpace:"normal",maxWidth:240}}>{c.title}{c.notes?<div style={{fontSize:11,color:"var(--faint)",fontWeight:400,marginTop:2}}>{c.notes}</div>:null}</td>
+<td className="l">{c.type==="copyright"?"Copyright":"Trademark"}</td>
+<td className="l">{c.store||"—"}</td>
+<td className="l" style={{fontFamily:"'JetBrains Mono'",fontSize:12}}>{c.date}</td>
+<td className="l"><select className="cur-sel" value={c.status} onChange={e=>chStatus(c.id,e.target.value)}><option value="notice">{stL("notice")}</option><option value="responded">{stL("responded")}</option><option value="removed">{stL("removed")}</option><option value="restored">{stL("restored")}</option></select></td>
+<td><button className="dl" onClick={()=>del(c.id)} title={TT("Sil","Delete")}>✕</button></td>
+</tr>)}
+</tbody></table></div>
+<div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div></div>
+</div>);}
 function DGorunurluk({accounts,act,setAccounts}){
 const acc=accounts.find(a=>a.id===act);
 if(!acc)return(<div style={{padding:"8px 0 40px"}}><div className="rules" style={{background:"var(--panel2)"}}>{TT("Önce soldan bir mağaza ekle/seç.","Add or select a store on the left first.")}</div></div>);
@@ -1055,7 +1100,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM23 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM24 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1108,7 +1153,7 @@ return(
 
 {tab==="ekip"&&<EkipPanel/>}
 {tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
-{tab==="trademark"&&<SectionOutline m={MOD().trademark}/>}
+{tab==="trademark"&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts}/>}
 {tab==="visibility"&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
 {tab==="dashboard"&&<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
