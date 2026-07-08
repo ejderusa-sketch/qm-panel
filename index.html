@@ -337,6 +337,7 @@ return{label:"Veri az",key:"advLow",color:"var(--faint)",strong:false,rank:5};
 const SB_URL="https://pepvzsffeyvzhxvlliex.supabase.co";
 const SB_KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
 const sb=supabase.createClient(SB_URL,SB_KEY);
+const DEFAULT_GCID="507868834696-m1gnrlcu7ba620knq4ck1cj58fs5qu97.apps.googleusercontent.com";
 const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
 let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null;
 /* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
@@ -628,8 +629,9 @@ return(<div style={{padding:"8px 0 40px"}}>
 {sub==="baglanti"&&<div className="rules">
 <div className="rh"><span style={{fontSize:15}}>🔗 {TT("Bağlantı (Connect)","Connection")}</span></div>
 <div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6,marginTop:6}}>{TT("Her mağazanın e-postasını sol taraftaki mağaza listesinden ekle, sonra \"Google ile Bağlan\"a bas. Şifre GİRME — Google izin ekranı açılır, sadece okuma yetkisi verirsin.","Add each store's email from the store list on the left, then click \"Connect with Google\". Do NOT enter a password — Google's own consent screen opens and you grant read-only access.")}</div>
-<label style={{display:"block",fontSize:12.5,fontWeight:700,marginTop:14}}>Google OAuth Client ID
-<input value={settings.googleClientId||""} placeholder="xxxxx.apps.googleusercontent.com" onChange={e=>setSettings(s=>({...s,googleClientId:e.target.value}))} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:12.5}}/></label>
+<div style={{marginTop:12,padding:"9px 12px",borderRadius:9,background:"var(--green-s)",color:"var(--green)",fontSize:12.5,fontWeight:700}}>✓ {TT("Google bağlantısı hazır — Client ID gömülü.","Google connection ready — Client ID is built in.")}</div>
+<label style={{display:"block",fontSize:12.5,fontWeight:700,marginTop:12}}>Google OAuth Client ID {TT("(isteğe bağlı — değiştirmek için)","(optional — to override)")}
+<input value={settings.googleClientId||DEFAULT_GCID} onChange={e=>setSettings(s=>({...s,googleClientId:e.target.value}))} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:12.5}}/></label>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:6,lineHeight:1.6}}>{TT("Google Cloud Console → APIs & Services → Credentials → OAuth Client ID (Web). İzinli JavaScript origin olarak https://ejderusa-sketch.github.io ekle. Gmail API'yi aç. Test kullanıcısına kendi e-postanı ekle.","Google Cloud Console → APIs & Services → Credentials → OAuth Client ID (Web). Add https://ejderusa-sketch.github.io as an authorized JavaScript origin. Enable the Gmail API. Add your email as a test user.")}</div>
 <div style={{marginTop:10,padding:"10px 13px",border:"1px dashed var(--line2)",borderRadius:10,fontSize:13,color:"var(--faint)"}}>🔌 {TT("Etsy / Amazon API bağlantısı — yakında (planın Faz 10).","Etsy / Amazon API connection — coming soon (plan Phase 10).")}</div></div>}
 {sub==="kaynak"&&<div className="rules">
@@ -912,7 +914,7 @@ try{const stream=await navigator.mediaDevices.getDisplayMedia({video:{cursor:"ne
 catch(e){if(e&&e.name!=="NotAllowedError")setImgErr("Hata: "+(e&&e.message))}};
 
 /* Gmail */
-const gmLogin=()=>{const cid=(settings.googleClientId||"").trim();if(!cid){setGmErr("⚙ Ayarlar'dan Google Client ID gir.");return}if(!window.google){setGmErr("Google kütüphanesi yüklenemedi.");return}setGmErr("");
+const gmLogin=()=>{const cid=(settings.googleClientId||DEFAULT_GCID||"").trim();if(!cid){setGmErr("⚙ Ayarlar'dan Google Client ID gir.");return}if(!window.google){setGmErr("Google kütüphanesi yüklenemedi.");return}setGmErr("");
 window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",hint:"novaallemail@gmail.com",callback:r=>{if(r.error){setGmErr("Giriş başarısız: "+r.error);return}setGmTok(r.access_token);fetchGm(r.access_token)}}).requestAccessToken()};
 const gmLogout=()=>{setGmTok(null);setGmUser(null);setGmData(null)};
 const gGet=async(tok,url)=>{const r=await fetch(url,{headers:{Authorization:"Bearer "+tok}});if(!r.ok)throw new Error("Gmail API "+r.status);return r.json()};
@@ -930,8 +932,8 @@ setGmData({email:prof.emailAddress,etsyAll:ed,ssAll:sd,orderCount:oc,shipCount:s
 catch(e){setGmErr("Çekilemedi: "+(e.message||"hata"))}finally{setGmLoad(false)}};
 
 /* QM19: mağaza başına Gmail bağlantısı */
-const connectStore=(acc)=>{const cid=(settings.googleClientId||"").trim();
-if(!cid){setToast(TT("Önce Ayarlar → Q3 Bağlantı'dan Google Client ID gir.","First enter the Google Client ID in Settings → Q3 Connection."));setShowSet(true);return;}
+const connectStore=(acc)=>{const cid=(settings.googleClientId||DEFAULT_GCID||"").trim();
+if(!cid){setToast(TT("Google Client ID bulunamadı.","Google Client ID not found."));setShowSet(true);return;}
 if(!window.google||!window.google.accounts){setToast(TT("Google kütüphanesi yüklenemedi.","Google library not loaded."));return;}
 try{window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",login_hint:acc.email||"",callback:async r=>{
 if(r.error){setToast(TT("Bağlantı iptal edildi.","Connection cancelled."));return;}
@@ -995,7 +997,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM19 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM20 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
