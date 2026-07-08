@@ -342,18 +342,28 @@ const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
 let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null;
 /* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
 const PERMS=[
- {key:"viewMarketing",label:"Marketing görüntüle"},
- {key:"uploadData",label:"Veri yükle (CSV/görsel)"},
- {key:"deleteData",label:"Veri sil"},
- {key:"editRules",label:"RULES / kuralları düzenle"},
- {key:"viewDikkat",label:"Dikkat notları"},
- {key:"viewTrend",label:"Gösterim trendi"},
- {key:"viewAgent",label:"Nova Agent"},
- {key:"manageTeam",label:"Ekip yönetimi"},
+ {key:"viewMarketing",group:"A · Marketing",tr:"Marketing görüntüle",en:"View Marketing"},
+ {key:"editMarketing",group:"A · Marketing",tr:"Reklam aç/kapat",en:"Toggle ads"},
+ {key:"deleteData",group:"A · Marketing",tr:"Veri sil",en:"Delete data"},
+ {key:"viewFinance",group:"B · Finance",tr:"Finance görüntüle",en:"View Finance"},
+ {key:"editFinance",group:"B · Finance",tr:"Ciro/gider düzenle",en:"Edit revenue/spend"},
+ {key:"viewTrademark",group:"C · Trademark",tr:"Trademark görüntüle",en:"View Trademark"},
+ {key:"editTrademark",group:"C · Trademark",tr:"Vaka ekle/düzenle",en:"Add/edit cases"},
+ {key:"viewVisibility",group:"D · Görünürlük",tr:"Görünürlük görüntüle",en:"View Visibility"},
+ {key:"editVisibility",group:"D · Görünürlük",tr:"Görünürlük düzenle",en:"Edit Visibility"},
+ {key:"viewDashboard",group:"X · Shop Manager",tr:"Shop Manager görüntüle",en:"View Shop Manager"},
+ {key:"viewIdentity",group:"Z · Kimlik",tr:"Kimlik görüntüle",en:"View Identity"},
+ {key:"editIdentity",group:"Z · Kimlik",tr:"Kimlik düzenle",en:"Edit Identity"},
+ {key:"manageStores",group:"Genel",tr:"Mağaza ekle/adlandır",en:"Add/rename stores"},
+ {key:"connectGmail",group:"Genel",tr:"Gmail bağla/çek",en:"Connect/fetch Gmail"},
+ {key:"manageTeam",group:"Ekip",tr:"Ekip yönetimi",en:"Manage team"},
+ {key:"sendMessages",group:"Ekip",tr:"Mesaj gönder",en:"Send messages"},
 ];
 function defaultPerms(role){
- if(role==="user")return{viewMarketing:true,uploadData:true,editRules:true,viewDikkat:true,viewTrend:true,viewAgent:true,manageTeam:false,deleteData:false};
- return{viewMarketing:true,uploadData:true,deleteData:false,editRules:false,viewDikkat:true,viewTrend:true,viewAgent:false,manageTeam:false};
+ const set=v=>PERMS.reduce((o,p)=>{o[p.key]=v;return o},{});
+ if(role==="admin")return set(true);
+ if(role==="user"){const o=set(true);o.deleteData=false;o.manageTeam=false;return o;}
+ const o=set(true);o.deleteData=false;o.editFinance=false;o.manageTeam=false;return o;
 }
 function can(key){ if(currentRole==="admin"||currentPermissions===null)return true; return !!(currentPermissions&&currentPermissions[key]); }
 /* Basit iki dilli yardımcı: TT("Türkçe","English") */
@@ -587,11 +597,17 @@ function SectionOutline({m}){return(<div style={{padding:"8px 0 40px"}}>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:8,marginTop:8}}>{m.items.map((it,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span>{it[1]}</span>{it[0]}</div>)}</div>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>{TT("Bu bölüm planın sıradaki fazlarında adım adım doldurulacak.","This section will be filled in step by step in the plan's upcoming phases.")}</div></div>
 </div>);}
-function SettingsPanel({settings,setSettings}){
+function SettingsPanel({settings,setSettings,accounts,setAccounts}){
 const[sub,setSub]=useState("profil");
 const[prof,setProf]=useState(null);
 const[acc,setAcc]=useState(null);
 const[saved,setSaved]=useState("");
+const[newRule,setNewRule]=useState("");
+const accts=Array.isArray(accounts)?accounts:[];
+const houseRules=Array.isArray(settings.houseRules)?settings.houseRules:[];
+const upStore=(id,k,v)=>setAccounts&&setAccounts(x=>x.map(s=>s.id===id?{...s,[k]:v}:s));
+const norm=s=>(s||"").toString().trim().toLowerCase();
+const simGroups=(()=>{const fields=[["owner",TT("Yasal sahip/şirket","Legal owner/company"),a=>(a.z||{}).owner],["country",TT("Ülke","Country"),a=>(a.z||{}).country],["theme",TT("Kategori/tema","Category/theme"),a=>(a.d||{}).theme],["closure",TT("Kapatma sebebi","Closure reason"),a=>a.closure]];const out=[];for(const[key,label,get]of fields){const map={};accts.forEach(a=>{const v=norm(get(a));if(!v)return;(map[v]=map[v]||[]).push(a.name||"—");});Object.keys(map).forEach(v=>{if(map[v].length>=2)out.push({label,value:v,stores:map[v]});});}return out;})();
 useEffect(()=>{getProfile().then(setProf);getAccountInfo().then(setAcc);},[]);
 if(!prof||!acc)return <div id="boot" style={{minHeight:180}}>{TT("Yükleniyor…","Loading…")}</div>;
 const isAdmin=currentRole==="admin";
@@ -599,7 +615,7 @@ const upP=(k,v)=>setProf(p=>({...p,[k]:v}));
 const flash=m=>{setSaved(m);setTimeout(()=>setSaved(""),1600);};
 const saveP=async()=>{await saveProfile(prof);flash(TT("Profil kaydedildi.","Profile saved."));};
 const saveA=async()=>{await saveAccountInfo({company_name:acc.company_name});flash(TT("Şirket bilgisi kaydedildi.","Company info saved."));};
-const SUBS=[["profil","Q1 · 👤 "+TT("Profil","Profile")],["abonelik","Q2 · 💳 "+TT("Abonelik","Subscription")],["baglanti","Q3 · 🔗 "+TT("Bağlantı","Connection")],["kaynak","Q4 · 📥 "+TT("Veri Kaynakları","Data Sources")],["dil","Q5 · 🌐 "+TT("Dil","Language")]];
+const SUBS=[["profil","Q1 · 👤 "+TT("Profil","Profile")],["abonelik","Q2 · 💳 "+TT("Abonelik","Subscription")],["baglanti","Q3 · 🔗 "+TT("Bağlantı","Connection")],["kaynak","Q4 · 📥 "+TT("Veri Kaynakları","Data Sources")],["dil","Q5 · 🌐 "+TT("Dil","Language")],["kurallar","Q6 · 🔒 "+TT("Kurallar & Hatırlatmalar","Rules & Reminders")],["kapatma","Q7 · 🚫 "+TT("Kapatma Sebepleri","Closure Reasons")],["benzerlik","Q8 · 🧬 "+TT("Benzerlik","Similarity")]];
 const inp=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={prof[k]||""} placeholder={ph||""} onChange={e=>upP(k,e.target.value)} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
 const DS=[["📷 "+TT("Screenshot yükle","Upload screenshot"),"ready"],["📄 "+TT("CSV yükle","Upload CSV"),"ready"],["📋 "+TT("Kopyala-yapıştır","Copy-paste"),"ready"],["⌨️ "+TT("Elle giriş","Manual entry"),"ready"],["📎 "+TT("Doküman yükle","Upload document"),"soon"],["✉️ "+TT("Bağlı e-posta (Gmail)","Connected email (Gmail)"),"soon"],["🔌 "+TT("API (Etsy/Amazon)","API (Etsy/Amazon)"),"soon"]];
 return(<div style={{padding:"8px 0 40px"}}>
@@ -644,6 +660,42 @@ return(<div style={{padding:"8px 0 40px"}}>
 <div style={{display:"flex",gap:8,marginTop:10}}>
 <button className={"btn"+(((settings&&settings.lang)||"tr")!=="en"?" pri":"")} onClick={()=>setSettings(s=>({...s,lang:"tr"}))}>🇹🇷 Türkçe</button>
 <button className={"btn"+((settings&&settings.lang==="en")?" pri":"")} onClick={()=>setSettings(s=>({...s,lang:"en"}))}>🇬🇧 English</button></div></div>}
+{sub==="kurallar"&&<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>🔒 {TT("Kurallar & Hatırlatmalar","Rules & Reminders")}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 10px"}}>{TT("QM ve ekip bu kurallara uyar. İstediğin kadar kural/hatırlatma ekleyebilirsin.","QM and the team follow these rules. Add as many rules/reminders as you like.")}</div>
+<div style={{padding:"12px 14px",border:"1px solid var(--red)",borderRadius:11,background:"var(--red-s)",marginBottom:10}}>
+<div style={{fontWeight:800,color:"var(--red)",fontSize:13.5,marginBottom:4}}>⚠ {TT("KURAL 1 — Mağaza İzolasyonu (zorunlu)","RULE 1 — Store Isolation (mandatory)")}</div>
+<div style={{fontSize:13,lineHeight:1.6}}>{TT("Hiçbir mağaza dışarıda başka bir mağazayla ilişkilendirilmez. Mağazalar bilgiyi yalnızca QM içinde paylaşır. Etsy mağazaların birbiriyle bağlantılı olduğunu anlarsa kapatır.","No store is ever externally linked to another store. Stores share information only inside QM. If Etsy detects that shops are connected, it suspends them.")}</div></div>
+<div style={{padding:"12px 14px",border:"1px solid var(--amber)",borderRadius:11,background:"var(--amber-s)",marginBottom:12}}>
+<div style={{fontWeight:800,color:"var(--amber)",fontSize:13.5,marginBottom:4}}>⚠ {TT("KURAL 2 — Belirsiz Bilgi Girilmez (zorunlu)","RULE 2 — No Ambiguous Data (mandatory)")}</div>
+<div style={{fontSize:13,lineHeight:1.6}}>{TT("Bir bilginin tarihi ve hangi mağazaya ait olduğu net değilse, o bilgi senkronize edilmez ve sisteme girilmez.","If a piece of data's date or which store it belongs to is not clearly known, it is not synced or entered into the system.")}</div></div>
+<div className="rh" style={{marginTop:4}}><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:14}}>{TT("Kendi kuralların","Your rules")}</span></div>
+<div style={{display:"flex",gap:8,marginTop:8}}>
+<input value={newRule} onChange={e=>setNewRule(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&newRule.trim()){setSettings(s=>({...s,houseRules:[...(Array.isArray(s.houseRules)?s.houseRules:[]),newRule.trim()]}));setNewRule("");}}} placeholder={TT("Yeni kural / hatırlatma yaz…","Write a new rule / reminder…")} style={{flex:1,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/>
+<button className="btn pri" onClick={()=>{if(newRule.trim()){setSettings(s=>({...s,houseRules:[...(Array.isArray(s.houseRules)?s.houseRules:[]),newRule.trim()]}));setNewRule("");}}}>{TT("Ekle","Add")}</button></div>
+<div style={{display:"flex",flexDirection:"column",gap:6,marginTop:10}}>
+{houseRules.length===0&&<div style={{fontSize:12.5,color:"var(--faint)"}}>{TT("Henüz kendi kuralın yok.","No custom rules yet.")}</div>}
+{houseRules.map((r,i)=><div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{color:"var(--green)",fontWeight:800}}>{i+3}.</span><span style={{flex:1,lineHeight:1.5}}>{r}</span><button className="dl" onClick={()=>setSettings(s=>({...s,houseRules:(Array.isArray(s.houseRules)?s.houseRules:[]).filter((_,j)=>j!==i)}))} title={TT("Sil","Delete")}>✕</button></div>)}
+</div></div>}
+{sub==="kapatma"&&<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>🚫 {TT("Kapatma / Uyarı Sebepleri","Closure / Warning Reasons")}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 10px"}}>{TT("Her mağazanın kapatma/uyarı sebebini buraya yaz. Sistem, sebepler birbirine benziyorsa Q8 Benzerlik'te uyarır.","Record each store's closure/warning reason here. The system flags similar reasons in Q8 Similarity.")}</div>
+{accts.length===0&&<div style={{fontSize:13,color:"var(--faint)"}}>{TT("Önce mağaza ekle.","Add a store first.")}</div>}
+<div style={{display:"flex",flexDirection:"column",gap:10}}>{accts.map(a=><div key={a.id}>
+<div style={{fontSize:12.5,fontWeight:700,marginBottom:4}}>{a.name||"—"}</div>
+<textarea value={a.closure||""} onChange={e=>upStore(a.id,"closure",e.target.value)} rows={2} placeholder={TT("Kapatma/uyarı sebebi (varsa)…","Closure/warning reason (if any)…")} style={{width:"100%",padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/>
+</div>)}</div>
+<div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir.","Changes are saved automatically.")}</div></div>}
+{sub==="benzerlik"&&<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>🧬 {TT("Benzerlik Analizi","Similarity Analysis")}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 10px"}}>{TT("Mağazaların kimlik/tema/kapatma sebepleri karşılaştırılır. Birden fazla mağazada AYNI olan şeyler, Etsy'nin bağlantı kurabileceği risklerdir.","Stores' identity/theme/closure reasons are compared. Anything IDENTICAL across multiple stores is a risk Etsy could use to link them.")}</div>
+{simGroups.length===0
+?<div style={{padding:"12px 14px",border:"1px solid var(--green)",borderRadius:11,background:"var(--green-s)",fontSize:13.5,color:"var(--green)",fontWeight:600}}>✓ {TT("Mağazalar arasında ortak/benzer bilgi bulunamadı. İzolasyon iyi.","No shared/similar info found across stores. Isolation looks good.")}</div>
+:<div style={{display:"flex",flexDirection:"column",gap:8}}>{simGroups.map((g,i)=><div key={i} style={{padding:"11px 14px",border:"1px solid var(--red)",borderRadius:11,background:"var(--red-s)"}}>
+<div style={{fontWeight:800,color:"var(--red)",fontSize:13,marginBottom:3}}>⚠ {g.label}: "{g.value}"</div>
+<div style={{fontSize:13,lineHeight:1.5}}>{TT("Ortak mağazalar","Shared by")}: <b>{g.stores.join(" · ")}</b></div>
+</div>)}</div>}
+</div>}
 </div>);}
 function FinanceTab({dm,act,accounts,settings,setSettings}){
 const storeName=(accounts.find(a=>a.id===act)||{}).name||"—";
@@ -719,11 +771,14 @@ return(<div style={{padding:"8px 0 40px"}}>
 <td><span style={{display:"flex",gap:6,justifyContent:"flex-end",alignItems:"center"}}>{isAdmin&&m.role!=="admin"&&<button className="btn" style={{fontSize:11,padding:"3px 9px"}} onClick={()=>setOpenId(openId===m.id?null:m.id)}>{TT("İzinler","Permissions")} {openId===m.id?"▴":"▾"}</button>}{isAdmin&&<button className="dl" onClick={()=>del(m.id)} title={TT("Çıkar","Remove")}>✕</button>}</span></td></tr>
 {isAdmin&&m.role!=="admin"&&openId===m.id&&<tr><td colSpan={4} style={{background:"var(--bg2)",padding:"12px 14px"}}>
 <div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>{TT("Bu üyenin görebileceği/yapabileceği işlemler (aç/kapat):","What this member can see/do (on/off):")}</div>
+{[...new Set(PERMS.map(p=>p.group))].map(g=><div key={g} style={{marginBottom:10}}>
+<div style={{fontSize:11.5,fontWeight:800,color:"var(--faint)",letterSpacing:".03em",margin:"4px 0 6px"}}>{g.toUpperCase()}</div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:8}}>
-{PERMS.map(p=>{const on=!!(m.permissions&&m.permissions[p.key]);return(
+{PERMS.filter(p=>p.group===g).map(p=>{const on=!!(m.permissions&&m.permissions[p.key]);return(
 <label key={p.key} style={{display:"flex",alignItems:"center",gap:8,fontSize:13,cursor:"pointer",padding:"6px 8px",border:"1px solid var(--line2)",borderRadius:8,background:on?"var(--green-s)":"var(--panel)"}}>
-<input type="checkbox" checked={on} onChange={async()=>{const np={...(m.permissions||{}),[p.key]:!on};await updateMemberPerms(m.id,np);load();}}/>{p.label}</label>);})}
-</div></td></tr>}
+<input type="checkbox" checked={on} onChange={async()=>{const np={...(m.permissions||{}),[p.key]:!on};await updateMemberPerms(m.id,np);load();}}/>{TT(p.tr,p.en)}</label>);})}
+</div></div>)}
+</td></tr>}
 </React.Fragment>))}
 </tbody></table></div></div>
 <div className="rules">
@@ -854,8 +909,8 @@ const[settings,setSettings]=useState(DS);
 const[dm,setDm]=useState({});
 const[date,setDate]=useState(todayISO());
 const[tab,setTab]=useState("marketing");
-const TAB_PERM={marketing:"viewMarketing",rules:"editRules",dikkat:"viewDikkat",trend:"viewTrend",agent:"viewAgent",ekip:"manageTeam"};
-useEffect(()=>{if(TAB_PERM[tab]&&!can(TAB_PERM[tab]))setTab("finance");},[tab]);
+const TAB_PERM={marketing:"viewMarketing",finance:"viewFinance",trademark:"viewTrademark",visibility:"viewVisibility",dashboard:"viewDashboard",zidentity:"viewIdentity",ekip:"manageTeam"};
+useEffect(()=>{if(TAB_PERM[tab]&&!can(TAB_PERM[tab])){const first=["marketing","finance","trademark","visibility","dashboard","zidentity"].find(x=>can(TAB_PERM[x]));setTab(first||"ayarlar");}},[tab]);
 const[mktFilter,setMktFilter]=useState("all");
 const[mktSearch,setMktSearch]=useState("");
 const[sel,setSel]=useState(()=>new Set());
@@ -1123,7 +1178,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM27 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM28 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1162,14 +1217,18 @@ return(
 </aside>
 
 <main className="main">
-<div className="hero"><span className="mk">{tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?TT("D — GÖRÜNÜRLÜK","D — VISIBILITY"):tab==="dashboard"?"X — SHOP MANAGER":tab==="zidentity"?TT("Z — STORE KİMLİK","Z — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"A — MARKETING"}</span></div>
+<div className="hero"><span className="mk">{tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?TT("D — GÖRÜNÜRLÜK","D — VISIBILITY"):tab==="dashboard"?"X — SHOP MANAGER":tab==="zidentity"?TT("Z — STORE KİMLİK","Z — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"A — MARKETING"}</span>
+<div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
+<button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")}>⚙ {TT("Ayarlar","Settings")}</button>
+<button className="btn" onClick={()=>setTab("ayarlar")} title={TT("Profil","Profile")}>👤 {TT("Profil","Profile")}</button>
+</div></div>
 <div className="tabs">
 {can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}><b className="tl">A</b> 📊 MARKETING</button>}
-<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}><b className="tl">B</b> 💰 FINANCE</button>
-<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}><b className="tl">C</b> ⚖️ TRADEMARK</button>
-<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}><b className="tl">D</b> 📈 {TT("GÖRÜNÜRLÜK","VISIBILITY")}</button>
-<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">X</b> ✅ SHOP MANAGER</button>
-<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">Z</b> 🆔 {TT("KİMLİK","IDENTITY")}</button>
+{can("viewFinance")&&<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}><b className="tl">B</b> 💰 FINANCE</button>}
+{can("viewTrademark")&&<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}><b className="tl">C</b> ⚖️ TRADEMARK</button>}
+{can("viewVisibility")&&<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}><b className="tl">D</b> 📈 {TT("GÖRÜNÜRLÜK","VISIBILITY")}</button>}
+{can("viewDashboard")&&<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">X</b> ✅ SHOP MANAGER</button>}
+{can("viewIdentity")&&<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">Z</b> 🆔 {TT("KİMLİK","IDENTITY")}</button>}
 {can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">Y</b> 👥 {TT("EKİP","TEAM")}</button>}
 <button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}><b className="tl">Q</b> ⚙ {TT("AYARLAR","SETTINGS")}</button>
 </div>
@@ -1191,7 +1250,7 @@ return(
 <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>{budget.moves.map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>➕ {m.to}</span><b style={{color:"var(--green)"}}>{money(m.amt,settings.cur)}</b><span style={{color:"var(--faint)",fontFamily:"'JetBrains Mono'",fontSize:12}}>ROAS {m.roas.toFixed(1)}×</span></div>)}</div></div>}
 </div>}
 {tab==="zidentity"&&<ZKimlik accounts={accounts} act={act} setAccounts={setAccounts}/>}
-{tab==="ayarlar"&&<SettingsPanel settings={settings} setSettings={setSettings}/>}
+{tab==="ayarlar"&&<SettingsPanel settings={settings} setSettings={setSettings} accounts={accounts} setAccounts={setAccounts}/>}
 
 {/* ===== MARKETING TAB ===== */}
 {tab==="marketing"&&(<>
