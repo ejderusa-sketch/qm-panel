@@ -352,6 +352,9 @@ function defaultPerms(role){
  return{viewMarketing:true,uploadData:true,deleteData:false,editRules:false,viewDikkat:true,viewTrend:true,viewAgent:false,manageTeam:false};
 }
 function can(key){ if(currentRole==="admin"||currentPermissions===null)return true; return !!(currentPermissions&&currentPermissions[key]); }
+/* Basit iki dilli yardımcı: TT("Türkçe","English") */
+let uiLang="tr";
+function TT(a,b){return uiLang==="en"?b:a;}
 /* Hesap bootstrap: ilk giriş yapan Admin olur; davetli manager kendi hesabına bağlanır */
 async function bootstrap(){
   const u=(await sb.auth.getUser()).data.user;
@@ -566,18 +569,18 @@ const blankV=()=>({id:Math.random().toString(36).slice(2),name:"",category:"",ke
 
 /* ========== APP ========== */
 /* ===== Plan modülleri (bölüm taslakları) ===== */
-const MODULES={
- finance:{title:"💰 B — FINANCE",intro:"Dashboard cirosu, reklam gideri ve Marketing oranını net gösterir.",items:[["Dashboard Revenue (ciro)","🔜"],["Ads Spend (reklam gideri)","🔜"],["Marketing Ratio = Ads ÷ Ciro × 100","🔜"],["Tarihsel görünüm (günlük/haftalık/aylık/yıllık)","🔜"],["Önceki dönemle karşılaştırma","🔜"]]},
- trademark:{title:"⚖️ C — TRADEMARK & COPYRIGHT",intro:"Bağlı Gmail'den gelen ihlal bildirimlerini takip eden canlı Case merkezi.",items:[["IP Summary sayaçları (notice/removed/restored)","🔜"],["Trademark & Copyright bildirimleri","🔜"],["Canlı e-posta izleme → Case oluşturma","🔜"],["Response Center (reply, withdrawal, counter notice)","🔜"],["Case durumları & tam geçmiş","🔜"]]},
- visibility:{title:"📈 D — ETSY GÖRÜNÜRLÜK & UPLOAD",intro:"Etsy şu an neyi daha çok gösteriyor, buna göre ne yüklenmeli?",items:[["Visibility Summary","🔜"],["Günlük görünürlük çizelgesi","🔜"],["Kategori / tema tespiti","🔜"],["Ne yükleyelim? tavsiyesi (STRONG/HOLD…)","🔜"],["Upload Gap (fırsat vs. mevcut listing)","🔜"]]},
- dashboard:{title:"✅ X — SHOP MANAGER DASHBOARD",intro:"Manager'ın günlük iş merkezi: bugün ne yapmalı?",items:[["Bugünün görevleri & tavsiyeler","🔜"],["Dikkat gerektirenler (öncelikli)","🔜"],["Etsy Listing takvimi (sezonluk plan)","🔜"],["Görev atama & durum","🔜"],["Haftalık manager raporu","🔜"]]},
- zidentity:{title:"🆔 Z — STORE KİMLİK & DOĞRULAMA",intro:"Her mağazanın doğrulanmış kimlik ve referans dosyası (dış yazışmada güvenli kaynak).",items:[["Store adı, URL, ID, ülke, para birimi","🔜"],["Legal owner / şirket / iletişim","🔜"],["Connected email & payment reference (maskeli)","🔜"],["Doğrulama durumu (Verified/Missing/Outdated)","🔜"],["Değişiklik geçmişi","🔜"]]},
-};
+function MOD(){return{
+ finance:{title:"💰 B — FINANCE",intro:TT("Dashboard cirosu, reklam gideri ve Marketing oranını net gösterir.","Clearly shows dashboard revenue, ad spend and the Marketing ratio."),items:[[TT("Dashboard Revenue (ciro)","Dashboard Revenue"),"🔜"],[TT("Ads Spend (reklam gideri)","Ads Spend"),"🔜"],["Marketing Ratio = Ads ÷ "+TT("Ciro","Revenue")+" × 100","🔜"],[TT("Tarihsel görünüm (günlük/haftalık/aylık/yıllık)","Historical view (daily/weekly/monthly/yearly)"),"🔜"],[TT("Önceki dönemle karşılaştırma","Compare with previous period"),"🔜"]]},
+ trademark:{title:"⚖️ C — TRADEMARK & COPYRIGHT",intro:TT("Bağlı Gmail'den gelen ihlal bildirimlerini takip eden canlı Case merkezi.","A live Case center that tracks infringement notices from the connected Gmail."),items:[[TT("IP Summary sayaçları (notice/removed/restored)","IP Summary counters (notice/removed/restored)"),"🔜"],[TT("Trademark & Copyright bildirimleri","Trademark & Copyright notices"),"🔜"],[TT("Canlı e-posta izleme → Case oluşturma","Live email monitoring → Case creation"),"🔜"],["Response Center (reply, withdrawal, counter notice)","🔜"],[TT("Case durumları & tam geçmiş","Case statuses & full history"),"🔜"]]},
+ visibility:{title:TT("📈 D — ETSY GÖRÜNÜRLÜK & UPLOAD","📈 D — ETSY VISIBILITY & UPLOAD"),intro:TT("Etsy şu an neyi daha çok gösteriyor, buna göre ne yüklenmeli?","What is Etsy showing more of right now, and what should we upload accordingly?"),items:[["Visibility Summary","🔜"],[TT("Günlük görünürlük çizelgesi","Daily visibility chart"),"🔜"],[TT("Kategori / tema tespiti","Category / theme detection"),"🔜"],[TT("Ne yükleyelim? tavsiyesi (STRONG/HOLD…)","What to upload? recommendation (STRONG/HOLD…)"),"🔜"],[TT("Upload Gap (fırsat vs. mevcut listing)","Upload Gap (opportunity vs. current listings)"),"🔜"]]},
+ dashboard:{title:"✅ X — SHOP MANAGER DASHBOARD",intro:TT("Manager'ın günlük iş merkezi: bugün ne yapmalı?","The manager's daily work hub: what to do today?"),items:[[TT("Bugünün görevleri & tavsiyeler","Today's tasks & recommendations"),"🔜"],[TT("Dikkat gerektirenler (öncelikli)","Needs attention (priority)"),"🔜"],[TT("Etsy Listing takvimi (sezonluk plan)","Etsy Listing calendar (seasonal plan)"),"🔜"],[TT("Görev atama & durum","Task assignment & status"),"🔜"],[TT("Haftalık manager raporu","Weekly manager report"),"🔜"]]},
+ zidentity:{title:TT("🆔 Z — STORE KİMLİK & DOĞRULAMA","🆔 Z — STORE IDENTITY & VERIFICATION"),intro:TT("Her mağazanın doğrulanmış kimlik ve referans dosyası (dış yazışmada güvenli kaynak).","A verified identity and reference file for each store (a trusted source for external correspondence)."),items:[[TT("Store adı, URL, ID, ülke, para birimi","Store name, URL, ID, country, currency"),"🔜"],[TT("Legal owner / şirket / iletişim","Legal owner / company / contact"),"🔜"],[TT("Connected email & payment reference (maskeli)","Connected email & payment reference (masked)"),"🔜"],[TT("Doğrulama durumu (Verified/Missing/Outdated)","Verification status (Verified/Missing/Outdated)"),"🔜"],[TT("Değişiklik geçmişi","Change history"),"🔜"]]},
+};}
 function SectionOutline({m}){return(<div style={{padding:"8px 0 40px"}}>
-<div className="rules" style={{background:"var(--panel2)"}}><div className="rh"><span style={{fontSize:16}}>{m.title}</span><span className="vd" style={{marginLeft:"auto",background:"var(--amber-s)",color:"var(--amber)"}}>Yakında</span></div><div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{m.intro}</div></div>
-<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>Bu bölümde olacaklar</span></div>
+<div className="rules" style={{background:"var(--panel2)"}}><div className="rh"><span style={{fontSize:16}}>{m.title}</span><span className="vd" style={{marginLeft:"auto",background:"var(--amber-s)",color:"var(--amber)"}}>{TT("Yakında","Coming soon")}</span></div><div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{m.intro}</div></div>
+<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{TT("Bu bölümde olacaklar","What this section will include")}</span></div>
 <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>{m.items.map((it,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span>{it[1]}</span>{it[0]}</div>)}</div>
-<div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>Bu bölüm planın sıradaki fazlarında adım adım doldurulacak.</div></div>
+<div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>{TT("Bu bölüm planın sıradaki fazlarında adım adım doldurulacak.","This section will be filled in step by step in the plan's upcoming phases.")}</div></div>
 </div>);}
 function SettingsPanel({settings,setSettings}){
 const[sub,setSub]=useState("profil");
@@ -585,48 +588,48 @@ const[prof,setProf]=useState(null);
 const[acc,setAcc]=useState(null);
 const[saved,setSaved]=useState("");
 useEffect(()=>{getProfile().then(setProf);getAccountInfo().then(setAcc);},[]);
-if(!prof||!acc)return <div id="boot" style={{minHeight:180}}>Yükleniyor…</div>;
+if(!prof||!acc)return <div id="boot" style={{minHeight:180}}>{TT("Yükleniyor…","Loading…")}</div>;
 const isAdmin=currentRole==="admin";
 const upP=(k,v)=>setProf(p=>({...p,[k]:v}));
 const flash=m=>{setSaved(m);setTimeout(()=>setSaved(""),1600);};
-const saveP=async()=>{await saveProfile(prof);flash("Profil kaydedildi.");};
-const saveA=async()=>{await saveAccountInfo({company_name:acc.company_name});flash("Şirket bilgisi kaydedildi.");};
-const SUBS=[["profil","👤 Profil"],["abonelik","💳 Abonelik"],["baglanti","🔗 Bağlantı"],["kaynak","📥 Veri Kaynakları"],["dil","🌐 Dil"]];
+const saveP=async()=>{await saveProfile(prof);flash(TT("Profil kaydedildi.","Profile saved."));};
+const saveA=async()=>{await saveAccountInfo({company_name:acc.company_name});flash(TT("Şirket bilgisi kaydedildi.","Company info saved."));};
+const SUBS=[["profil","👤 "+TT("Profil","Profile")],["abonelik","💳 "+TT("Abonelik","Subscription")],["baglanti","🔗 "+TT("Bağlantı","Connection")],["kaynak","📥 "+TT("Veri Kaynakları","Data Sources")],["dil","🌐 "+TT("Dil","Language")]];
 const inp=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={prof[k]||""} placeholder={ph||""} onChange={e=>upP(k,e.target.value)} style={{display:"block",width:"100%",maxWidth:360,marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
-const DS=[["📷 Screenshot yükle","hazır"],["📄 CSV yükle","hazır"],["📋 Kopyala-yapıştır","hazır"],["⌨️ Elle giriş","hazır"],["📎 Doküman yükle","yakında"],["✉️ Bağlı e-posta (Gmail)","yakında"],["🔌 API (Etsy/Amazon)","yakında"]];
+const DS=[["📷 "+TT("Screenshot yükle","Upload screenshot"),"ready"],["📄 "+TT("CSV yükle","Upload CSV"),"ready"],["📋 "+TT("Kopyala-yapıştır","Copy-paste"),"ready"],["⌨️ "+TT("Elle giriş","Manual entry"),"ready"],["📎 "+TT("Doküman yükle","Upload document"),"soon"],["✉️ "+TT("Bağlı e-posta (Gmail)","Connected email (Gmail)"),"soon"],["🔌 "+TT("API (Etsy/Amazon)","API (Etsy/Amazon)"),"soon"]];
 return(<div style={{padding:"8px 0 40px"}}>
 <div className="tabs" style={{marginBottom:14}}>{SUBS.map(([k,lb])=><button key={k} className={sub===k?"on":""} onClick={()=>setSub(k)}>{lb}</button>)}</div>
 {saved&&<div className="busy" style={{background:"var(--green-s)",borderColor:"rgba(15,157,99,.3)",color:"var(--green)"}}>{saved}</div>}
 {sub==="profil"&&<div className="rules">
-<div className="rh"><span style={{fontSize:15}}>👤 Profil</span></div>
-<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>E-posta<input value={prof.email||""} disabled style={{display:"block",width:"100%",maxWidth:360,marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5,background:"var(--panel2)",color:"var(--faint)"}}/></label>
-{inp("Ad Soyad","full_name","Adın Soyadın")}
-{inp("Telefon","phone","+1 ...")}
-{inp("Ülke","country","US / TR ...")}
-{inp("Saat dilimi","timezone","America/New_York")}
-<div><button className="btn pri" style={{marginTop:16}} onClick={saveP}>Profili kaydet</button></div>
+<div className="rh"><span style={{fontSize:15}}>👤 {TT("Profil","Profile")}</span></div>
+<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("E-posta","Email")}<input value={prof.email||""} disabled style={{display:"block",width:"100%",maxWidth:360,marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5,background:"var(--panel2)",color:"var(--faint)"}}/></label>
+{inp(TT("Ad Soyad","Full name"),"full_name",TT("Adın Soyadın","Your full name"))}
+{inp(TT("Telefon","Phone"),"phone","+1 ...")}
+{inp(TT("Ülke","Country"),"country","US / TR ...")}
+{inp(TT("Saat dilimi","Timezone"),"timezone","America/New_York")}
+<div><button className="btn pri" style={{marginTop:16}} onClick={saveP}>{TT("Profili kaydet","Save profile")}</button></div>
 {isAdmin&&<div style={{marginTop:20,paddingTop:16,borderTop:"1px solid var(--line)"}}>
-<div style={{fontSize:13,fontWeight:600,marginBottom:6}}>Şirket / Hesap adı (Admin)</div>
+<div style={{fontSize:13,fontWeight:600,marginBottom:6}}>{TT("Şirket / Hesap adı (Admin)","Company / Account name (Admin)")}</div>
 <input value={acc.company_name||""} onChange={e=>setAcc(a=>({...a,company_name:e.target.value}))} style={{width:"100%",maxWidth:360,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5}}/>
-<div><button className="btn" style={{marginTop:10}} onClick={saveA}>Şirket bilgisini kaydet</button></div></div>}
+<div><button className="btn" style={{marginTop:10}} onClick={saveA}>{TT("Şirket bilgisini kaydet","Save company info")}</button></div></div>}
 </div>}
 {sub==="abonelik"&&<div className="rules">
-<div className="rh"><span style={{fontSize:15}}>💳 Abonelik</span><span className="vd" style={{marginLeft:"auto",background:"var(--green-s)",color:"var(--green)"}}>{(acc.subscription_plan||"beginner").toUpperCase()}</span></div>
+<div className="rh"><span style={{fontSize:15}}>💳 {TT("Abonelik","Subscription")}</span><span className="vd" style={{marginLeft:"auto",background:"var(--green-s)",color:"var(--green)"}}>{(acc.subscription_plan||"beginner").toUpperCase()}</span></div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:12,marginTop:10}}>
-{[["BEGINNER","Küçük işletme","Sınırlı mağaza & manager, temel Marketing/Finance, screenshot upload"],["STANDARD","Büyüyen işletme","Daha fazla mağaza & manager, yetki sistemi, CSV, e-posta, karşılaştırma"],["GOLDEN","Büyük hesap","Yüksek limitler, e-posta otomasyonu, API entegrasyonları, gelişmiş rapor"]].map(p=><div key={p[0]} style={{border:"1px solid var(--line2)",borderRadius:12,padding:14,background:(acc.subscription_plan||"beginner")===p[0].toLowerCase()?"var(--green-s)":"var(--bg2)"}}>
+{[["BEGINNER",TT("Küçük işletme","Small business"),TT("Sınırlı mağaza & manager, temel Marketing/Finance, screenshot upload","Limited stores & managers, basic Marketing/Finance, screenshot upload")],["STANDARD",TT("Büyüyen işletme","Growing business"),TT("Daha fazla mağaza & manager, yetki sistemi, CSV, e-posta, karşılaştırma","More stores & managers, permissions system, CSV, email, comparison")],["GOLDEN",TT("Büyük hesap","Large account"),TT("Yüksek limitler, e-posta otomasyonu, API entegrasyonları, gelişmiş rapor","High limits, email automation, API integrations, advanced reporting")]].map(p=><div key={p[0]} style={{border:"1px solid var(--line2)",borderRadius:12,padding:14,background:(acc.subscription_plan||"beginner")===p[0].toLowerCase()?"var(--green-s)":"var(--bg2)"}}>
 <div style={{fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:15}}>{p[0]}</div><div style={{fontSize:12,color:"var(--muted)",margin:"2px 0 8px"}}>{p[1]}</div><div style={{fontSize:12.5,lineHeight:1.5}}>{p[2]}</div></div>)}
 </div>
-<div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>Ödeme & yükseltme yakında. Şu an tüm özellikler açık (geliştirme sürümü).</div></div>}
+<div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>{TT("Ödeme & yükseltme yakında. Şu an tüm özellikler açık (geliştirme sürümü).","Payment & upgrades coming soon. All features are currently open (development build).")}</div></div>}
 {sub==="baglanti"&&<div className="rules">
-<div className="rh"><span style={{fontSize:15}}>🔗 Bağlantı (Connect)</span></div>
-<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6,marginTop:6}}>Her mağazanın e-postasını <b>sol taraftaki mağaza listesinden</b> ekle (mağaza altındaki "e-posta ekle"). Bağlı e-posta hem iletişim kanalı hem veri kaynağıdır.</div>
-<div style={{marginTop:10,padding:"10px 13px",border:"1px dashed var(--line2)",borderRadius:10,fontSize:13,color:"var(--faint)"}}>🔌 Etsy / Amazon API bağlantısı — <b>yakında</b> (planın Phase 10).</div></div>}
+<div className="rh"><span style={{fontSize:15}}>🔗 {TT("Bağlantı (Connect)","Connection")}</span></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6,marginTop:6}}>{TT("Her mağazanın e-postasını sol taraftaki mağaza listesinden ekle (mağaza altındaki \"e-posta ekle\"). Bağlı e-posta hem iletişim kanalı hem veri kaynağıdır.","Add each store's email from the store list on the left (\"add email\" under the store). The connected email is both a communication channel and a data source.")}</div>
+<div style={{marginTop:10,padding:"10px 13px",border:"1px dashed var(--line2)",borderRadius:10,fontSize:13,color:"var(--faint)"}}>🔌 {TT("Etsy / Amazon API bağlantısı — yakında (planın Phase 10).","Etsy / Amazon API connection — coming soon (plan Phase 10).")}</div></div>}
 {sub==="kaynak"&&<div className="rules">
-<div className="rh"><span style={{fontSize:15}}>📥 Veri Kaynakları</span></div>
-<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 8px"}}>QM'ye veri şu yollarla girer:</div>
-<div style={{display:"flex",flexDirection:"column",gap:8}}>{DS.map((d,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>{d[0]}</span><span className="vd" style={d[1]==="hazır"?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{d[1]}</span></div>)}</div></div>}
+<div className="rh"><span style={{fontSize:15}}>📥 {TT("Veri Kaynakları","Data Sources")}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 8px"}}>{TT("QM'ye veri şu yollarla girer:","Data enters QM in these ways:")}</div>
+<div style={{display:"flex",flexDirection:"column",gap:8}}>{DS.map((d,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>{d[0]}</span><span className="vd" style={d[1]==="ready"?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{d[1]==="ready"?TT("hazır","ready"):TT("yakında","soon")}</span></div>)}</div></div>}
 {sub==="dil"&&<div className="rules">
-<div className="rh"><span style={{fontSize:15}}>🌐 Dil</span></div>
+<div className="rh"><span style={{fontSize:15}}>🌐 {TT("Dil","Language")}</span></div>
 <div style={{display:"flex",gap:8,marginTop:10}}>
 <button className={"btn"+(((settings&&settings.lang)||"tr")!=="en"?" pri":"")} onClick={()=>setSettings(s=>({...s,lang:"tr"}))}>🇹🇷 Türkçe</button>
 <button className={"btn"+((settings&&settings.lang==="en")?" pri":"")} onClick={()=>setSettings(s=>({...s,lang:"en"}))}>🇬🇧 English</button></div></div>}
@@ -635,14 +638,14 @@ function FinanceTab({dm,act,accounts,settings,setSettings}){
 const storeName=(accounts.find(a=>a.id===act)||{}).name||"—";
 const cur=settings.cur;const fin=settings.finance||{};
 const setDashRev=(p,v)=>setSettings(s=>({...s,finance:{...(s.finance||{}),[act+"|"+p]:{dashRev:v}}}));
-const PER=[["1ay","1 AY"],["3ay","3 AY"],["6ay","6 AY"],["1yil","1 YIL"]];
+const PER=[["1ay",TT("1 AY","1 MO")],["3ay",TT("3 AY","3 MO")],["6ay",TT("6 AY","6 MO")],["1yil",TT("1 YIL","1 YR")]];
 const rowsFor=p=>dm[act+"|"+p]||[];
 return(<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
 <div className="rh"><span style={{fontSize:16}}>💰 B — FINANCE</span><span className="store" style={{marginLeft:"auto"}}>{storeName}</span></div>
-<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>Marketing Ratio = Reklam Gideri ÷ Dashboard Cirosu × 100. Reklam gideri marketing verinden otomatik gelir; <b>Dashboard cirosunu</b> (mağazanın toplam cirosu) sen girersin.</div></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{TT("Marketing Ratio = Reklam Gideri ÷ Dashboard Cirosu × 100. Reklam gideri marketing verinden otomatik gelir; Dashboard cirosunu (mağazanın toplam cirosu) sen girersin.","Marketing Ratio = Ad Spend ÷ Dashboard Revenue × 100. Ad spend comes automatically from your marketing data; you enter the Dashboard revenue (the store's total revenue).")}</div></div>
 <div className="tw"><table style={{minWidth:640}}><thead><tr>
-<th className="l">Dönem</th><th>Dashboard Ciro</th><th>Reklam Gideri</th><th>Marketing Ratio</th><th>Reklam Geliri</th>
+<th className="l">{TT("Dönem","Period")}</th><th>{TT("Dashboard Ciro","Dashboard Revenue")}</th><th>{TT("Reklam Gideri","Ad Spend")}</th><th>Marketing Ratio</th><th>{TT("Reklam Geliri","Ad Revenue")}</th>
 </tr></thead><tbody>
 {PER.map(([p,lb])=>{const rs=rowsFor(p);const spend=rs.reduce((s,r)=>s+toNum(r.spend),0);const rev=rs.reduce((s,r)=>s+toNum(r.revenue),0);const dash=toNum((fin[act+"|"+p]||{}).dashRev);const ratio=dash>0?spend/dash*100:0;const rc=ratio<=15?"var(--green)":ratio<=30?"var(--amber)":"var(--red)";return(
 <tr key={p}>
@@ -653,9 +656,11 @@ return(<div style={{padding:"8px 0 40px"}}>
 <td className="calc">{money(rev,cur)}</td>
 </tr>);})}
 </tbody></table></div>
-<div style={{fontSize:12,color:"var(--faint)",marginTop:8}}>Yeşil ≤%15 · sarı %15–30 · kırmızı &gt;%30 (reklam gideri/ciro oranı). İleride: kargo, ürün maliyeti, net kâr eklenecek.</div>
+<div style={{fontSize:12,color:"var(--faint)",marginTop:8}}>{TT("Yeşil ≤%15 · sarı %15–30 · kırmızı >%30 (reklam gideri/ciro oranı). İleride: kargo, ürün maliyeti, net kâr eklenecek.","Green ≤15% · amber 15–30% · red >30% (ad spend/revenue ratio). Later: shipping, product cost, net profit will be added.")}</div>
 </div>);}
 const ROLE_TR={admin:"Yönetici",user:"Kullanıcı",shop_manager:"Mağaza Müdürü"};
+const ROLE_EN={admin:"Admin",user:"User",shop_manager:"Shop Manager"};
+function roleName(r){return TT(ROLE_TR[r]||r,ROLE_EN[r]||r);}
 function EkipPanel(){
 const[members,setMembers]=useState([]);
 const[email,setEmail]=useState("");
@@ -668,36 +673,36 @@ const load=()=>listMembers().then(setMembers);
 useEffect(()=>{load()},[]);
 const add=async()=>{const e=email.trim();if(!e)return;setBusy(true);setErr("");setMsg("");
 const r=await addMember(e,role);
-if(r&&r.error){setErr(/duplicate|unique/i.test(r.error.message)?"Bu e-posta zaten ekli.":r.error.message);}
-else{setMsg(e+" davet edildi. O kişi bu e-postayla giriş yapınca hesabına katılır.");setEmail("");}
+if(r&&r.error){setErr(/duplicate|unique/i.test(r.error.message)?TT("Bu e-posta zaten ekli.","This email is already added."):r.error.message);}
+else{setMsg(e+TT(" davet edildi. O kişi bu e-postayla giriş yapınca hesabına katılır."," invited. They join your account when they sign in with this email."));setEmail("");}
 await load();setBusy(false);};
-const del=async(id)=>{if(!window.confirm("Bu üyeyi çıkar?"))return;await removeMember(id);load();};
+const del=async(id)=>{if(!window.confirm(TT("Bu üyeyi çıkar?","Remove this member?")))return;await removeMember(id);load();};
 const chRole=async(id,rl)=>{await updateMemberRole(id,rl);load();};
 const isAdmin=currentRole==="admin";
-const roleOpts=<React.Fragment><option value="shop_manager">Mağaza Müdürü</option><option value="user">Kullanıcı</option><option value="admin">Yönetici</option></React.Fragment>;
+const roleOpts=<React.Fragment><option value="shop_manager">{TT("Mağaza Müdürü","Shop Manager")}</option><option value="user">{TT("Kullanıcı","User")}</option><option value="admin">{TT("Yönetici","Admin")}</option></React.Fragment>;
 return(<div style={{padding:"8px 0 40px"}}>
-<div className="rules" style={{background:"var(--panel2)"}}>Ekip yönetimi. Admin, e-postayla <b>Mağaza Müdürü</b> veya <b>Kullanıcı</b> davet eder; davet edilen kişi <b>o e-postayla giriş yapınca</b> senin hesabına katılır ve aynı verileri görür. {!isAdmin&&<span style={{color:"var(--red)"}}> (Yalnızca Admin üye ekleyip çıkarabilir.)</span>}</div>
+<div className="rules" style={{background:"var(--panel2)"}}>{TT("Ekip yönetimi. Admin, e-postayla Mağaza Müdürü veya Kullanıcı davet eder; davet edilen kişi o e-postayla giriş yapınca senin hesabına katılır ve aynı verileri görür.","Team management. An admin invites a Shop Manager or User by email; the invited person joins your account when they sign in with that email and sees the same data.")} {!isAdmin&&<span style={{color:"var(--red)"}}> {TT("(Yalnızca Admin üye ekleyip çıkarabilir.)","(Only an Admin can add or remove members.)")}</span>}</div>
 {isAdmin&&<div className="rules">
-<div className="rh"><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>➕ Üye davet et</span></div>
+<div className="rh"><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>➕ {TT("Üye davet et","Invite member")}</span></div>
 <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center",marginTop:8}}>
-<input value={email} onChange={e=>setEmail(e.target.value)} placeholder="e-posta adresi" type="email" style={{flex:1,minWidth:200,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/>
+<input value={email} onChange={e=>setEmail(e.target.value)} placeholder={TT("e-posta adresi","email address")} type="email" style={{flex:1,minWidth:200,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/>
 <select className="cur-sel" value={role} onChange={e=>setRole(e.target.value)} style={{fontFamily:"'Inter'",fontSize:13,padding:"9px 10px"}}>{roleOpts}</select>
-<button className="btn pri" disabled={busy} onClick={add}>{busy?"...":"Davet et"}</button></div>
+<button className="btn pri" disabled={busy} onClick={add}>{busy?"...":TT("Davet et","Invite")}</button></div>
 {err&&<div className="err" style={{marginTop:10}}>⚠ {err}</div>}
 {msg&&<div className="busy" style={{marginTop:10,background:"var(--green-s)",borderColor:"rgba(15,157,99,.3)",color:"var(--green)"}}>{msg}</div>}
 </div>}
 <div className="rules">
-<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>👥 Ekip üyeleri</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{members.length}</span></div>
-<div className="tw" style={{marginTop:8}}><table style={{minWidth:520}}><thead><tr><th className="l">E-posta</th><th className="l">Rol</th><th className="l">Durum</th><th></th></tr></thead><tbody>
-{members.length===0&&<tr><td colSpan={4}><div className="empty" style={{padding:24}}><p>Henüz üye yok. Yukarıdan davet et.</p></div></td></tr>}
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>👥 {TT("Ekip üyeleri","Team members")}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{members.length}</span></div>
+<div className="tw" style={{marginTop:8}}><table style={{minWidth:520}}><thead><tr><th className="l">{TT("E-posta","Email")}</th><th className="l">{TT("Rol","Role")}</th><th className="l">{TT("Durum","Status")}</th><th></th></tr></thead><tbody>
+{members.length===0&&<tr><td colSpan={4}><div className="empty" style={{padding:24}}><p>{TT("Henüz üye yok. Yukarıdan davet et.","No members yet. Invite one above.")}</p></div></td></tr>}
 {members.map(m=>(<React.Fragment key={m.id}>
 <tr>
 <td className="l" style={{fontWeight:600}}>{m.email}</td>
-<td className="l">{isAdmin?<select className="cur-sel" value={m.role} onChange={e=>chRole(m.id,e.target.value)}>{roleOpts}</select>:(ROLE_TR[m.role]||m.role)}</td>
-<td className="l"><span className="vd" style={m.user_id?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{m.user_id?"Katıldı":"Davet bekliyor"}</span></td>
-<td><span style={{display:"flex",gap:6,justifyContent:"flex-end",alignItems:"center"}}>{isAdmin&&m.role!=="admin"&&<button className="btn" style={{fontSize:11,padding:"3px 9px"}} onClick={()=>setOpenId(openId===m.id?null:m.id)}>İzinler {openId===m.id?"▴":"▾"}</button>}{isAdmin&&<button className="dl" onClick={()=>del(m.id)} title="Çıkar">✕</button>}</span></td></tr>
+<td className="l">{isAdmin?<select className="cur-sel" value={m.role} onChange={e=>chRole(m.id,e.target.value)}>{roleOpts}</select>:roleName(m.role)}</td>
+<td className="l"><span className="vd" style={m.user_id?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{m.user_id?TT("Katıldı","Joined"):TT("Davet bekliyor","Pending")}</span></td>
+<td><span style={{display:"flex",gap:6,justifyContent:"flex-end",alignItems:"center"}}>{isAdmin&&m.role!=="admin"&&<button className="btn" style={{fontSize:11,padding:"3px 9px"}} onClick={()=>setOpenId(openId===m.id?null:m.id)}>{TT("İzinler","Permissions")} {openId===m.id?"▴":"▾"}</button>}{isAdmin&&<button className="dl" onClick={()=>del(m.id)} title={TT("Çıkar","Remove")}>✕</button>}</span></td></tr>
 {isAdmin&&m.role!=="admin"&&openId===m.id&&<tr><td colSpan={4} style={{background:"var(--bg2)",padding:"12px 14px"}}>
-<div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>Bu üyenin görebileceği/yapabileceği işlemler (aç/kapat):</div>
+<div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>{TT("Bu üyenin görebileceği/yapabileceği işlemler (aç/kapat):","What this member can see/do (on/off):")}</div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:8}}>
 {PERMS.map(p=>{const on=!!(m.permissions&&m.permissions[p.key]);return(
 <label key={p.key} style={{display:"flex",alignItems:"center",gap:8,fontSize:13,cursor:"pointer",padding:"6px 8px",border:"1px solid var(--line2)",borderRadius:8,background:on?"var(--green-s)":"var(--panel)"}}>
@@ -964,7 +969,7 @@ if(!ds.includes(date))ds.push(date);return[...new Set(ds)].sort().reverse().slic
 const acctStats=useMemo(()=>{const m={};for(const a of accounts){const rs=dm[`${a.id}|${date}`]||[];let cl=0;for(const r of rs)if(evaluate(r,settings).verdict==="KAPAT")cl++;m[a.id]={count:rs.length,close:cl}}return m},[accounts,dm,date,settings]);
 const acctName=(accounts.find(a=>a.id===act)||{}).name||"";
 const pct=v=>(v*100).toFixed(2)+"%";
-const lang=settings.lang||"tr";
+const lang=settings.lang||"tr";uiLang=lang;
 const t=L[lang]||L.tr;
 
 return(
@@ -972,7 +977,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM10 ☁️</b> · A·B·C·D modülleri</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM11 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1003,24 +1008,24 @@ return(
 </aside>
 
 <main className="main">
-<div className="hero"><span className="mk">{tab==="ayarlar"?"AYARLAR":tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?"D — GÖRÜNÜRLÜK":tab==="dashboard"?"X — DASHBOARD":tab==="zidentity"?"Z — STORE KİMLİK":tab==="ekip"?"EKİP YÖNETİMİ":"A — MARKETING"}</span></div>
+<div className="hero"><span className="mk">{tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?TT("D — GÖRÜNÜRLÜK","D — VISIBILITY"):tab==="dashboard"?"X — DASHBOARD":tab==="zidentity"?TT("Z — STORE KİMLİK","Z — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"A — MARKETING"}</span></div>
 <div className="tabs">
 {can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>📊 A · MARKETING</button>}
 <button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}>💰 B · FINANCE</button>
 <button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}>⚖️ C · TRADEMARK</button>
-<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}>📈 D · GÖRÜNÜRLÜK</button>
+<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}>📈 D · {TT("GÖRÜNÜRLÜK","VISIBILITY")}</button>
 <button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}>✅ X · DASHBOARD</button>
-<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}>🆔 Z · KİMLİK</button>
-{can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}>👥 EKİP</button>}
-<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}>⚙ AYARLAR</button>
+<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}>🆔 Z · {TT("KİMLİK","IDENTITY")}</button>
+{can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}>👥 {TT("EKİP","TEAM")}</button>}
+<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}>⚙ {TT("AYARLAR","SETTINGS")}</button>
 </div>
 
 {tab==="ekip"&&<EkipPanel/>}
 {tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
-{tab==="trademark"&&<SectionOutline m={MODULES.trademark}/>}
-{tab==="visibility"&&<SectionOutline m={MODULES.visibility}/>}
-{tab==="dashboard"&&<SectionOutline m={MODULES.dashboard}/>}
-{tab==="zidentity"&&<SectionOutline m={MODULES.zidentity}/>}
+{tab==="trademark"&&<SectionOutline m={MOD().trademark}/>}
+{tab==="visibility"&&<SectionOutline m={MOD().visibility}/>}
+{tab==="dashboard"&&<SectionOutline m={MOD().dashboard}/>}
+{tab==="zidentity"&&<SectionOutline m={MOD().zidentity}/>}
 {tab==="ayarlar"&&<SettingsPanel settings={settings} setSettings={setSettings}/>}
 
 {/* ===== MARKETING TAB ===== */}
