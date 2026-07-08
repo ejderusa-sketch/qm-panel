@@ -732,7 +732,7 @@ const[dm,setDm]=useState({});
 const[date,setDate]=useState(todayISO());
 const[tab,setTab]=useState("marketing");
 const TAB_PERM={marketing:"viewMarketing",rules:"editRules",dikkat:"viewDikkat",trend:"viewTrend",agent:"viewAgent",ekip:"manageTeam"};
-useEffect(()=>{if(TAB_PERM[tab]&&!can(TAB_PERM[tab])){const first=["marketing","rules","dikkat","trend","agent","ekip"].find(x=>can(TAB_PERM[x]));if(first&&first!==tab)setTab(first);}},[tab]);
+useEffect(()=>{if(TAB_PERM[tab]&&!can(TAB_PERM[tab]))setTab("finance");},[tab]);
 const[mktFilter,setMktFilter]=useState("all");
 const[mktSearch,setMktSearch]=useState("");
 const[sel,setSel]=useState(()=>new Set());
@@ -972,7 +972,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM9 ☁️</b> · Finance</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM10 ☁️</b> · A·B·C·D modülleri</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1003,19 +1003,15 @@ return(
 </aside>
 
 <main className="main">
-<div className="hero"><span className="mk">{tab==="ayarlar"?"AYARLAR":tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?"D — GÖRÜNÜRLÜK":tab==="dashboard"?"X — DASHBOARD":tab==="zidentity"?"Z — STORE KİMLİK":tab==="ekip"?"EKİP YÖNETİMİ":tab==="agent"?t.hAgent:tab==="rules"?t.hRules:tab==="trend"?t.hTrend:tab==="dikkat"?t.hDikkat:t.mktTitle}</span></div>
+<div className="hero"><span className="mk">{tab==="ayarlar"?"AYARLAR":tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?"D — GÖRÜNÜRLÜK":tab==="dashboard"?"X — DASHBOARD":tab==="zidentity"?"Z — STORE KİMLİK":tab==="ekip"?"EKİP YÖNETİMİ":"A — MARKETING"}</span></div>
 <div className="tabs">
-{can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>{t.tabMkt}</button>}
-{can("editRules")&&<button className={tab==="rules"?"on":""} onClick={()=>setTab("rules")}>{t.tabRules}</button>}
-{can("viewDikkat")&&<button className={tab==="dikkat"?"on":""} onClick={()=>setTab("dikkat")}>{t.tabDikkat}</button>}
-{can("viewTrend")&&<button className={tab==="trend"?"on":""} onClick={()=>setTab("trend")}>{t.tabTrend}</button>}
-{can("viewAgent")&&<button className={tab==="agent"?"on":""} onClick={()=>setTab("agent")}>{t.tabAgent}</button>}
+{can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>📊 A · MARKETING</button>}
+<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}>💰 B · FINANCE</button>
+<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}>⚖️ C · TRADEMARK</button>
+<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}>📈 D · GÖRÜNÜRLÜK</button>
+<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}>✅ X · DASHBOARD</button>
+<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}>🆔 Z · KİMLİK</button>
 {can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}>👥 EKİP</button>}
-<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}>💰 FINANCE</button>
-<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}>⚖️ TRADEMARK</button>
-<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}>📈 GÖRÜNÜRLÜK</button>
-<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}>✅ DASHBOARD</button>
-<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}>🆔 Z-KİMLİK</button>
 <button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}>⚙ AYARLAR</button>
 </div>
 
