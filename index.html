@@ -347,11 +347,15 @@ async function bootstrap(){
   try{mems=((await sb.from("members").select("account_id,role").eq("user_id",u.id).eq("status","active")).data)||[];}catch(e){}
   if(!owned.length && !mems.length){
     try{
-      const acc=(await sb.from("accounts").insert({owner_id:u.id,company_name:email.split("@")[0]}).select().single()).data;
-      if(acc){
-        await sb.from("members").insert({account_id:acc.id,user_id:u.id,email:email,name:email,role:"admin"});
-        await sb.from("profiles").upsert({user_id:u.id});
-        currentAccountId=acc.id; currentRole="admin";
+      const insRes=await sb.from("accounts").insert({owner_id:u.id,company_name:email.split("@")[0]});
+      if(!insRes.error){
+        const got=(await sb.from("accounts").select("id").eq("owner_id",u.id).order("created_at",{ascending:true}).limit(1)).data;
+        const aid=got&&got[0]&&got[0].id;
+        if(aid){
+          await sb.from("members").insert({account_id:aid,user_id:u.id,email:email,name:email,role:"admin"});
+          await sb.from("profiles").upsert({user_id:u.id});
+          currentAccountId=aid; currentRole="admin";
+        }
       }
     }catch(e){}
   }else{
@@ -374,6 +378,12 @@ async function _loadShared(){
 const store={
 async get(k,d){try{const row=await _loadShared();const col=COLMAP[k];if(!col)return d;const v=row[col];return v!=null?v:d}catch(e){return d}},
 async set(k,v){const col=COLMAP[k];if(!col)return;try{_shared=_shared||{};_shared[col]=v;if(currentAccountId){await sb.from("account_state").upsert({account_id:currentAccountId,[col]:v,updated_at:new Date().toISOString()});}else{await sb.from("shared_state").upsert({id:"main",[col]:v,updated_at:new Date().toISOString()});}}catch(e){}}};
+
+/* ===== Ekip (members) veri fonksiyonları ===== */
+async function listMembers(){if(!currentAccountId)return[];try{const{data}=await sb.from("members").select("*").eq("account_id",currentAccountId).order("created_at",{ascending:true});return data||[];}catch(e){return[];}}
+async function addMember(email,role){if(!currentAccountId)return{error:{message:"Hesap yok"}};return await sb.from("members").insert({account_id:currentAccountId,email:(email||"").toLowerCase(),name:email,role:role});}
+async function removeMember(id){return await sb.from("members").delete().eq("id",id);}
+async function updateMemberRole(id,role){return await sb.from("members").update({role}).eq("id",id);}
 
 /* ========== i18n ========== */
 const L={
@@ -532,6 +542,47 @@ const blankRow=()=>({id:Math.random().toString(36).slice(2),name:"",impressions:
 const blankV=()=>({id:Math.random().toString(36).slice(2),name:"",category:"",keyword:"",position:"",views:"",note:""});
 
 /* ========== APP ========== */
+const ROLE_TR={admin:"Yönetici",user:"Kullanıcı",shop_manager:"Mağaza Müdürü"};
+function EkipPanel(){
+const[members,setMembers]=useState([]);
+const[email,setEmail]=useState("");
+const[role,setRole]=useState("shop_manager");
+const[busy,setBusy]=useState(false);
+const[err,setErr]=useState("");
+const[msg,setMsg]=useState("");
+const load=()=>listMembers().then(setMembers);
+useEffect(()=>{load()},[]);
+const add=async()=>{const e=email.trim();if(!e)return;setBusy(true);setErr("");setMsg("");
+const r=await addMember(e,role);
+if(r&&r.error){setErr(/duplicate|unique/i.test(r.error.message)?"Bu e-posta zaten ekli.":r.error.message);}
+else{setMsg(e+" davet edildi. O kişi bu e-postayla giriş yapınca hesabına katılır.");setEmail("");}
+await load();setBusy(false);};
+const del=async(id)=>{if(!window.confirm("Bu üyeyi çıkar?"))return;await removeMember(id);load();};
+const chRole=async(id,rl)=>{await updateMemberRole(id,rl);load();};
+const isAdmin=currentRole==="admin";
+const roleOpts=<React.Fragment><option value="shop_manager">Mağaza Müdürü</option><option value="user">Kullanıcı</option><option value="admin">Yönetici</option></React.Fragment>;
+return(<div style={{padding:"8px 0 40px"}}>
+<div className="rules" style={{background:"var(--panel2)"}}>Ekip yönetimi. Admin, e-postayla <b>Mağaza Müdürü</b> veya <b>Kullanıcı</b> davet eder; davet edilen kişi <b>o e-postayla giriş yapınca</b> senin hesabına katılır ve aynı verileri görür. {!isAdmin&&<span style={{color:"var(--red)"}}> (Yalnızca Admin üye ekleyip çıkarabilir.)</span>}</div>
+{isAdmin&&<div className="rules">
+<div className="rh"><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>➕ Üye davet et</span></div>
+<div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center",marginTop:8}}>
+<input value={email} onChange={e=>setEmail(e.target.value)} placeholder="e-posta adresi" type="email" style={{flex:1,minWidth:200,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/>
+<select className="cur-sel" value={role} onChange={e=>setRole(e.target.value)} style={{fontFamily:"'Inter'",fontSize:13,padding:"9px 10px"}}>{roleOpts}</select>
+<button className="btn pri" disabled={busy} onClick={add}>{busy?"...":"Davet et"}</button></div>
+{err&&<div className="err" style={{marginTop:10}}>⚠ {err}</div>}
+{msg&&<div className="busy" style={{marginTop:10,background:"var(--green-s)",borderColor:"rgba(15,157,99,.3)",color:"var(--green)"}}>{msg}</div>}
+</div>}
+<div className="rules">
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>👥 Ekip üyeleri</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{members.length}</span></div>
+<div className="tw" style={{marginTop:8}}><table style={{minWidth:520}}><thead><tr><th className="l">E-posta</th><th className="l">Rol</th><th className="l">Durum</th><th></th></tr></thead><tbody>
+{members.length===0&&<tr><td colSpan={4}><div className="empty" style={{padding:24}}><p>Henüz üye yok. Yukarıdan davet et.</p></div></td></tr>}
+{members.map(m=>(<tr key={m.id}>
+<td className="l" style={{fontWeight:600}}>{m.email}</td>
+<td className="l">{isAdmin?<select className="cur-sel" value={m.role} onChange={e=>chRole(m.id,e.target.value)}>{roleOpts}</select>:(ROLE_TR[m.role]||m.role)}</td>
+<td className="l"><span className="vd" style={m.user_id?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{m.user_id?"Katıldı":"Davet bekliyor"}</span></td>
+<td>{isAdmin&&<button className="dl" onClick={()=>del(m.id)} title="Çıkar">✕</button>}</td></tr>))}
+</tbody></table></div></div>
+</div>);}
 function App(){
 const ALL_STORES=[
 {id:"a0",name:"00 BYDR (SnowflakeApparelUS)"},
@@ -783,7 +834,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM4 ☁️</b> · her hesap ayrı</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM5 ☁️</b> · ekip + hesap</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -814,15 +865,17 @@ return(
 </aside>
 
 <main className="main">
-<div className="hero"><span className="mk">{tab==="agent"?t.hAgent:tab==="rules"?t.hRules:tab==="trend"?t.hTrend:tab==="dikkat"?t.hDikkat:t.mktTitle}</span></div>
+<div className="hero"><span className="mk">{tab==="ekip"?"EKİP YÖNETİMİ":tab==="agent"?t.hAgent:tab==="rules"?t.hRules:tab==="trend"?t.hTrend:tab==="dikkat"?t.hDikkat:t.mktTitle}</span></div>
 <div className="tabs">
 <button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}>{t.tabMkt}</button>
 <button className={tab==="rules"?"on":""} onClick={()=>setTab("rules")}>{t.tabRules}</button>
 <button className={tab==="dikkat"?"on":""} onClick={()=>setTab("dikkat")}>{t.tabDikkat}</button>
 <button className={tab==="trend"?"on":""} onClick={()=>setTab("trend")}>{t.tabTrend}</button>
 <button className={tab==="agent"?"on":""} onClick={()=>setTab("agent")}>{t.tabAgent}</button>
+<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}>👥 EKİP</button>
 </div>
 
+{tab==="ekip"&&<EkipPanel/>}
 
 {/* ===== MARKETING TAB ===== */}
 {tab==="marketing"&&(<>
