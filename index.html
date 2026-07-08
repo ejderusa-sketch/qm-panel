@@ -335,11 +335,41 @@ const SB_URL="https://pepvzsffeyvzhxvlliex.supabase.co";
 const SB_KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
-let _shared=null;
-async function _loadShared(){if(_shared)return _shared;try{const{data}=await sb.from("shared_state").select("*").eq("id","main").maybeSingle();_shared=data||{};}catch(e){_shared={};}return _shared;}
+let _shared=null, currentAccountId=null, currentRole=null;
+/* Hesap bootstrap: ilk giriş yapan Admin olur; davetli manager kendi hesabına bağlanır */
+async function bootstrap(){
+  const u=(await sb.auth.getUser()).data.user;
+  if(!u){currentAccountId=null;return null;}
+  const email=(u.email||"").toLowerCase();
+  try{await sb.from("members").update({user_id:u.id}).is("user_id",null).eq("email",email);}catch(e){}
+  let owned=[],mems=[];
+  try{owned=((await sb.from("accounts").select("id").eq("owner_id",u.id)).data)||[];}catch(e){}
+  try{mems=((await sb.from("members").select("account_id,role").eq("user_id",u.id).eq("status","active")).data)||[];}catch(e){}
+  if(!owned.length && !mems.length){
+    try{
+      const acc=(await sb.from("accounts").insert({owner_id:u.id,company_name:email.split("@")[0]}).select().single()).data;
+      if(acc){
+        await sb.from("members").insert({account_id:acc.id,user_id:u.id,email:email,name:email,role:"admin"});
+        await sb.from("profiles").upsert({user_id:u.id});
+        currentAccountId=acc.id; currentRole="admin";
+      }
+    }catch(e){}
+  }else{
+    currentAccountId = owned.length ? owned[0].id : mems[0].account_id;
+    currentRole = owned.length ? "admin" : (mems[0].role||"user");
+  }
+  _shared=null;
+  return currentAccountId;
+}
+async function _loadShared(){
+  if(_shared)return _shared;
+  if(!currentAccountId){_shared={};return _shared;}
+  try{const{data}=await sb.from("account_state").select("*").eq("account_id",currentAccountId).maybeSingle();_shared=data||{};}catch(e){_shared={};}
+  return _shared;
+}
 const store={
 async get(k,d){try{const row=await _loadShared();const col=COLMAP[k];if(!col)return d;const v=row[col];return v!=null?v:d}catch(e){return d}},
-async set(k,v){const col=COLMAP[k];if(!col)return;try{_shared=_shared||{};_shared[col]=v;await sb.from("shared_state").upsert({id:"main",[col]:v,updated_at:new Date().toISOString()})}catch(e){}}};
+async set(k,v){const col=COLMAP[k];if(!col||!currentAccountId)return;try{_shared=_shared||{};_shared[col]=v;await sb.from("account_state").upsert({account_id:currentAccountId,[col]:v,updated_at:new Date().toISOString()})}catch(e){}}};
 
 /* ========== i18n ========== */
 const L={
@@ -749,7 +779,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy reklam paneli · QM47 · <b style={{color:"var(--azure)"}}>v3 ☁️</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">Etsy paneli · <b style={{color:"var(--azure)"}}>QM4 ☁️</b> · her hesap ayrı</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1169,9 +1199,12 @@ return(<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justify
 </form></div>);}
 function Root(){
 const[session,setSession]=useState(undefined);
-useEffect(()=>{sb.auth.getSession().then(({data})=>setSession(data.session));const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{_shared=null;setSession(s)});return()=>sub.subscription.unsubscribe()},[]);
+const[ready,setReady]=useState(false);
+useEffect(()=>{sb.auth.getSession().then(({data})=>setSession(data.session));const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{currentAccountId=null;_shared=null;setReady(false);setSession(s)});return()=>sub.subscription.unsubscribe()},[]);
+useEffect(()=>{let ok=true;if(session){bootstrap().then(()=>{if(ok)setReady(true)}).catch(()=>{if(ok)setReady(true)});}return()=>{ok=false}},[session]);
 if(session===undefined)return <div id="boot">Yükleniyor…</div>;
 if(!session)return <AuthGate/>;
+if(!ready)return <div id="boot">Hesap hazırlanıyor…</div>;
 return <App/>;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
