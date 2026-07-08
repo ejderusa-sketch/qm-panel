@@ -339,7 +339,7 @@ const SB_KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const DEFAULT_GCID="507868834696-m1gnrlcu7ba620knq4ck1cj58fs5qu97.apps.googleusercontent.com";
 const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
-let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null;
+let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null;
 /* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
 const PERMS=[
  {key:"viewMarketing",label:"Marketing görüntüle"},
@@ -364,6 +364,7 @@ async function bootstrap(){
   const u=(await sb.auth.getUser()).data.user;
   if(!u){currentAccountId=null;return null;}
   const email=(u.email||"").toLowerCase();
+  currentUserEmail=email;
   try{await sb.from("members").update({user_id:u.id}).is("user_id",null).eq("email",email);}catch(e){}
   let owned=[],mems=[];
   try{owned=((await sb.from("accounts").select("id").eq("owner_id",u.id)).data)||[];}catch(e){}
@@ -671,7 +672,7 @@ return(<div style={{padding:"8px 0 40px"}}>
 const ROLE_TR={admin:"Yönetici",user:"Kullanıcı",shop_manager:"Mağaza Müdürü"};
 const ROLE_EN={admin:"Admin",user:"User",shop_manager:"Shop Manager"};
 function roleName(r){return TT(ROLE_TR[r]||r,ROLE_EN[r]||r);}
-function EkipPanel(){
+function EkipPanel({settings,setSettings}){
 const[members,setMembers]=useState([]);
 const[email,setEmail]=useState("");
 const[role,setRole]=useState("shop_manager");
@@ -679,6 +680,11 @@ const[busy,setBusy]=useState(false);
 const[err,setErr]=useState("");
 const[msg,setMsg]=useState("");
 const[openId,setOpenId]=useState(null);
+const[msgTxt,setMsgTxt]=useState("");
+const msgs=Array.isArray(settings&&settings.messages)?settings.messages:[];
+const sendMsg=()=>{const t=msgTxt.trim();if(!t)return;const m={id:"m"+Date.now().toString(36),from:currentUserEmail||"—",text:t,ts:Date.now()};setSettings(s=>({...s,messages:[...(Array.isArray(s.messages)?s.messages:[]),m]}));setMsgTxt("");};
+const delMsg=id=>setSettings(s=>({...s,messages:(Array.isArray(s.messages)?s.messages:[]).filter(x=>x.id!==id)}));
+const fmtTs=ts=>{try{return new Date(ts).toLocaleString(uiLang==="en"?"en-US":"tr-TR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});}catch(e){return"";}};
 const load=()=>listMembers().then(setMembers);
 useEffect(()=>{load()},[]);
 const add=async()=>{const e=email.trim();if(!e)return;setBusy(true);setErr("");setMsg("");
@@ -720,6 +726,22 @@ return(<div style={{padding:"8px 0 40px"}}>
 </div></td></tr>}
 </React.Fragment>))}
 </tbody></table></div></div>
+<div className="rules">
+<div className="rh"><span style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>💬 {TT("Ekip Mesajları","Team Messages")}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{msgs.length}</span></div>
+<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:10,maxHeight:340,overflowY:"auto"}}>
+{msgs.length===0&&<div className="empty" style={{padding:20}}><p>{TT("Henüz mesaj yok. İlk mesajı yaz.","No messages yet. Write the first one.")}</p></div>}
+{msgs.slice().reverse().map(m=>{const mine=(m.from||"")===(currentUserEmail||"");return(
+<div key={m.id} style={{alignSelf:mine?"flex-end":"flex-start",maxWidth:"80%",background:mine?"var(--azure)":"var(--bg2)",color:mine?"#fff":"var(--ink)",border:"1px solid "+(mine?"var(--azure)":"var(--line2)"),borderRadius:12,padding:"8px 12px"}}>
+<div style={{fontSize:10.5,opacity:.8,fontWeight:700,marginBottom:3}}>{mine?TT("Sen","You"):m.from} · {fmtTs(m.ts)}</div>
+<div style={{fontSize:13.5,lineHeight:1.45,whiteSpace:"pre-wrap"}}>{m.text}</div>
+{mine&&<div style={{textAlign:"right",marginTop:2}}><button onClick={()=>delMsg(m.id)} style={{fontSize:10,color:"#fff",opacity:.75,background:"none",border:"none",cursor:"pointer"}}>{TT("sil","delete")}</button></div>}
+</div>);})}
+</div>
+<div style={{display:"flex",gap:8,marginTop:10}}>
+<input value={msgTxt} onChange={e=>setMsgTxt(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMsg();}}} placeholder={TT("Ekibe mesaj yaz…","Message your team…")} style={{flex:1,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/>
+<button className="btn pri" onClick={sendMsg}>{TT("Gönder","Send")}</button></div>
+<div style={{fontSize:11.5,color:"var(--faint)",marginTop:6}}>{TT("Mesajlar hesabın tüm üyelerine görünür ve buluta kaydedilir.","Messages are visible to all account members and saved to the cloud.")}</div>
+</div>
 </div>);}
 function ZKimlik({accounts,act,setAccounts}){
 const acc=accounts.find(a=>a.id===act);
@@ -1101,7 +1123,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM26 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM27 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1152,7 +1174,7 @@ return(
 <button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}><b className="tl">Q</b> ⚙ {TT("AYARLAR","SETTINGS")}</button>
 </div>
 
-{tab==="ekip"&&<EkipPanel/>}
+{tab==="ekip"&&<EkipPanel settings={settings} setSettings={setSettings}/>}
 {tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
 {tab==="trademark"&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts}/>}
 {tab==="visibility"&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
