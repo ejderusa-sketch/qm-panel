@@ -66,9 +66,9 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 .tabs button{font-family:'Space Grotesk';font-size:11px;font-weight:800;letter-spacing:.01em;padding:9px 12px;border:none;background:transparent;color:#111;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.13s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;flex:none}
 .tabs button:hover{color:#000}
 .tabs button.on{color:var(--orange);border-bottom-color:var(--orange)}
-.tabs button .tl{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:5px;background:var(--red);color:#fff;font-family:'JetBrains Mono';font-size:10px;font-weight:800;flex:none}
-.tabs button.on .tl{background:var(--red)}
-.tabs button:not(.on) .tl{background:var(--red);color:#fff}
+.tabs button .tl{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;background:#fff;color:var(--red);border:1.5px solid var(--red);font-family:'JetBrains Mono';font-size:10px;font-weight:800;flex:none}
+.tabs button.on .tl{background:#fff;color:var(--red)}
+.tabs button:not(.on) .tl{background:#fff;color:var(--red)}
 
 /* command */
 .cmd{margin:18px 0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#eef3ff 0%,#f6f8fc 55%,#fdf1e9 100%)}
@@ -980,7 +980,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM13 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM14 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1019,8 +1019,8 @@ return(
 <button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}><b className="tl">D</b> 📈 {TT("GÖRÜNÜRLÜK","VISIBILITY")}</button>
 <button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">X</b> ✅ DASHBOARD</button>
 <button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">Z</b> 🆔 {TT("KİMLİK","IDENTITY")}</button>
-{can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}>👥 {TT("EKİP","TEAM")}</button>}
-<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}>⚙ {TT("AYARLAR","SETTINGS")}</button>
+{can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">Y</b> 👥 {TT("EKİP","TEAM")}</button>}
+<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}><b className="tl">Q</b> ⚙ {TT("AYARLAR","SETTINGS")}</button>
 </div>
 
 {tab==="ekip"&&<EkipPanel/>}
