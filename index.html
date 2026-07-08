@@ -955,7 +955,7 @@ const allShownSelected=shownEvals.length>0&&shownEvals.every(x=>sel.has(x.row.id
 const selAll=()=>setSel(allShownSelected?new Set():new Set(shownEvals.map(x=>x.row.id)));
 const bulkAds=on=>{setRows(rs=>rs.map(r=>sel.has(r.id)?{...r,ads:on?"on":"off"}:r));};
 const bulkDelete=()=>{if(!sel.size)return;if(!window.confirm(sel.size+" listing silinsin?"))return;setRows(rs=>rs.filter(r=>!sel.has(r.id)));setSel(new Set());};
-const FILTERS=[["all","Hepsi"],["BÜYÜT","BÜYÜT"],["İZLE","İZLE"],["DÜZELT","DÜZELT"],["KAPAT","KAPAT"],["VERİ AZ","VERİ AZ"]];
+const FILTERS=[["all",TT("Hepsi","All")],["BÜYÜT",TT("BÜYÜT","GROW")],["İZLE",TT("İZLE","WATCH")],["DÜZELT",TT("DÜZELT","FIX")],["KAPAT",TT("KAPAT","CLOSE")],["VERİ AZ",TT("VERİ AZ","LOW DATA")]];
 const totals=useMemo(()=>{const t={spend:0,rev:0,imp:0,clk:0,ord:0,close:0,watch:0,grow:0};
 for(const{e}of evals){t.spend+=e.spend;t.rev+=e.rev;t.imp+=e.imp;t.clk+=e.clk;t.ord+=e.ord;if(e.verdict==="KAPAT")t.close++;if(e.verdict==="İZLE")t.watch++;if(e.verdict==="BÜYÜT")t.grow++}
 t.wasted=evals.filter(x=>x.e.verdict==="KAPAT").reduce((s,x)=>s+Math.max(x.e.spend-x.e.rev,0),0);
@@ -980,7 +980,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM11 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name">QM <span style={{fontWeight:400,fontSize:14,color:"var(--faint)"}}>(47)</span></div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM12 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1006,7 +1006,7 @@ return(
 <button className="btn" style={{fontSize:11,padding:"5px 10px",fontWeight:700,letterSpacing:".05em"}} onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 <select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
 <button className="icon-btn" onClick={()=>setShowSet(true)} title={t.settings}>⚙</button>
-<button className="btn" style={{fontSize:11,padding:"5px 9px",fontWeight:700}} onClick={()=>sb.auth.signOut()}>Çıkış</button>
+<button className="btn" style={{fontSize:11,padding:"5px 9px",fontWeight:700}} onClick={()=>sb.auth.signOut()}>{TT("Çıkış","Log out")}</button>
 </div>
 </aside>
 
@@ -1053,11 +1053,11 @@ onDrop={e=>{e.preventDefault();setDragO(false);const f=e.dataTransfer.files&&e.d
 </div>
 
 <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:10}}>
-<input value={mktSearch} onChange={e=>setMktSearch(e.target.value)} placeholder="🔎 Listing ara…" style={{flex:1,minWidth:180,padding:"8px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13,fontFamily:"'Inter'"}}/>
+<input value={mktSearch} onChange={e=>setMktSearch(e.target.value)} placeholder={TT("🔎 Listing ara…","🔎 Search listing…")} style={{flex:1,minWidth:180,padding:"8px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13,fontFamily:"'Inter'"}}/>
 {sel.size>0&&<React.Fragment>
 <span style={{fontSize:12.5,color:"var(--muted)",fontFamily:"'JetBrains Mono'"}}>{sel.size} seçili</span>
-<button className="btn" style={{borderColor:"var(--green)",color:"var(--green)"}} onClick={()=>bulkAds(true)}>▶ Reklamı AÇ</button>
-<button className="btn" style={{borderColor:"var(--red)",color:"var(--red)"}} onClick={()=>bulkAds(false)}>⏸ Reklamı KAPAT</button>
+<button className="btn" style={{borderColor:"var(--green)",color:"var(--green)"}} onClick={()=>bulkAds(true)}>{TT("▶ Reklamı AÇ","▶ Turn ads ON")}</button>
+<button className="btn" style={{borderColor:"var(--red)",color:"var(--red)"}} onClick={()=>bulkAds(false)}>{TT("⏸ Reklamı KAPAT","⏸ Turn ads OFF")}</button>
 {can("deleteData")&&<button className="btn" onClick={bulkDelete}>🗑 Sil</button>}
 <button className="btn ghost" onClick={()=>setSel(new Set())}>Temizle</button>
 </React.Fragment>}
@@ -1065,7 +1065,7 @@ onDrop={e=>{e.preventDefault();setDragO(false);const f=e.dataTransfer.files&&e.d
 
 <div className="tw" style={{marginBottom:18}}><table style={{minWidth:1000}}><thead><tr>
 <th style={{width:34}}><input type="checkbox" checked={allShownSelected} onChange={selAll}/></th>
-<th className="l">{t.cProduct}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>Reklam</th><th>{t.cImpr}</th><th>{t.cClicks}</th><th>CTR</th><th>{t.cOrders}</th><th>{t.cRev}</th><th>{t.cSpend}</th><th>ROAS</th><th className="l">{t.cAction}</th><th></th>
+<th className="l">{t.cProduct}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>{TT("Reklam","Ads")}</th><th>{t.cImpr}</th><th>{t.cClicks}</th><th>CTR</th><th>{t.cOrders}</th><th>{t.cRev}</th><th>{t.cSpend}</th><th>ROAS</th><th className="l">{t.cAction}</th><th></th>
 </tr></thead><tbody>
 {shownEvals.length===0&&<tr><td colSpan={13}><div className="empty"><div className="big">{baseEvals.length?"Bu filtrede listing yok":t.emptyT}</div><p>{baseEvals.length?"Farklı bir durum sekmesi seç ya da aramayı temizle.":t.emptyS}</p></div></td></tr>}
 {shownEvals.map(({row:r,e,a})=>{
@@ -1076,7 +1076,7 @@ return(
 <td style={{paddingTop:13}}><input type="checkbox" checked={isSel} onChange={()=>toggleSel(r.id)}/></td>
 <td className="l" style={{fontWeight:a.strong?700:600,whiteSpace:"normal",maxWidth:240,lineHeight:1.4,paddingTop:14}}>{r.name||"Listing"}</td>
 <td style={{paddingTop:11}}><input className="ci" style={{width:48,textAlign:"center"}} value={r.months||""} placeholder="—" onChange={ev=>upRow(r.id,"months",ev.target.value)}/></td>
-<td style={{paddingTop:11}}><button onClick={()=>upRow(r.id,"ads",adsOn?"off":"on")} title="Reklam AÇ/KAPAT" style={{fontFamily:"'Space Grotesk'",fontSize:11,fontWeight:700,padding:"4px 9px",borderRadius:7,cursor:"pointer",whiteSpace:"nowrap",border:"1px solid "+(adsOn?"var(--green)":"var(--line2)"),background:adsOn?"var(--green-s)":"var(--panel2)",color:adsOn?"var(--green)":"var(--faint)"}}>{adsOn?"● AÇIK":"○ KAPALI"}</button></td>
+<td style={{paddingTop:11}}><button onClick={()=>upRow(r.id,"ads",adsOn?"off":"on")} title={TT("Reklam AÇ/KAPAT","Toggle ads ON/OFF")} style={{fontFamily:"'Space Grotesk'",fontSize:11,fontWeight:700,padding:"4px 9px",borderRadius:7,cursor:"pointer",whiteSpace:"nowrap",border:"1px solid "+(adsOn?"var(--green)":"var(--line2)"),background:adsOn?"var(--green-s)":"var(--panel2)",color:adsOn?"var(--green)":"var(--faint)"}}>{adsOn?TT("● AÇIK","● ON"):TT("○ KAPALI","○ OFF")}</button></td>
 <td className="calc" style={{paddingTop:14}}>{numFmt(e.imp)}</td>
 <td className="calc" style={{paddingTop:14}}>{numFmt(e.clk)}</td>
 <td className="calc" style={{paddingTop:14}}>{e.imp?pct(e.ctr):"—"}</td>
