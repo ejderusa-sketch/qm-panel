@@ -721,6 +721,38 @@ return(<div style={{padding:"8px 0 40px"}}>
 </React.Fragment>))}
 </tbody></table></div></div>
 </div>);}
+function ZKimlik({accounts,act,setAccounts}){
+const acc=accounts.find(a=>a.id===act);
+if(!acc)return(<div style={{padding:"8px 0 40px"}}><div className="rules" style={{background:"var(--panel2)"}}>{TT("Önce soldan bir mağaza ekle/seç.","Add or select a store on the left first.")}</div></div>);
+const z=acc.z||{};
+const up=(k,v)=>setAccounts(x=>x.map(s=>s.id===act?{...s,z:{...(s.z||{}),[k]:v}}:s));
+const F=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={z[k]||""} placeholder={ph||""} onChange={e=>up(k,e.target.value)} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
+const vs=z.verify||"missing";
+const vColor=vs==="verified"?"var(--green)":vs==="outdated"?"var(--amber)":"var(--red)";
+const vBg=vs==="verified"?"var(--green-s)":vs==="outdated"?"var(--amber-s)":"var(--red-s)";
+return(<div style={{padding:"8px 0 40px"}}>
+<div className="rules" style={{background:"var(--panel2)"}}>
+<div className="rh"><span style={{fontSize:16}}>🆔 Z — {TT("STORE KİMLİK & DOĞRULAMA","STORE IDENTITY & VERIFICATION")}</span><span className="store" style={{marginLeft:"auto"}}>{acc.name}</span></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{TT("Bu mağazanın doğrulanmış kimlik ve referans dosyası. Dış yazışmalarda güvenli kaynak olarak kullan.","This store's verified identity & reference file. Use it as a trusted source in external correspondence.")}</div></div>
+<div className="rules">
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{TT("Kimlik bilgileri","Identity details")}</span>
+<span className="vd" style={{marginLeft:"auto",background:vBg,color:vColor}}>{vs==="verified"?TT("Doğrulandı","Verified"):vs==="outdated"?TT("Güncel değil","Outdated"):TT("Eksik","Missing")}</span></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:"4px 20px"}}>
+{F(TT("Mağaza adı","Store name"),"name",acc.name)}
+{F("Etsy URL","url","https://www.etsy.com/shop/...")}
+{F(TT("Mağaza ID","Store ID"),"sid","...")}
+{F(TT("Ülke","Country"),"country","US / TR ...")}
+{F(TT("Para birimi","Currency"),"currency","$ / € / ₺")}
+{F(TT("Yasal sahip / Şirket","Legal owner / Company"),"owner","...")}
+{F(TT("İletişim","Contact"),"contact","...")}
+{F(TT("Bağlı e-posta","Connected email"),"cemail",acc.email||"...")}
+</div>
+<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:14}}>{TT("Doğrulama durumu","Verification status")}
+<select value={vs} onChange={e=>up("verify",e.target.value)} className="cur-sel" style={{display:"block",marginTop:5,padding:"9px 12px"}}>
+<option value="missing">{TT("Eksik","Missing")}</option><option value="verified">{TT("Doğrulandı","Verified")}</option><option value="outdated">{TT("Güncel değil","Outdated")}</option></select></label>
+<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("Notlar","Notes")}<textarea value={z.notes||""} onChange={e=>up("notes",e.target.value)} rows={3} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/></label>
+<div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
+</div></div>);}
 function App(){
 const ALL_STORES=[];
 const DEMO_IDS=new Set(["a0","a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13","a14","a15"]);
@@ -867,7 +899,7 @@ setSettings(s=>{const arr=(s.trendTopics||[]).map(t=>({...t}));for(const lab of 
 flash(cats.length+" konu Marketing'ten çekildi — Son 1 Ay dolduruldu.");
 };
 
-const addAcct=()=>{const n=prompt(TT("Mağaza adı (ör. 01 MYSHOP):","Store name (e.g. 01 MYSHOP):"),`0${accounts.length+1}`);if(!n)return;const id="a"+Date.now().toString(36);setAccounts(a=>[...a,{id,name:n.trim()}]);setAct(id)};
+const addAcct=()=>{const id="a"+Date.now().toString(36);const n="0"+(accounts.length+1)+" "+TT("MAĞAZA","STORE");setAccounts(a=>[...a,{id,name:n}]);setAct(id)};
 const renAcct=id=>{const c=accounts.find(a=>a.id===id);const n=prompt(TT("Mağaza adı:","Store name:"),(c&&c.name)||"");if(n)setAccounts(a=>a.map(x=>x.id===id?{...x,name:n}:x))};
 
 /* image handling */
@@ -997,7 +1029,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM20 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM21 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1053,7 +1085,7 @@ return(
 {tab==="trademark"&&<SectionOutline m={MOD().trademark}/>}
 {tab==="visibility"&&<SectionOutline m={MOD().visibility}/>}
 {tab==="dashboard"&&<SectionOutline m={MOD().dashboard}/>}
-{tab==="zidentity"&&<SectionOutline m={MOD().zidentity}/>}
+{tab==="zidentity"&&<ZKimlik accounts={accounts} act={act} setAccounts={setAccounts}/>}
 {tab==="ayarlar"&&<SettingsPanel settings={settings} setSettings={setSettings}/>}
 
 {/* ===== MARKETING TAB ===== */}
