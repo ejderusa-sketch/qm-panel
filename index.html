@@ -799,7 +799,9 @@ useEffect(()=>{(async()=>{
 const a=await store.get("q:a",[]);
 const s=await store.get("q:s",DS);
 const d=await store.get("q:d",{});
-const am=(Array.isArray(a)?a:[]).filter(x=>x&&x.id&&!DEMO_IDS.has(x.id));
+const dmSaved=(d&&d.__v===2)?(d.dm||{}):(d||{});
+const accSaved=(d&&d.__v===2&&Array.isArray(d.accts))?d.accts:(Array.isArray(a)?a:[]);
+const am=accSaved.filter(x=>x&&x.id&&!DEMO_IDS.has(x.id));
 setAccounts(am);setAct((am[0]&&am[0].id)||null);
 const sr=s&&s.rules;
 const rules=(s&&s.rulesV===5&&Array.isArray(sr))?sr:DS.rules;
@@ -808,11 +810,10 @@ const warnings=[...savedW];for(const dw of DS.warnings){if(!warnings.some(w=>w.i
 const savedD=(s&&Array.isArray(s.dzChecks))?s.dzChecks:DS.dzChecks;
 const dzChecks=[...savedD];for(const dd of DS.dzChecks){const ex=dzChecks.find(c=>c.id===dd.id);if(!ex)dzChecks.push(dd);else if(dd.close&&!ex.close)ex.close=true}
 const trendTopics=(s&&Array.isArray(s.trendTopics))?s.trendTopics:DS.trendTopics;
-setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5)?{}:{minImp:1000,minClicks:30})});setDm(d);setLoaded(true)})()},[]);
+setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5)?{}:{minImp:1000,minClicks:30})});setDm(dmSaved);setLoaded(true)})()},[]);
 
-useEffect(()=>{if(loaded)store.set("q:a",accounts)},[accounts,loaded]);
+useEffect(()=>{if(loaded)store.set("q:d",{__v:2,dm,accts:accounts})},[accounts,dm,loaded]);
 useEffect(()=>{if(loaded)store.set("q:s",settings)},[settings,loaded]);
-useEffect(()=>{if(loaded)store.set("q:d",dm)},[dm,loaded]);
 
 const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
 const setRows=n=>setDm(m=>({...m,[key]:typeof n==="function"?n(m[key]||[]):n}));
@@ -1029,7 +1030,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM21 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM22 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1084,7 +1085,18 @@ return(
 {tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
 {tab==="trademark"&&<SectionOutline m={MOD().trademark}/>}
 {tab==="visibility"&&<SectionOutline m={MOD().visibility}/>}
-{tab==="dashboard"&&<SectionOutline m={MOD().dashboard}/>}
+{tab==="dashboard"&&<div style={{padding:"8px 0 40px"}}>
+<div className="rules" style={{background:"var(--panel2)"}}>
+<div className="rh"><span style={{fontSize:16}}>✅ X — {TT("SHOP MANAGER · Bugün","SHOP MANAGER · Today")}</span><span className="store" style={{marginLeft:"auto"}}>{(accounts.find(a=>a.id===act)||{}).name||"—"}</span></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{directive}</div></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))",gap:12,margin:"2px 0 12px"}}>
+{[[TT("Kapat","Close"),totals.close,"var(--red)"],[TT("Büyüt","Grow"),totals.grow,"var(--green)"],[TT("İzle","Watch"),totals.watch,"var(--amber)"],[TT("Boşa giden","Wasted"),money(totals.wasted,settings.cur),"var(--red)"]].map((c,i)=><div key={i} className="rules" style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:c[2]}}>{c[1]}</div><div style={{fontSize:12,color:"var(--muted)"}}>{c[0]}</div></div>)}
+</div>
+<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--red)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{TT("Dikkat: kapatılacaklar","Attention: to close")}</span></div>
+{budget.losers>0?<div style={{fontSize:13.5,color:"var(--muted)",marginTop:6}}>{budget.losers} {TT("listing zarar ediyor; kapatınca","losing listings; closing frees")} <b>{money(budget.freed,settings.cur)}</b> {TT("bütçe boşalır.","of budget.")}</div>:<div style={{fontSize:13,color:"var(--faint)",marginTop:6}}>{TT("Şu an kapatılacak listing yok.","No listings to close right now.")}</div>}</div>
+{budget.moves.length>0&&<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{TT("Bütçe önerisi","Budget suggestion")}</span></div>
+<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>{budget.moves.map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>➕ {m.to}</span><b style={{color:"var(--green)"}}>{money(m.amt,settings.cur)}</b><span style={{color:"var(--faint)",fontFamily:"'JetBrains Mono'",fontSize:12}}>ROAS {m.roas.toFixed(1)}×</span></div>)}</div></div>}
+</div>}
 {tab==="zidentity"&&<ZKimlik accounts={accounts} act={act} setAccounts={setAccounts}/>}
 {tab==="ayarlar"&&<SettingsPanel settings={settings} setSettings={setSettings}/>}
 
