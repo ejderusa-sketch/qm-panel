@@ -1219,7 +1219,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM29 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM30 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1300,7 +1300,21 @@ return(
 {imgErr&&<div className="err">⚠ {imgErr}</div>}
 {imgBusy&&<div className="busy"><span className="sp"/>{imgMsg}</div>}
 
-<div style={{margin:"2px 0 12px"}}><button className={"btn"+(showRules?" pri":"")} onClick={()=>setShowRules(v=>!v)} style={{fontWeight:700}}>⚙ {TT("Kurallar (RULES)","Rules (RULES)")} {showRules?"▴":"▾"}</button></div>
+{(()=>{const wR=toNum(settings.watchRoas)||2;const tR=toNum(settings.targetRoas)||3;const setW=v=>setSettings(s=>({...s,watchRoas:Math.max(0,Math.round(v*10)/10)}));const setT=v=>setSettings(s=>({...s,targetRoas:Math.max(0,Math.round(v*10)/10)}));const St=({v,set})=><span style={{display:"inline-flex",alignItems:"center",gap:6}}><button onClick={()=>set(v-0.1)} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,color:"var(--red)"}}>−</button><span style={{minWidth:44,textAlign:"center",fontFamily:"'JetBrains Mono'",fontWeight:700}}>{v}×</span><button onClick={()=>set(v+0.1)} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,color:"var(--green)"}}>+</button></span>;return(
+<div className="rules" style={{marginBottom:12}}>
+<div className="rh"><span style={{width:3,height:15,background:"var(--red)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚖️ {TT("ROAS Kuralı (3 kademe)","ROAS Rule (3 tiers)")}</span></div>
+<div style={{display:"flex",borderRadius:11,overflow:"hidden",border:"1px solid var(--line2)",marginTop:10}}>
+<div style={{flex:1,background:"var(--red-s)",color:"var(--red)",padding:"12px 8px",textAlign:"center"}}><div style={{fontWeight:800,fontSize:14}}>{TT("KESİN KAPAT","CLOSE")}</div><div style={{fontSize:12.5,marginTop:2,fontFamily:"'JetBrains Mono'"}}>ROAS &lt; {wR}×</div></div>
+<div style={{flex:1,background:"var(--amber-s)",color:"var(--amber)",padding:"12px 8px",textAlign:"center",borderLeft:"1px solid var(--line2)",borderRight:"1px solid var(--line2)"}}><div style={{fontWeight:800,fontSize:14}}>{TT("BEKLE","HOLD")}</div><div style={{fontSize:12.5,marginTop:2,fontFamily:"'JetBrains Mono'"}}>{wR}× – {tR}×</div></div>
+<div style={{flex:1,background:"var(--green-s)",color:"var(--green)",padding:"12px 8px",textAlign:"center"}}><div style={{fontWeight:800,fontSize:14}}>{TT("KAPATMA","KEEP")}</div><div style={{fontSize:12.5,marginTop:2,fontFamily:"'JetBrains Mono'"}}>ROAS ≥ {tR}×</div></div>
+</div>
+<div style={{display:"flex",gap:20,marginTop:12,flexWrap:"wrap",alignItems:"center"}}>
+<div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:12.5,fontWeight:600,color:"var(--red)"}}>{TT("Alt eşik (bunun altı → KESİN KAPAT)","Low (below → CLOSE)")}</span><St v={wR} set={setW}/></div>
+<div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:12.5,fontWeight:600,color:"var(--green)"}}>{TT("Üst eşik (bunun üstü → KAPATMA)","High (above → KEEP)")}</span><St v={tR} set={setT}/></div>
+</div>
+<div style={{fontSize:11.5,color:"var(--faint)",marginTop:8}}>{TT("Örn: ROAS 3× altı bekle, 2× altı kesin kapat, 3× üstü kapatma (büyüt). Anında uygulanır.","E.g. ROAS below 3× hold, below 2× close, above 3× keep (grow). Applied instantly.")}</div>
+</div>);})()}
+<div style={{margin:"2px 0 12px"}}><button className={"btn"+(showRules?" pri":"")} onClick={()=>setShowRules(v=>!v)} style={{fontWeight:700}}>⚙ {TT("Diğer kurallar (CTR, harcama…)","Other rules (CTR, spend…)")} {showRules?"▴":"▾"}</button></div>
 {showRules&&<RulesPanel settings={settings} setSettings={setSettings}/>}
 
 <div className="sec"><h2><span className="bar"/>{t.analysis}</h2>
