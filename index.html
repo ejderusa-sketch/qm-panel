@@ -1307,7 +1307,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM65 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM66 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1337,12 +1337,6 @@ return(
 {accounts.length===0&&<div style={{padding:"16px 10px 6px",textAlign:"center",color:"var(--faint)",fontSize:12,lineHeight:1.6}}>{TT("Henüz mağaza yok.","No stores yet.")}<br/>{TT("Aşağıdan bağla.","Connect below.")}</div>}
 </div>
 <button className="sa" onClick={addAcct} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5,padding:"18px 12px",border:"2px dashed var(--red)",borderRadius:13,background:"var(--panel)",cursor:"pointer",width:"100%",marginTop:6}}><span style={{fontSize:32,lineHeight:1,color:"var(--red)",fontWeight:800}}>＋</span><span style={{fontSize:12.5,fontWeight:700,color:"var(--ink)"}}>{TT("E-posta veya Mağaza Bağla","Connect Email or Store")}</span></button>
-<div className="sf">
-<button className="btn" style={{fontSize:11,padding:"5px 10px",fontWeight:700,letterSpacing:".05em"}} onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
-<select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
-<button className="icon-btn" onClick={()=>setShowSet(true)} title={t.settings}>⚙</button>
-<button className="btn" style={{fontSize:11,padding:"5px 9px",fontWeight:700}} onClick={()=>sb.auth.signOut()}>{TT("Çıkış","Log out")}</button>
-</div>
 </aside>
 
 <main className="main">
@@ -1350,6 +1344,8 @@ return(
 <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
 <button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")}>⚙ {TT("Ayarlar","Settings")}</button>
 <button className="btn" onClick={()=>setTab("ayarlar")} title={TT("Profil","Profile")}>👤 {TT("Profil","Profile")}</button>
+<select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
+<button className="btn" onClick={()=>sb.auth.signOut()}>{TT("Çıkış","Log out")}</button>
 </div></div>
 <div className="tabs">
 {can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}><b className="tl">A</b> 📊 MARKETING</button>}
