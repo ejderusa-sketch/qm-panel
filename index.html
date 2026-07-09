@@ -440,7 +440,7 @@ async function _loadShared(){
 }
 const store={
 async get(k,d){try{const row=await _loadShared();const col=COLMAP[k];if(!col)return d;const v=row[col];return v!=null?v:d}catch(e){return d}},
-async set(k,v){const col=COLMAP[k];if(!col)return;try{_shared=_shared||{};_shared[col]=v;if(currentAccountId){await sb.from("account_state").upsert({account_id:currentAccountId,[col]:v,updated_at:new Date().toISOString()});}else{await sb.from("shared_state").upsert({id:"main",[col]:v,updated_at:new Date().toISOString()});}}catch(e){}}};
+async set(k,v){const col=COLMAP[k];if(!col)return null;try{_shared=_shared||{};_shared[col]=v;let res;if(currentAccountId){res=await sb.from("account_state").upsert({account_id:currentAccountId,[col]:v,updated_at:new Date().toISOString()},{onConflict:"account_id"});}else{res=await sb.from("shared_state").upsert({id:"main",[col]:v,updated_at:new Date().toISOString()},{onConflict:"id"});}return (res&&res.error)?res.error:null;}catch(e){return e}}};
 
 /* ===== Ekip (members) veri fonksiyonları ===== */
 async function listMembers(){if(!currentAccountId)return[];try{const{data}=await sb.from("members").select("*").eq("account_id",currentAccountId).order("created_at",{ascending:true});return data||[];}catch(e){return[];}}
@@ -1080,7 +1080,7 @@ setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5
 const mig={};Object.keys(dmSaved||{}).forEach(k=>{if(k.startsWith("V::")){mig[k]=dmSaved[k];return;}const md=k.match(/^(.+)\|(\d{4})-(\d{2})-\d{2}$/);if(md){const nk=md[1]+"|"+md[2]+"-"+md[3];if((dmSaved[k]||[]).length>=((mig[nk]||[]).length))mig[nk]=dmSaved[k];return;}if(/\|\d{4}-\d{2}$/.test(k)){mig[k]=dmSaved[k];}});
 const _sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");Object.keys(mig).forEach(k=>{if(k.startsWith("V::"))return;const arr=mig[k]||[];const seen=new Set();const out=[];for(const r of arr){const sg=_sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);}}mig[k]=out;});setDm(mig);setLoaded(true)})()},[]);
 
-useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:d",{__v:2,dm,accts:accounts}),600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
+useEffect(()=>{if(!loaded)return;const t=setTimeout(async()=>{const err=await store.set("q:d",{__v:2,dm,accts:accounts});if(err)setToast("⚠ Buluta kaydedilemedi: "+(err.message||err.hint||err.code||JSON.stringify(err)).slice(0,120));},600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
 useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:s",settings),600);return()=>clearTimeout(t)},[settings,loaded]);
 
 const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
@@ -1332,7 +1332,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM80 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM81 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
