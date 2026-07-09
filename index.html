@@ -954,7 +954,7 @@ return(<div style={{padding:"8px 0 40px"}}>
 <label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("Notlar","Notes")}<textarea value={z.notes||""} onChange={e=>up("notes",e.target.value)} rows={3} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/></label>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
 </div></div>);}
-function CTrademark({settings,setSettings,accounts,act,onFetch}){
+function CTrademark({settings,setSettings,accounts,act,setAct,onFetch}){
 const cases=Array.isArray(settings.cases)?settings.cases:[];
 const acc=accounts.find(a=>a.id===act);
 const[showAll,setShowAll]=useState(false);
@@ -970,6 +970,7 @@ const stL=st=>({notice:TT("Bildirim","Notice"),responded:TT("Yanıtlandı","Resp
 const iS={display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5};
 const lS={display:"block",fontSize:12.5,fontWeight:600,marginTop:12};
 return(<div style={{padding:"8px 0 40px"}}>
+{accounts.filter(x=>x.name||x.email).length>0&&<div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>{accounts.map((a,i)=>(a.name||a.email)?<button key={a.id} onClick={()=>setAct&&setAct(a.id)} title={a.email||""} style={{display:"inline-flex",alignItems:"center",gap:7,padding:"6px 13px",borderRadius:999,cursor:"pointer",border:"1.5px solid "+(a.id===act?STORE_COLORS[i%STORE_COLORS.length]:"var(--line2)"),background:a.id===act?STORE_COLORS[i%STORE_COLORS.length]:"var(--panel)",color:a.id===act?"#fff":"var(--ink)",fontWeight:700,fontSize:12.5}}><span style={{fontFamily:"'Space Grotesk'",fontWeight:800,fontSize:11,opacity:.9}}>{String(i+1).padStart(2,"0")}</span>{a.name||"—"}</button>:null)}</div>}
 <div className="rules" style={{background:"var(--panel2)"}}>
 <div className="rh"><span style={{fontSize:16}}>⚖️ C — TRADEMARK & COPYRIGHT</span></div>
 <div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{TT("IP/telif ihlal bildirimlerini takip eden vaka merkezi. Bağlı Gmail'den gelen bildirimleri buraya kaydet.","A case center tracking IP/copyright infringement notices. Log notices from the connected Gmail here.")}</div>
@@ -1362,7 +1363,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM94 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM95 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1418,7 +1419,7 @@ return(
 
 {tab==="ekip"&&<EkipPanel settings={settings} setSettings={setSettings}/>}
 {tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
-{tab==="trademark"&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts} act={act} onFetch={fetchStoreTrademark}/>}
+{tab==="trademark"&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts} act={act} setAct={setAct} onFetch={fetchStoreTrademark}/>}
 {tab==="visibility"&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
 {tab==="dashboard"&&<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
