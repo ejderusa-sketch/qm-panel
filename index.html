@@ -292,10 +292,13 @@ if(a.length>=18&&/[a-zA-ZğüşıöçĞÜŞİÖÇ]{4,}/.test(a)&&!bad.test(a)&&c
 return rows;}
 function detectMonth(text){
 const M={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-const y=((text.match(/\b(20\d{2})\b/)||[])[1])||String(new Date().getFullYear());
-let best=null;const re=/([A-Za-z]{3})[a-z]*\s+(\d{1,2})(?:,?\s*\d{4})?\s*[-–—]\s*([A-Za-z]{3})[a-z]*\s+(\d{1,2})/g;let m;
-while((m=re.exec(text))){const a=M[m[1].toLowerCase()],b=M[m[3].toLowerCase()],d1=+m[2],d2=+m[4];if(a==null||b==null)continue;if(a===b&&d1<=2&&d2>=27)best=a;}
-if(best!=null)return y+"-"+String(best+1).padStart(2,"0");return null;}
+const cy=new Date().getFullYear();
+let best=null,bestY=cy,partial=null,partialY=cy;
+const re=/([A-Za-z]{3})[a-z]*\s+(\d{1,2})(?:,?\s*(\d{4}))?\s*[-–—]\s*([A-Za-z]{3})[a-z]*\s+(\d{1,2})(?:,?\s*(\d{4}))?/g;let m;
+while((m=re.exec(text))){const a=M[m[1].toLowerCase()],b=M[m[4].toLowerCase()],d1=+m[2],d2=+m[5];if(a==null||b==null)continue;const yr=(+m[6])||(+m[3])||cy;if(a===b){if(d1<=2&&d2>=27){best=a;bestY=yr;}else if(partial==null){partial=a;partialY=yr;}}}
+if(best!=null)return bestY+"-"+String(best+1).padStart(2,"0");
+if(partial!=null)return partialY+"-"+String(partial+1).padStart(2,"0");
+return null;}
 function parseCSV(text){
 const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
 if(lines.length<2)return[];
@@ -1363,7 +1366,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM95 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM96 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
