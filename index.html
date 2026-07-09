@@ -1085,7 +1085,7 @@ useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:s",settings
 
 const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
 const setRows=n=>setDm(m=>({...m,[key]:typeof n==="function"?n(m[key]||[]):n}));
-const reloadCloud=async()=>{setToast(TT("Buluttan yükleniyor…","Loading from cloud…"));try{const d=await store.get("q:d",{});const dmSaved=(d&&d.__v===2)?(d.dm||{}):(d||{});setDm(dmSaved||{});setToast(TT("Buluttan yenilendi ✓","Refreshed from cloud ✓"));}catch(e){setToast(TT("Yenilenemedi","Refresh failed"));}};
+const reloadCloud=async()=>{setToast(TT("Buluttan yükleniyor…","Loading from cloud…"));try{const d=await store.get("q:d",{});const dmSaved=(d&&d.__v===2)?(d.dm||{}):(d||{});if(dmSaved&&Object.keys(dmSaved).length){setDm(dmSaved);setToast(TT("Buluttan yenilendi ✓","Refreshed from cloud ✓"));}else{setToast(TT("Bulutta bu veri yok — 📥 E-postadan çek","No cloud data — use Fetch from email"));}}catch(e){setToast(TT("Yenilenemedi","Refresh failed"));}};
 const setVRows=n=>setDm(m=>({...m,[vkey]:typeof n==="function"?n(m[vkey]||[]):n}));
 const upRow=(id,f,v)=>setRows(rs=>rs.map(r=>r.id===id?{...r,[f]:v}:r));
 const addRow=()=>setRows(rs=>[...rs,blankRow()]);
@@ -1332,7 +1332,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM78 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM79 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
