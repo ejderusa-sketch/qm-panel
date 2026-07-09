@@ -857,30 +857,30 @@ const Step=({v,set,st,unit})=><span style={{display:"inline-flex",alignItems:"ce
 <span style={{minWidth:56,textAlign:"center",fontFamily:"'JetBrains Mono'",fontWeight:700,fontSize:14}}>{v}{unit}</span>
 <button onClick={()=>set(Math.round((v+st)*100)/100)} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,lineHeight:1,color:"var(--green)"}}>+</button></span>;
 const Toggle=({on,set})=><button onClick={()=>set(!on)} style={{width:46,height:26,borderRadius:999,border:"none",cursor:"pointer",background:on?"var(--green)":"var(--line2)",position:"relative",transition:".15s",flex:"none"}}><span style={{position:"absolute",top:3,left:on?23:3,width:20,height:20,borderRadius:"50%",background:"#fff",transition:".15s"}}/></button>;
-const Sq=({label,color,v,set,st,unit})=><div style={{minWidth:0,border:"1px solid var(--line2)",borderRadius:8,padding:"4px 4px",textAlign:"center",background:"var(--panel)"}}>
+const Sq=({label,color,v,set,st,unit})=><div style={{minWidth:0,border:"1px solid var(--line2)",borderRadius:8,padding:"3px 4px",textAlign:"center",background:"var(--panel)"}}>
 <div style={{fontSize:8.5,fontWeight:800,color,letterSpacing:.2,whiteSpace:"nowrap"}}>{label}</div>
 <div style={{fontSize:11,fontFamily:"'JetBrains Mono'",fontWeight:700,margin:"0"}}>{v}{unit}</div>
 <div style={{display:"flex",gap:2,justifyContent:"center"}}>
-<button onClick={()=>set(Math.max(0,Math.round((v-st)*100)/100))} style={{width:17,height:17,borderRadius:5,border:"1px solid var(--line2)",background:"var(--panel2)",cursor:"pointer",fontWeight:800,color:"var(--red)",fontSize:11,lineHeight:1}}>−</button>
-<button onClick={()=>set(Math.round((v+st)*100)/100)} style={{width:17,height:17,borderRadius:5,border:"1px solid var(--line2)",background:"var(--panel2)",cursor:"pointer",fontWeight:800,color:"var(--green)",fontSize:11,lineHeight:1}}>+</button>
+<button onClick={()=>set(Math.max(0,Math.round((v-st)*100)/100))} style={{width:16,height:16,borderRadius:5,border:"1px solid var(--line2)",background:"var(--panel2)",cursor:"pointer",fontWeight:800,color:"var(--red)",fontSize:11,lineHeight:1}}>−</button>
+<button onClick={()=>set(Math.round((v+st)*100)/100)} style={{width:16,height:16,borderRadius:5,border:"1px solid var(--line2)",background:"var(--panel2)",cursor:"pointer",fontWeight:800,color:"var(--green)",fontSize:11,lineHeight:1}}>+</button>
 </div></div>;
 return(<div className="rules" style={{marginBottom:14}}>
 <div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("A1 · Kurallar — Marketing Parametreleri","A1 · Rules — Marketing Parameters")}</span></div>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametre için 3 aksiyon eşiği: KAPAT · KAPATMA · BEKLE. Metriği aç/kapat, her karenin eşiğini −/+ ile ayarla.","Each parameter has 3 action thresholds: CLOSE · SHUT · HOLD. Toggle the metric and set each square with −/+.")}</div>
 <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
-<div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:12,padding:"7px 13px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
+<div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:12,maxWidth:900,padding:"5px 13px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
 <div style={{display:"flex",alignItems:"center",gap:10}}>
 <Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/>
 <span style={{fontSize:13,fontWeight:700,flex:1}}>{TT(p.tr,p.en)}</span></div>
 
-<div style={{display:"flex",gap:16,marginTop:6,alignItems:"flex-start",flexWrap:"wrap"}}>
+<div style={{display:"flex",gap:14,marginTop:5,alignItems:"flex-start",flexWrap:"wrap"}}>
 <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,120px))",gap:6,justifyContent:"start",flex:"none",opacity:r.on?1:0.5}}>
 <Sq label={TT("KAPAT","CLOSE")} color="var(--red)" v={toNum(r.n)} set={v=>setR(p.type,{n:v})} st={p.st} unit={p.unit}/>
 <Sq label={TT("KAPATMA","SHUT")} color="var(--orange)" v={toNum(r.kapatma)} set={v=>setR(p.type,{kapatma:v})} st={p.st} unit={p.unit}/>
 <Sq label={TT("BEKLE","HOLD")} color="var(--amber)" v={toNum(r.bekle)} set={v=>setR(p.type,{bekle:v})} st={p.st} unit={p.unit}/>
 </div>
-<div style={{flex:1,minWidth:240}}>{(RNOTES[p.type]?TT(RNOTES[p.type].tr,RNOTES[p.type].en):[]).map((ln,i)=><div key={i} style={{fontSize:11,color:"var(--muted)",lineHeight:1.3,display:"flex",gap:6,marginBottom:1}}><b style={{color:"var(--azure)",flex:"none",fontWeight:800,fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}</div>
+<div style={{flex:1,minWidth:240}}>{(RNOTES[p.type]?TT(RNOTES[p.type].tr,RNOTES[p.type].en):[]).map((ln,i)=><div key={i} style={{fontSize:10.5,color:"var(--muted)",lineHeight:1.22,display:"flex",gap:6,marginBottom:0}}><b style={{color:"var(--azure)",flex:"none",fontWeight:800,fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}</div>
 </div>
 </div>);})}
 </div>
@@ -1304,7 +1304,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM52 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM53 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
