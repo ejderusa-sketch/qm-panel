@@ -153,16 +153,16 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 /* table */
 .tw{border:1px solid var(--line);border-radius:13px;overflow:auto;background:var(--panel);margin-bottom:8px}
 table{width:100%;border-collapse:collapse;min-width:900px}
-thead th{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);text-align:right;padding:13px 12px;border-bottom:1px solid var(--line2);white-space:nowrap;font-weight:500}
+thead th{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);text-align:right;padding:11px 6px;border-bottom:1px solid var(--line2);white-space:nowrap;font-weight:700}
 thead th.l{text-align:left}
-tbody td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+tbody td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--bg2)}
 .ci{background:transparent;border:1px solid transparent;border-radius:7px;color:var(--ink);font-family:'JetBrains Mono';font-size:13px;text-align:right;width:84px;padding:6px 8px;transition:.1s}
 .ci:hover{border-color:var(--line2)}
 .ci:focus{outline:none;border-color:var(--orange);background:var(--bg2)}
 .ci.nm{text-align:left;width:180px;font-family:'Inter';font-weight:500}
-.calc{font-family:'JetBrains Mono';font-size:11.5px;color:var(--muted)}
+.calc{font-family:'JetBrains Mono';font-size:11.5px;color:var(--ink);font-weight:700}
 .calc.s{color:var(--ink);font-weight:500}
 .vd{font-family:'JetBrains Mono';font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 9px;border-radius:7px;display:inline-block;white-space:nowrap}
 .vd.r{background:var(--red-s);color:var(--red)}
@@ -1007,6 +1007,10 @@ const TAB_PERM={marketing:"viewMarketing",finance:"viewFinance",trademark:"viewT
 useEffect(()=>{if(TAB_PERM[tab]&&!can(TAB_PERM[tab])){const first=["marketing","finance","trademark","visibility","dashboard","zidentity"].find(x=>can(TAB_PERM[x]));setTab(first||"ayarlar");}},[tab]);
 const[mktFilter,setMktFilter]=useState("all");
 const[mSub,setMSub]=useState("a1");
+const[sortCol,setSortCol]=useState(null);
+const[sortDir,setSortDir]=useState("desc");
+const toggleSort=col=>{if(sortCol===col){setSortDir(d=>d==="desc"?"asc":"desc")}else{setSortCol(col);setSortDir("desc")}};
+const sArrow=col=>sortCol===col?(sortDir==="desc"?" ↓":" ↑"):"";
 const[mktSearch,setMktSearch]=useState("");
 const[sel,setSel]=useState(()=>new Set());
 const[showPaste,setShowPaste]=useState(false);
@@ -1271,7 +1275,7 @@ const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,settings)})),[rows,sett
 /* QM7: ShipStation tarzı filtre/arama/seçim */
 const baseEvals=evals.filter(x=>x.e.imp||x.e.spend);
 const verdictCounts=useMemo(()=>{const c={all:0,"BÜYÜT":0,"İZLE":0,"DÜZELT":0,"KAPAT":0,"VERİ AZ":0};for(const x of baseEvals){c.all++;if(c[x.e.verdict]!=null)c[x.e.verdict]++;}return c;},[rows,settings]);
-const shownEvals=baseEvals.filter(x=>(mktFilter==="all"||x.e.verdict===mktFilter)).filter(x=>{const q=mktSearch.trim().toLowerCase();return!q||(x.row.name||"").toLowerCase().includes(q);}).map(x=>({...x,a:advise(x.e)})).sort((p,q)=>p.a.rank-q.a.rank||q.e.roas-p.e.roas);
+const shownEvals=baseEvals.filter(x=>(mktFilter==="all"||x.e.verdict===mktFilter)).filter(x=>{const q=mktSearch.trim().toLowerCase();return!q||(x.row.name||"").toLowerCase().includes(q);}).map(x=>({...x,a:advise(x.e)})).sort((p,q)=>{if(sortCol){const g=x=>sortCol==="name"?(x.row.name||"").toLowerCase():(toNum(x.e[sortCol])||0);const pv=g(p),qv=g(q);const c=pv<qv?-1:pv>qv?1:0;return sortDir==="desc"?-c:c;}return p.a.rank-q.a.rank||q.e.roas-p.e.roas;});
 const toggleSel=id=>setSel(s=>{const n=new Set(s);n.has(id)?n.delete(id):n.add(id);return n;});
 const allShownSelected=shownEvals.length>0&&shownEvals.every(x=>sel.has(x.row.id));
 const selAll=()=>setSel(allShownSelected?new Set():new Set(shownEvals.map(x=>x.row.id)));
@@ -1302,7 +1306,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM59 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM60 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1418,7 +1422,7 @@ return(
 
 <div className="tw" style={{marginBottom:18}}><table style={{minWidth:1000}}><thead><tr>
 <th style={{width:34}}><input type="checkbox" checked={allShownSelected} onChange={selAll}/></th>
-<th className="l">{t.cProduct}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>{TT("Reklam","Ads")}</th><th>{t.cImpr}</th><th>{t.cClicks}</th><th>CTR</th><th>{t.cOrders}</th><th>{t.cRev}</th><th>{t.cSpend}</th><th>ROAS</th><th></th>
+<th className="l" style={{cursor:"pointer"}} onClick={()=>toggleSort("name")}>{t.cProduct}{sArrow("name")}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>{TT("Reklam","Ads")}</th><th style={{cursor:"pointer"}} onClick={()=>toggleSort("imp")}>{t.cImpr}{sArrow("imp")}</th><th style={{cursor:"pointer"}} onClick={()=>toggleSort("clk")}>{t.cClicks}{sArrow("clk")}</th><th style={{cursor:"pointer"}} onClick={()=>toggleSort("ctr")}>CTR{sArrow("ctr")}</th><th style={{cursor:"pointer"}} onClick={()=>toggleSort("ord")}>{t.cOrders}{sArrow("ord")}</th><th style={{cursor:"pointer"}} onClick={()=>toggleSort("rev")}>{t.cRev}{sArrow("rev")}</th><th style={{cursor:"pointer"}} onClick={()=>toggleSort("spend")}>{t.cSpend}{sArrow("spend")}</th><th style={{cursor:"pointer"}} onClick={()=>toggleSort("roas")}>ROAS{sArrow("roas")}</th><th></th>
 </tr></thead><tbody>
 {shownEvals.length===0&&<tr><td colSpan={12}><div className="empty"><div className="big">{baseEvals.length?"Bu filtrede listing yok":t.emptyT}</div><p>{baseEvals.length?"Farklı bir durum sekmesi seç ya da aramayı temizle.":t.emptyS}</p></div></td></tr>}
 {shownEvals.map(({row:r,e,a})=>{
