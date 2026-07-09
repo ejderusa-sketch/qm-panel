@@ -814,17 +814,17 @@ const setR=(type,patch)=>setSettings(s=>{const rs=Array.isArray(s.rules)?s.rules
 const setNum=(k,v)=>setSettings(s=>({...s,[k]:Math.max(0,v)}));
 const cur=settings.cur||"$";
 const PARAMS=[
- {type:"roas_lt",tr:"1 · ROAS",en:"1 · ROAS",unit:"×",st:0.1,hint:TT("Gelir ÷ Harcama. Bu değerin altındaysa zarar → KAPAT.","Revenue ÷ Spend. Below this = loss → CLOSE.")},
- {type:"acos_gt",tr:"2 · ACOS",en:"2 · ACOS",unit:"%",st:5,hint:TT("Harcama ÷ Gelir ×100. Bu %'nin üstündeyse → KAPAT.","Spend ÷ Revenue ×100. Above this % → CLOSE.")},
- {type:"cpa_gt",tr:"3 · CPA (sipariş maliyeti)",en:"3 · CPA (cost/order)",unit:cur,st:1,hint:TT("Harcama ÷ Sipariş. Sipariş başı maliyet bu değerin üstündeyse → KAPAT.","Spend ÷ Orders. Above this cost per order → CLOSE.")},
- {type:"conv_lt",tr:"4 · CVR (dönüşüm)",en:"4 · CVR (conversion)",unit:"%",st:0.5,hint:TT("Sipariş ÷ Tıklama ×100. Bu %'nin altındaysa → KAPAT.","Orders ÷ Clicks ×100. Below this % → CLOSE.")},
- {type:"ctr_fix",tr:"5 · CTR",en:"5 · CTR",unit:"%",st:0.1,hint:TT("Tıklama ÷ Gösterim ×100. 1000+ gösterimde bunun altındaysa → DÜZELT (kapatma).","Clicks ÷ Impressions ×100. Below this with 1000+ impressions → FIX (don't close).")},
- {type:"cpc_gt",tr:"6 · CPC (tık maliyeti)",en:"6 · CPC (cost/click)",unit:cur,st:0.1,hint:TT("Harcama ÷ Tıklama. Tık başı maliyet bu değerin üstündeyse → KAPAT.","Spend ÷ Clicks. Above this cost per click → CLOSE.")},
- {type:"ord_lt",tr:"7 · Sipariş (reklamdan)",en:"7 · Orders from ads",unit:"",st:1,hint:TT("Harcama var ama sipariş bu sayının altındaysa → KAPAT.","Spending but orders below this count → CLOSE.")},
- {type:"rev_lt",tr:"8 · Gelir (reklamdan)",en:"8 · Revenue from ads",unit:cur,st:5,hint:TT("Reklam geliri bu değerin altındaysa → KAPAT.","Ad revenue below this → CLOSE.")},
- {type:"spend_gte",tr:"9 · Harcama (Spend)",en:"9 · Spend",unit:cur,st:5,hint:TT("Harcama bu değeri geçtiyse → KAPAT (bütçe sınırı).","Spend reached this amount → CLOSE (budget cap).")},
- {type:"imp_no_clk",tr:"10 · Gösterim (Impressions)",en:"10 · Impressions / Ad views",unit:"",st:100,hint:TT("Bu kadar gösterimde 0 tıklama varsa → KAPAT.","This many impressions with 0 clicks → CLOSE.")},
- {type:"aov_lt",tr:"11 · AOV (ortalama sepet)",en:"11 · AOV (avg order value)",unit:cur,st:5,hint:TT("Gelir ÷ Sipariş. Ortalama sepet bu değerin altındaysa → İZLE.","Revenue ÷ Orders. Below this avg basket → WATCH.")},
+ {type:"roas_lt",tr:"A1.1 · ROAS",en:"A1.1 · ROAS",unit:"×",st:0.1,hint:TT("Gelir ÷ Harcama. Bu değerin altındaysa zarar → KAPAT.","Revenue ÷ Spend. Below this = loss → CLOSE.")},
+ {type:"acos_gt",tr:"A1.2 · ACOS",en:"A1.2 · ACOS",unit:"%",st:5,hint:TT("Harcama ÷ Gelir ×100. Bu %'nin üstündeyse → KAPAT.","Spend ÷ Revenue ×100. Above this % → CLOSE.")},
+ {type:"cpc_gt",tr:"A1.3 · CPC (tık maliyeti)",en:"A1.3 · CPC (cost/click)",unit:cur,st:0.1,hint:TT("Harcama ÷ Tıklama. Tık başı maliyet bu değerin üstündeyse → KAPAT.","Spend ÷ Clicks. Above this cost per click → CLOSE.")},
+ {type:"conv_lt",tr:"A1.4 · CVR (dönüşüm)",en:"A1.4 · CVR (conversion)",unit:"%",st:0.5,hint:TT("Sipariş ÷ Tıklama ×100. Bu %'nin altındaysa → KAPAT.","Orders ÷ Clicks ×100. Below this % → CLOSE.")},
+ {type:"ctr_fix",tr:"A1.5 · CTR",en:"A1.5 · CTR",unit:"%",st:0.1,hint:TT("Tıklama ÷ Gösterim ×100. 1000+ gösterimde bunun altındaysa → DÜZELT (kapatma).","Clicks ÷ Impressions ×100. Below this with 1000+ impressions → FIX (don't close).")},
+ {type:"cpa_gt",tr:"A1.6 · CPA (sipariş maliyeti)",en:"A1.6 · CPA (cost/order)",unit:cur,st:1,hint:TT("Harcama ÷ Sipariş. Sipariş başı maliyet bu değerin üstündeyse → KAPAT.","Spend ÷ Orders. Above this cost per order → CLOSE.")},
+ {type:"ord_lt",tr:"A1.7 · Sipariş (reklamdan)",en:"A1.7 · Orders from ads",unit:"",st:1,hint:TT("Harcama var ama sipariş bu sayının altındaysa → KAPAT.","Spending but orders below this count → CLOSE.")},
+ {type:"rev_lt",tr:"A1.8 · Gelir (reklamdan)",en:"A1.8 · Revenue from ads",unit:cur,st:5,hint:TT("Reklam geliri bu değerin altındaysa → KAPAT.","Ad revenue below this → CLOSE.")},
+ {type:"spend_gte",tr:"A1.9 · Harcama (Spend)",en:"A1.9 · Spend",unit:cur,st:5,hint:TT("Harcama bu değeri geçtiyse → KAPAT (bütçe sınırı).","Spend reached this amount → CLOSE (budget cap).")},
+ {type:"imp_no_clk",tr:"A1.10 · Gösterim (Impressions)",en:"A1.10 · Impressions / Ad views",unit:"",st:100,hint:TT("Bu kadar gösterimde 0 tıklama varsa → KAPAT.","This many impressions with 0 clicks → CLOSE.")},
+ {type:"aov_lt",tr:"A1.11 · AOV (ortalama sepet)",en:"A1.11 · AOV (avg order value)",unit:cur,st:5,hint:TT("Gelir ÷ Sipariş. Ortalama sepet bu değerin altındaysa → İZLE.","Revenue ÷ Orders. Below this avg basket → WATCH.")},
 ];
 const NOTES={
 roas_lt:{tr:["Ne: Reklam gelirinin harcamaya oranı (Gelir÷Harcama).","Sorun: 1×'in altı = harcadığından az kazanç, zarar.","Olmalı: En az 2×; yükseldikçe reklamı büyüt."],en:["What: Ad revenue ÷ spend.","Issue: Below 1× = earning less than you spend, loss.","Target: At least 2×; scale up as it rises."]},
@@ -852,7 +852,7 @@ const Sq=({label,color,v,set,st,unit})=><div style={{flex:1,minWidth:0,border:"1
 <button onClick={()=>set(Math.round((v+st)*100)/100)} style={{width:22,height:22,borderRadius:6,border:"1px solid var(--line2)",background:"var(--panel2)",cursor:"pointer",fontWeight:800,color:"var(--green)",fontSize:13,lineHeight:1}}>+</button>
 </div></div>;
 return(<div className="rules" style={{marginBottom:14}}>
-<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("Kurallar — Marketing Parametreleri","Rules — Marketing Parameters")}</span></div>
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("A1 · Kurallar — Marketing Parametreleri","A1 · Rules — Marketing Parameters")}</span></div>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametre için 4 aksiyon eşiği: AÇ · KAPAT · KAPATMA · BEKLE. Metriği aç/kapat, her karenin eşiğini −/+ ile ayarla.","Each parameter has 4 action thresholds: OPEN · CLOSE · SHUT · HOLD. Toggle the metric and set each square with −/+.")}</div>
 <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
@@ -1260,7 +1260,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM43 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM44 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
