@@ -1276,7 +1276,7 @@ const allShownSelected=shownEvals.length>0&&shownEvals.every(x=>sel.has(x.row.id
 const selAll=()=>setSel(allShownSelected?new Set():new Set(shownEvals.map(x=>x.row.id)));
 const bulkAds=on=>{setRows(rs=>rs.map(r=>sel.has(r.id)?{...r,ads:on?"on":"off"}:r));};
 const bulkDelete=()=>{if(!sel.size)return;if(!window.confirm(sel.size+" listing silinsin?"))return;setRows(rs=>rs.filter(r=>!sel.has(r.id)));setSel(new Set());};
-const FILTERS=[["all","A1 · "+TT("VARSAYILAN","DEFAULT")],["DÜZELT","A2 · "+TT("DÜZELTME","FIX")],["KAPAT","A3 · "+TT("KAPAT","CLOSE")],["VERİ AZ","A4 · "+TT("KAPATMA","SHUT OFF")],["İZLE","A5 · "+TT("BEKLE","HOLD")],["BÜYÜT",TT("BÜYÜT","GROW")]];
+const FILTERS=[["DÜZELT","A1 · "+TT("DÜZELTME","FIX")],["KAPAT","A2 · "+TT("KAPAT","CLOSE")],["VERİ AZ","A3 · "+TT("KAPATMA","SHUT OFF")],["İZLE","A4 · "+TT("BEKLE","HOLD")],["BÜYÜT","A5 · "+TT("BÜYÜT","GROW")]];
 const totals=useMemo(()=>{const t={spend:0,rev:0,imp:0,clk:0,ord:0,close:0,watch:0,grow:0};
 for(const{e}of evals){t.spend+=e.spend;t.rev+=e.rev;t.imp+=e.imp;t.clk+=e.clk;t.ord+=e.ord;if(e.verdict==="KAPAT")t.close++;if(e.verdict==="İZLE")t.watch++;if(e.verdict==="BÜYÜT")t.grow++}
 t.wasted=evals.filter(x=>x.e.verdict==="KAPAT").reduce((s,x)=>s+Math.max(x.e.spend-x.e.rev,0),0);
@@ -1301,7 +1301,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM56 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM57 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1395,6 +1395,10 @@ return(
 <div className="sec"><h2><span className="bar"/>{t.analysis}</h2>
 <div className="brow">{can("deleteData")&&<button className="btn" onClick={()=>{if(rows.length&&window.confirm(t.delAllQ)){setRows([]);setSel(new Set());}}}>{t.delAll}</button>}</div></div>
 
+<div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
+{FILTERS.map(([k,lb])=>{const cnt=verdictCounts[k]||0;const on=mktFilter===k;const col=k==="BÜYÜT"?"var(--green)":k==="İZLE"?"var(--amber)":k==="DÜZELT"?"var(--orange)":k==="KAPAT"?"var(--red)":k==="VERİ AZ"?"var(--faint)":"var(--azure)";return(
+<button key={k} onClick={()=>setMktFilter(k)} style={{fontFamily:"'Space Grotesk'",fontSize:12.5,fontWeight:600,padding:"7px 13px",borderRadius:9,cursor:"pointer",border:"1px solid "+(on?col:"var(--line2)"),background:on?col:"var(--panel)",color:on?"#fff":"var(--ink)"}}>{lb} <span style={{opacity:.75,fontFamily:"'JetBrains Mono'"}}>{cnt}</span></button>);})}
+</div>
 
 <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:10}}>
 <input value={mktSearch} onChange={e=>setMktSearch(e.target.value)} placeholder={TT("🔎 Listing ara…","🔎 Search listing…")} style={{flex:1,minWidth:180,padding:"8px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13,fontFamily:"'Inter'"}}/>
