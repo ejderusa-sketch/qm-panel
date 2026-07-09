@@ -152,10 +152,10 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 
 /* table */
 .tw{border:1px solid var(--line);border-radius:13px;overflow:auto;background:var(--panel);margin-bottom:8px}
-table{width:100%;border-collapse:collapse;min-width:900px}
-thead th{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);text-align:right;padding:11px 6px;border-bottom:1px solid var(--line2);white-space:nowrap;font-weight:700}
+table{width:auto;border-collapse:collapse;min-width:auto}
+thead th{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);text-align:right;padding:9px 10px;border-bottom:1px solid var(--line2);white-space:nowrap;font-weight:700}
 thead th.l{text-align:left}
-tbody td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+tbody td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--bg2)}
 .ci{background:transparent;border:1px solid transparent;border-radius:7px;color:var(--ink);font-family:'JetBrains Mono';font-size:13px;text-align:right;width:84px;padding:6px 8px;transition:.1s}
@@ -1059,7 +1059,7 @@ const dzChecks=[...savedD];for(const dd of DS.dzChecks){const ex=dzChecks.find(c
 const trendTopics=(s&&Array.isArray(s.trendTopics))?s.trendTopics:DS.trendTopics;
 setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5)?{}:{minImp:1000,minClicks:30})});
 const mig={};Object.keys(dmSaved||{}).forEach(k=>{if(k.startsWith("V::")){mig[k]=dmSaved[k];return;}const md=k.match(/^(.+)\|(\d{4})-(\d{2})-\d{2}$/);if(md){const nk=md[1]+"|"+md[2]+"-"+md[3];if((dmSaved[k]||[]).length>=((mig[nk]||[]).length))mig[nk]=dmSaved[k];return;}if(/\|\d{4}-\d{2}$/.test(k)){mig[k]=dmSaved[k];}});
-setDm(mig);setLoaded(true)})()},[]);
+const _sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");Object.keys(mig).forEach(k=>{if(k.startsWith("V::"))return;const arr=mig[k]||[];const seen=new Set();const out=[];for(const r of arr){const sg=_sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);}}mig[k]=out;});setDm(mig);setLoaded(true)})()},[]);
 
 useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:d",{__v:2,dm,accts:accounts}),600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
 useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:s",settings),600);return()=>clearTimeout(t)},[settings,loaded]);
@@ -1187,7 +1187,7 @@ useEffect(()=>{const h=e=>{const it=e.clipboardData&&e.clipboardData.items;if(!i
 
 const applyPaste=()=>{const p=parseReport(pt);if(!p.length){flash("Okunamadı.");return}setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);setPt("");setShowPaste(false);flash(`${p.length} listing eklendi.`)};
 const handleCSV=async(file,targetPeriod,targetAct)=>{if(!file)return;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
-try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const aid=targetAct||act,tp=targetPeriod||period,kk=aid+"|"+tp;setDm(m=>({...m,[kk]:[...((m[kk]||[]).filter(r=>r.name||r.impressions||r.spend)),...p]}));flash(`${p.length} listing → ${tp}`)}
+try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const aid=targetAct||act,tp=targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} yeni listing → ${tp}`)}
 catch(err){setImgErr("CSV hatası: "+(err&&err.message||"bilinmeyen"))}
 finally{const el=document.getElementById("csvInput");if(el)el.value=""}};
 
@@ -1306,7 +1306,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM61 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM62 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
