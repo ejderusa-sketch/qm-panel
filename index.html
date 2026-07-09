@@ -1085,6 +1085,7 @@ useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:s",settings
 
 const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
 const setRows=n=>setDm(m=>({...m,[key]:typeof n==="function"?n(m[key]||[]):n}));
+const reloadCloud=async()=>{setToast(TT("Buluttan yükleniyor…","Loading from cloud…"));try{const d=await store.get("q:d",{});const dmSaved=(d&&d.__v===2)?(d.dm||{}):(d||{});setDm(dmSaved||{});setToast(TT("Buluttan yenilendi ✓","Refreshed from cloud ✓"));}catch(e){setToast(TT("Yenilenemedi","Refresh failed"));}};
 const setVRows=n=>setDm(m=>({...m,[vkey]:typeof n==="function"?n(m[vkey]||[]):n}));
 const upRow=(id,f,v)=>setRows(rs=>rs.map(r=>r.id===id?{...r,[f]:v}:r));
 const addRow=()=>setRows(rs=>[...rs,blankRow()]);
@@ -1331,7 +1332,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM77 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM78 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1351,7 +1352,7 @@ return(
 {a.email&&(a.gmailConnected?
 <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}} onClick={e=>e.stopPropagation()}>
 <span style={{fontSize:10,fontWeight:800,color:"var(--green)"}}>✓ {TT("Bağlı","Connected")}</span>
-<button onClick={()=>fetchStoreCSV(a)} style={{fontSize:10.5,fontWeight:700,color:"var(--azure)",background:"var(--panel)",border:"1px solid var(--line2)",borderRadius:6,padding:"3px 7px",cursor:"pointer"}}>📥 {TT("Şimdi çek","Fetch now")}</button>
+<button onClick={()=>fetchStoreCSV(a)} style={{fontSize:10.5,fontWeight:700,color:"var(--azure)",background:"var(--panel)",border:"1px solid var(--line2)",borderRadius:6,padding:"3px 7px",cursor:"pointer"}}>📥 {TT("E-postadan çek","Fetch from email")}</button>
 <button onClick={()=>disconnectStore(a)} title={TT("Bağlantıyı kes","Disconnect")} style={{fontSize:10.5,color:"var(--faint)",background:"none",border:"none",cursor:"pointer"}}>✕</button>
 </div>
 :<button onClick={e=>{e.stopPropagation();connectStore(a)}} style={{fontSize:10.5,fontWeight:700,color:"#fff",background:"#1b2a6b",border:"none",borderRadius:6,padding:"4px 9px",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5,alignSelf:"flex-start"}}>🔗 {TT("Google ile Bağlan","Connect with Google")}</button>
@@ -1407,6 +1408,7 @@ return(
 <input ref={fRef} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handleImage(e.target.files&&e.target.files[0])}/>
 <div style={{display:"flex",alignItems:"center",gap:10,margin:"2px 0 12px",flexWrap:"wrap"}}>
 <span style={{fontSize:12.5,fontWeight:700,color:"var(--ink)"}}>📅 {TT("Dönem","Period")}:</span>
+<button onClick={reloadCloud} title={TT("Veriyi buluttan tazele (ana kaynak)","Refresh data from cloud (main source)")} style={{fontSize:12,fontWeight:700,color:"var(--azure)",background:"var(--panel)",border:"1px solid var(--azure)",borderRadius:8,padding:"6px 11px",cursor:"pointer"}}>🔄 {TT("Yenile","Refresh")}</button>
 <select value={period} onChange={e=>setPeriod(e.target.value)} className="cur-sel" style={{fontFamily:"'Inter'",fontSize:13,padding:"8px 12px",fontWeight:600}}>
 {PERIODS.map(([k,tr,en])=><option key={k} value={k}>{TT(tr,en)}</option>)}
 </select>
