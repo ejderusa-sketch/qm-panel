@@ -290,6 +290,12 @@ if(isMetrics&&pend){rows.push({id:Math.random().toString(36).slice(2),name:pend,
 if(a.length>=18&&/[a-zA-ZğüşıöçĞÜŞİÖÇ]{4,}/.test(a)&&!bad.test(a)&&c.slice(1).every(x=>!(x||"").trim()))pend=a;
 }
 return rows;}
+function detectMonth(text){
+const M={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+const y=((text.match(/\b(20\d{2})\b/)||[])[1])||String(new Date().getFullYear());
+let best=null;const re=/([A-Za-z]{3})[a-z]*\s+(\d{1,2})\s*[-–—]\s*([A-Za-z]{3})[a-z]*\s+(\d{1,2})/g;let m;
+while((m=re.exec(text))){const a=M[m[1].toLowerCase()],b=M[m[3].toLowerCase()],d1=+m[2],d2=+m[4];if(a==null||b==null)continue;if(a===b&&d1<=2&&d2>=27)best=a;}
+if(best!=null)return y+"-"+String(best+1).padStart(2,"0");return null;}
 function parseCSV(text){
 const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
 if(lines.length<2)return[];
@@ -1200,7 +1206,7 @@ useEffect(()=>{const h=e=>{const it=e.clipboardData&&e.clipboardData.items;if(!i
 
 const applyPaste=()=>{const p=parseReport(pt);if(!p.length){flash("Okunamadı.");return}setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);setPt("");setShowPaste(false);flash(`${p.length} listing eklendi.`)};
 const handleCSV=async(file,targetPeriod,targetAct)=>{if(!file)return;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
-try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const aid=targetAct||act,tp=targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} yeni listing → ${tp}`)}
+try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} yeni listing → ${tp}`)}
 catch(err){setImgErr("CSV hatası: "+(err&&err.message||"bilinmeyen"))}
 finally{const el=document.getElementById("csvInput");if(el)el.value=""}};
 
@@ -1328,7 +1334,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM75 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM76 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1407,6 +1413,7 @@ return(
 <select value={period} onChange={e=>setPeriod(e.target.value)} className="cur-sel" style={{fontFamily:"'Inter'",fontSize:13,padding:"8px 12px",fontWeight:600}}>
 {PERIODS.map(([k,tr,en])=><option key={k} value={k}>{TT(tr,en)}</option>)}
 </select>
+<input type="month" value={/^\d{4}-\d{2}$/.test(period)?period:""} onChange={e=>{if(e.target.value)setPeriod(e.target.value)}} className="cur-sel" style={{fontFamily:"'Inter'",fontSize:13,padding:"7px 10px"}} title={TT("Özel ay seç","Custom month")}/>
 <span style={{fontSize:11.5,color:"var(--faint)"}}>{TT("Tüm oranlar bu döneme göre hesaplanır. Etsy'den bu dönemi seçip veri çek.","All ratios are computed for this period. Select this period on Etsy when exporting data.")}</span>
 </div>
 <div style={{display:"flex",gap:6,marginBottom:12}}>
