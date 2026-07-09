@@ -290,7 +290,7 @@ const iClk=find(/click/,/rate|ctr|%/);
 const iRev=find(/revenue|sales|order value|order amount|order total/);
 const iOrd=find(/order/,/value|amount|revenue|total/);
 const iSpend=find(/spend|cost|budget/);
-let iN2=iName;if(iN2<0){const used=new Set([iImp,iClk,iRev,iOrd,iSpend]);const sample=parseCSVLine(lines[1]||"");for(let i=0;i<hdr.length;i++){if(used.has(i))continue;if(/[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}/.test((sample[i]||"").trim())){iN2=i;break;}}}
+let iN2=iName;if(iN2<0){const used=new Set([iImp,iClk,iRev,iOrd,iSpend]);const sample=parseCSVLine(lines[1]||"");const isDate=v=>/\b(19|20)\d{2}\b/.test(v)||/^\s*\d{1,2}[\/.\- ]/.test(v)||/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık)/i.test(v);for(let i=0;i<hdr.length;i++){if(used.has(i))continue;const v=(sample[i]||"").trim();if(v&&v.length>=4&&/[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}/.test(v)&&!isDate(v)){iN2=i;break;}}}
 const out=[];
 for(let r=1;r<lines.length;r++){
 const c=parseCSVLine(lines[r]);if(!c.length)continue;
@@ -1307,7 +1307,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM66 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM67 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
