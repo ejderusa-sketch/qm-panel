@@ -1229,7 +1229,7 @@ useEffect(()=>{const h=e=>{const it=e.clipboardData&&e.clipboardData.items;if(!i
 
 const applyPaste=()=>{const p=parseReport(pt);if(!p.length){flash("Okunamadı.");return}setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);setPt("");setShowPaste(false);flash(`${p.length} listing eklendi.`)};
 const handleCSV=async(file,targetPeriod,targetAct,requireNames)=>{if(!file)return false;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
-try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} → ${tp}`);return true}
+try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;if(requireNames&&!dmo)return false;const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} → ${tp}`);return true}
 catch(err){setImgErr("CSV hatası: "+(err&&err.message||"bilinmeyen"))}
 finally{const el=document.getElementById("csvInput");if(el)el.value=""}};
 
@@ -1354,7 +1354,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM85 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM86 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1449,7 +1449,7 @@ return(
 
 {mSub==="a2"&&rows.length===0&&<div className="rules" style={{textAlign:"center",color:"var(--faint)",padding:"26px 10px"}}>{TT("Bu dönemde henüz veri yok. Soldan bağlı mağazanın e-postasına tıklayıp çek ya da CSV yükle.","No data yet for this period. Fetch from the connected email on the left, or upload a CSV.")}</div>}
 {mSub==="a2"&&rows.length>0 && (<>
-<div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>{can("deleteData")&&<button className="btn" onClick={()=>{skipSave.current=true;setRows([]);setSel(new Set());setToast(TT("Ekran temizlendi (buluttan silinmedi) — 🔄 Refresh ile geri gelir","Screen cleared (not deleted) — Refresh to restore"));}}>🧹 {TT("Ekranı temizle","Clear screen")}</button>}</div>
+<div style={{display:"flex",justifyContent:"flex-end",gap:8,marginBottom:8}}>{can("deleteData")&&<button className="btn" onClick={()=>{skipSave.current=true;setRows([]);setSel(new Set());setToast(TT("Ekran temizlendi (buluttan silinmedi) — 🔄 Refresh ile geri gelir","Screen cleared (not deleted) — Refresh to restore"));}}>🧹 {TT("Ekranı temizle","Clear screen")}</button>}{can("deleteData")&&/^\d{4}-\d{2}$/.test(period)&&<button className="btn" style={{borderColor:"var(--red)",color:"var(--red)"}} title={TT("Bu ayın verisini buluttan da siler — sonra doğru CSV yükle","Deletes this month from cloud too — then import the correct CSV")} onClick={()=>{setDm(m=>{const n={...m};delete n[key];return n;});setSel(new Set());setToast(period+" "+TT("buluttan sıfırlandı — şimdi doğru CSV'yi yükle","reset from cloud — now import the correct CSV"));}}>🗑 {TT("Bu ayı buluttan sıfırla","Reset this month (cloud)")}</button>}</div>
 
 
 <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:10}}>
