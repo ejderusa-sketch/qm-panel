@@ -839,6 +839,19 @@ spend_gte:{tr:["Ne: Bu dönemde reklamda harcanan toplam.","Sorun: Satış olmad
 imp_no_clk:{tr:["Ne: İlanın kaç kez gösterildiği.","Sorun: Çok gösterim + 0 tık = yanlış kitle/ilan.","Olmalı: Gösterim tıklamaya dönüşmeli."],en:["What: How often the listing was shown.","Issue: Many views + 0 clicks = wrong audience/listing.","Target: Impressions should turn into clicks."]},
 aov_lt:{tr:["Ne: Sipariş başına ortalama tutar (Gelir÷Sipariş).","Sorun: Düşük AOV = kâr marjı ince, reklam zor çıkar.","Olmalı: Paket/ek ürünle yükselt; düşükse izle."],en:["What: Avg order value (Revenue÷Orders).","Issue: Low AOV = thin margin, hard to profit on ads.","Target: Raise with bundles/upsells; watch if low."]},
 };
+const RNOTES={
+roas_lt:{tr:["Reklamın verimi: Reklam Geliri ÷ Reklam Harcaması.","2× = harcadığın 1$ için 2$ satış; 1× = başabaş; 1× altı = zarar.","Yükseldikçe reklam kârlı, düştükçe bütçe boşa gider.","Kâr marjını da hesaba kat: düşük marjlı üründe hedef ROAS yüksek olmalı.","Eşikler: KAPAT altı kes · KAPATMA askıya · BEKLE üstü izle."],en:["Ad efficiency: Ad Revenue ÷ Ad Spend.","2× = $2 sales per $1 spent; 1× = break-even; below 1× = loss.","Higher = profitable ads; lower = wasted budget.","Factor in margin: low-margin items need a higher target ROAS.","Thresholds: below CLOSE cut · SHUT suspend · above HOLD watch."]},
+acos_gt:{tr:["ROAS'ın tersi: Reklam Harcaması ÷ Reklam Geliri ×100.","%25 ACOS = her 100$ satış için 25$ reklam harcandı.","Düşük iyi; yüksek ACOS kârı yer.","Hedef ACOS genelde kâr marjının altında olmalı.","Eşiği aşan listing → kes/askıya."],en:["Inverse of ROAS: Ad Spend ÷ Ad Revenue ×100.","25% ACOS = $25 ad spend per $100 in sales.","Lower is better; high ACOS eats profit.","Target ACOS should stay under your margin.","Above the threshold → cut/suspend."]},
+cpc_gt:{tr:["Tık başına maliyet: Harcama ÷ Tıklama.","Bir kişinin ilanına tıklaması sana kaça mal oluyor.","Yüksek CPC bütçeyi hızlı bitirir; satış yoksa çok zarar.","Rekabetçi anahtar kelimelerde CPC artar.","Eşiği aşarsa teklifi/kelimeyi kıs ya da kapat."],en:["Cost per click: Spend ÷ Clicks.","How much one click on your listing costs you.","High CPC burns budget fast; painful with no sales.","Competitive keywords raise CPC.","Above threshold → lower bid/keywords or close."]},
+conv_lt:{tr:["Dönüşüm oranı: Sipariş ÷ Tıklama ×100.","Tıklayan 100 kişiden kaçı satın aldı.","Düşük CVR = trafik var ama satış yok (fiyat/görsel/ürün).","İyi ürün sayfası + doğru fiyat CVR'yi yükseltir.","Eşiğin altına düşerse düzelt/izle."],en:["Conversion rate: Orders ÷ Clicks ×100.","Of 100 who clicked, how many bought.","Low CVR = traffic but no sales (price/image/product).","Good page + right price lift CVR.","Below threshold → fix/watch."]},
+ctr_fix:{tr:["Tıklama oranı: Tıklama ÷ Gösterim ×100.","İlanı görenlerin kaçı tıkladı — ilgi ölçüsü.","Düşük CTR = başlık/kapak görseli çekici değil.","En az 1000 gösterimde değerlendir (az veri yanıltır).","Düşükse önce DÜZELT (başlık/görsel), hemen kapatma."],en:["Click rate: Clicks ÷ Impressions ×100.","Of those who saw it, how many clicked — interest.","Low CTR = title/cover image not attractive.","Judge with 1000+ impressions (small data misleads).","If low, FIX first (title/image), don't close yet."]},
+cpa_gt:{tr:["Sipariş başına maliyet: Harcama ÷ Sipariş.","Bir satış elde etmek sana kaça mal oluyor.","CPA ürün kârından yüksekse her sipariş zarar.","Düşük CPA = verimli reklam.","Eşiği aşarsa kes/askıya."],en:["Cost per order: Spend ÷ Orders.","How much acquiring one sale costs you.","If CPA > product margin, every order loses money.","Low CPA = efficient ads.","Above threshold → cut/suspend."]},
+ord_lt:{tr:["Reklamdan gelen sipariş adedi.","Harcama var ama sipariş yoksa reklam işe yaramıyor.","Dönem boyunca belirlediğin minimumun üstünde olmalı.","Az siparişte ROAS/CVR gibi oranlar yanıltıcı olur.","Minimum altındaysa kes."],en:["Number of orders from ads.","Spending but no orders = ads not working.","Should stay above your set minimum for the period.","With few orders, ROAS/CVR become unreliable.","Below minimum → cut."]},
+rev_lt:{tr:["Reklamdan gelen toplam satış tutarı.","Reklamın getirdiği ciro.","Düşük gelir = reklam kendini çıkarmıyor.","Harcamayla birlikte değerlendir (ROAS'ın payı).","Eşiğin altındaysa kes/askıya."],en:["Total sales revenue from ads.","The turnover ads generate.","Low revenue = ads don't pay for themselves.","Assess with spend (ROAS side).","Below threshold → cut/suspend."]},
+spend_gte:{tr:["Bu dönemde reklama harcanan toplam.","Bütçe kontrolü için üst sınır.","Satış gelmeden harcama artıyorsa dur.","Yüksek harcama + düşük ROAS = hızlı zarar.","Eşiği aşınca kapat (bütçe sınırı)."],en:["Total ad spend this period.","An upper cap for budget control.","If spend grows without sales, stop.","High spend + low ROAS = fast loss.","Above cap → close (budget limit)."]},
+imp_no_clk:{tr:["İlanın kaç kez gösterildiği (görünürlük).","Çok gösterim + az tık = yanlış kitle/ilan.","Gösterim tek başına gelir getirmez; tık+satış gerekir.","Yüksek gösterim + düşük CTR = kötü işaret.","Bu kadar gösterimde tık yoksa kes."],en:["How often the listing was shown (visibility).","Many views + few clicks = wrong audience/listing.","Impressions alone earn nothing; need clicks+sales.","High impressions + low CTR = bad sign.","No clicks at this many views → cut."]},
+aov_lt:{tr:["Ortalama sepet: Gelir ÷ Sipariş.","Müşteri başına ortalama harcama tutarı.","Düşük AOV = kâr marjı ince, reklam maliyeti zor çıkar.","Paket/ek satış/ücretsiz kargo eşiği AOV'yi yükseltir.","Eşiğin altındaysa izle."],en:["Average order value: Revenue ÷ Orders.","Average spend per customer.","Low AOV = thin margin, hard to cover ad cost.","Bundles/upsell/free-ship threshold raise AOV.","Below threshold → watch."]},
+};
 const Step=({v,set,st,unit})=><span style={{display:"inline-flex",alignItems:"center",gap:6}}>
 <button onClick={()=>set(Math.max(0,Math.round((v-st)*100)/100))} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,lineHeight:1,color:"var(--red)"}}>−</button>
 <span style={{minWidth:56,textAlign:"center",fontFamily:"'JetBrains Mono'",fontWeight:700,fontSize:14}}>{v}{unit}</span>
@@ -861,10 +874,13 @@ return(<div className="rules" style={{marginBottom:14}}>
 <Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/>
 <span style={{fontSize:13,fontWeight:700,flex:1}}>{TT(p.tr,p.en)}</span></div>
 
-<div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,120px))",gap:6,marginTop:8,justifyContent:"start",opacity:r.on?1:0.5}}>
+<div style={{display:"flex",gap:18,marginTop:8,alignItems:"flex-start",flexWrap:"wrap"}}>
+<div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,120px))",gap:6,justifyContent:"start",flex:"none",opacity:r.on?1:0.5}}>
 <Sq label={TT("KAPAT","CLOSE")} color="var(--red)" v={toNum(r.n)} set={v=>setR(p.type,{n:v})} st={p.st} unit={p.unit}/>
 <Sq label={TT("KAPATMA","SHUT")} color="var(--orange)" v={toNum(r.kapatma)} set={v=>setR(p.type,{kapatma:v})} st={p.st} unit={p.unit}/>
 <Sq label={TT("BEKLE","HOLD")} color="var(--amber)" v={toNum(r.bekle)} set={v=>setR(p.type,{bekle:v})} st={p.st} unit={p.unit}/>
+</div>
+<div style={{flex:1,minWidth:240}}>{(RNOTES[p.type]?TT(RNOTES[p.type].tr,RNOTES[p.type].en):[]).map((ln,i)=><div key={i} style={{fontSize:11.5,color:"var(--muted)",lineHeight:1.5,display:"flex",gap:7,marginBottom:3}}><b style={{color:"var(--azure)",flex:"none",fontWeight:800,fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}</div>
 </div>
 </div>);})}
 </div>
@@ -1288,7 +1304,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM48 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM49 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
