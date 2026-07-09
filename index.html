@@ -869,18 +869,15 @@ return(<div className="rules" style={{marginBottom:14}}>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametre için 3 aksiyon eşiği: KAPAT · KAPATMA · BEKLE. Metriği aç/kapat, her karenin eşiğini −/+ ile ayarla.","Each parameter has 3 action thresholds: CLOSE · SHUT · HOLD. Toggle the metric and set each square with −/+.")}</div>
 <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
-<div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:12,maxWidth:900,padding:"5px 13px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
-<div style={{display:"flex",alignItems:"center",gap:10}}>
-<Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/>
-<span style={{fontSize:13,fontWeight:700,flex:1}}>{TT(p.tr,p.en)}</span></div>
-
-<div style={{display:"flex",gap:14,marginTop:5,alignItems:"flex-start",flexWrap:"wrap"}}>
-<div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,120px))",gap:6,justifyContent:"start",flex:"none",opacity:r.on?1:0.5}}>
+<div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:10,maxWidth:1040,padding:"5px 12px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
+<div style={{display:"flex",gap:12,alignItems:"flex-start",flexWrap:"wrap"}}>
+<div style={{display:"flex",alignItems:"center",gap:8,width:148,flex:"none"}}><Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/><span style={{fontSize:12.5,fontWeight:700}}>{TT(p.tr,p.en)}</span></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,108px))",gap:6,flex:"none",opacity:r.on?1:0.5}}>
 <Sq label={TT("KAPAT","CLOSE")} color="var(--red)" v={toNum(r.n)} set={v=>setR(p.type,{n:v})} st={p.st} unit={p.unit}/>
 <Sq label={TT("KAPATMA","SHUT")} color="var(--orange)" v={toNum(r.kapatma)} set={v=>setR(p.type,{kapatma:v})} st={p.st} unit={p.unit}/>
 <Sq label={TT("BEKLE","HOLD")} color="var(--amber)" v={toNum(r.bekle)} set={v=>setR(p.type,{bekle:v})} st={p.st} unit={p.unit}/>
 </div>
-<div style={{flex:1,minWidth:240}}>{(RNOTES[p.type]?TT(RNOTES[p.type].tr,RNOTES[p.type].en):[]).map((ln,i)=><div key={i} style={{fontSize:10.5,color:"var(--muted)",lineHeight:1.22,display:"flex",gap:6,marginBottom:0}}><b style={{color:"var(--azure)",flex:"none",fontWeight:800,fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}</div>
+<div style={{flex:1,minWidth:200}}>{(RNOTES[p.type]?TT(RNOTES[p.type].tr,RNOTES[p.type].en):[]).map((ln,i)=><div key={i} style={{fontSize:10.5,color:"var(--muted)",lineHeight:1.22,display:"flex",gap:6,marginBottom:0}}><b style={{color:"var(--azure)",flex:"none",fontWeight:800,fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}</div>
 </div>
 </div>);})}
 </div>
@@ -1304,7 +1301,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM53 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM54 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
