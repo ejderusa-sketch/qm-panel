@@ -162,7 +162,7 @@ tbody tr:hover{background:var(--bg2)}
 .ci:hover{border-color:var(--line2)}
 .ci:focus{outline:none;border-color:var(--orange);background:var(--bg2)}
 .ci.nm{text-align:left;width:180px;font-family:'Inter';font-weight:500}
-.calc{font-family:'JetBrains Mono';font-size:13px;color:var(--muted)}
+.calc{font-family:'JetBrains Mono';font-size:11.5px;color:var(--muted)}
 .calc.s{color:var(--ink);font-weight:500}
 .vd{font-family:'JetBrains Mono';font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 9px;border-radius:7px;display:inline-block;white-space:nowrap}
 .vd.r{background:var(--red-s);color:var(--red)}
@@ -1302,7 +1302,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM58 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM59 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1418,32 +1418,25 @@ return(
 
 <div className="tw" style={{marginBottom:18}}><table style={{minWidth:1000}}><thead><tr>
 <th style={{width:34}}><input type="checkbox" checked={allShownSelected} onChange={selAll}/></th>
-<th className="l">{t.cProduct}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>{TT("Reklam","Ads")}</th><th>{t.cImpr}</th><th>{t.cClicks}</th><th>CTR</th><th>{t.cOrders}</th><th>{t.cRev}</th><th>{t.cSpend}</th><th>ROAS</th><th className="l">{t.cAction}</th><th></th>
+<th className="l">{t.cProduct}</th><th title={t.cMonthTip}>{t.cMonth}</th><th>{TT("Reklam","Ads")}</th><th>{t.cImpr}</th><th>{t.cClicks}</th><th>CTR</th><th>{t.cOrders}</th><th>{t.cRev}</th><th>{t.cSpend}</th><th>ROAS</th><th></th>
 </tr></thead><tbody>
-{shownEvals.length===0&&<tr><td colSpan={13}><div className="empty"><div className="big">{baseEvals.length?"Bu filtrede listing yok":t.emptyT}</div><p>{baseEvals.length?"Farklı bir durum sekmesi seç ya da aramayı temizle.":t.emptyS}</p></div></td></tr>}
+{shownEvals.length===0&&<tr><td colSpan={12}><div className="empty"><div className="big">{baseEvals.length?"Bu filtrede listing yok":t.emptyT}</div><p>{baseEvals.length?"Farklı bir durum sekmesi seç ya da aramayı temizle.":t.emptyS}</p></div></td></tr>}
 {shownEvals.map(({row:r,e,a})=>{
 const softBg={"var(--green)":"var(--green-s)","var(--amber)":"var(--amber-s)","var(--orange)":"var(--orange-s)","var(--red)":"var(--red-s)","var(--faint)":"var(--panel2)"}[a.color]||"var(--panel2)";
 const adsOn=(r.ads||"on")!=="off";const isSel=sel.has(r.id);
 return(
 <tr key={r.id} style={{verticalAlign:"top",background:isSel?"rgba(31,122,224,.06)":undefined,opacity:adsOn?1:0.6}}>
 <td style={{paddingTop:13}}><input type="checkbox" checked={isSel} onChange={()=>toggleSel(r.id)}/></td>
-<td className="l" style={{fontWeight:a.strong?700:600,whiteSpace:"normal",maxWidth:240,lineHeight:1.4,paddingTop:14}}>{r.name||"Listing"}</td>
+<td className="l" style={{fontWeight:a.strong?700:600,fontSize:12,whiteSpace:"normal",maxWidth:240,lineHeight:1.35,paddingTop:11}}>{r.name||"Listing"}</td>
 <td style={{paddingTop:11}}><input className="ci" style={{width:48,textAlign:"center"}} value={r.months||""} placeholder="—" onChange={ev=>upRow(r.id,"months",ev.target.value)}/></td>
 <td style={{paddingTop:11}}><button onClick={()=>upRow(r.id,"ads",adsOn?"off":"on")} title={TT("Reklam AÇ/KAPAT","Toggle ads ON/OFF")} style={{fontFamily:"'Space Grotesk'",fontSize:11,fontWeight:700,padding:"4px 9px",borderRadius:7,cursor:"pointer",whiteSpace:"nowrap",border:"1px solid "+(adsOn?"var(--green)":"var(--line2)"),background:adsOn?"var(--green-s)":"var(--panel2)",color:adsOn?"var(--green)":"var(--faint)"}}>{adsOn?TT("● AÇIK","● ON"):TT("○ KAPALI","○ OFF")}</button></td>
-<td className="calc" style={{paddingTop:14}}>{numFmt(e.imp)}</td>
-<td className="calc" style={{paddingTop:14}}>{numFmt(e.clk)}</td>
-<td className="calc" style={{paddingTop:14}}>{e.imp?pct(e.ctr):"—"}</td>
-<td className="calc" style={{paddingTop:14}}>{numFmt(e.ord)}</td>
-<td className="calc" style={{paddingTop:14}}>{money(e.rev,settings.cur)}</td>
-<td className="calc" style={{paddingTop:14}}>{money(e.spend,settings.cur)}</td>
+<td className="calc" style={{paddingTop:11}}>{numFmt(e.imp)}</td>
+<td className="calc" style={{paddingTop:11}}>{numFmt(e.clk)}</td>
+<td className="calc" style={{paddingTop:11}}>{e.imp?pct(e.ctr):"—"}</td>
+<td className="calc" style={{paddingTop:11}}>{numFmt(e.ord)}</td>
+<td className="calc" style={{paddingTop:11}}>{money(e.rev,settings.cur)}</td>
+<td className="calc" style={{paddingTop:11}}>{money(e.spend,settings.cur)}</td>
 <td className="calc s" style={{fontWeight:700,paddingTop:14,color:e.roas>=1.7?"var(--green)":e.roas<1?"var(--red)":"var(--ink)"}}>{e.spend?e.roas.toFixed(2)+"×":"—"}</td>
-<td className="l" style={{whiteSpace:"normal",paddingTop:11}}>
-<div style={{display:"flex",flexDirection:"column",gap:6,maxWidth:280}}>
-<span style={{display:"inline-flex",alignItems:"center",gap:7,alignSelf:"flex-start",fontFamily:"'Space Grotesk'",fontWeight:700,fontSize:12.5,letterSpacing:".03em",color:a.color,background:softBg,border:"1.5px solid "+a.color,borderRadius:9,padding:"6px 12px",whiteSpace:"nowrap"}}>
-<span style={{width:9,height:9,borderRadius:"50%",background:a.color,display:"inline-block",flexShrink:0}}/>{(t[a.key]||a.label).toUpperCase()}</span>
-{e.reason&&<span style={{color:"var(--muted)",fontWeight:400,fontSize:11.5,lineHeight:1.5}}>{e.reason}</span>}
-</div>
-</td>
 <td style={{paddingTop:11}}>{can("deleteData")&&<button className="dl" onClick={()=>delRow(r.id)} title={t.delOne}>✕</button>}</td>
 </tr>)})}
 </tbody></table></div>
