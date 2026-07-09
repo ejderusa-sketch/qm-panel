@@ -290,11 +290,12 @@ const iClk=find(/click/,/rate|ctr|%/);
 const iRev=find(/revenue|sales|order value|order amount|order total/);
 const iOrd=find(/order/,/value|amount|revenue|total/);
 const iSpend=find(/spend|cost|budget/);
+let iN2=iName;if(iN2<0){const used=new Set([iImp,iClk,iRev,iOrd,iSpend]);const sample=parseCSVLine(lines[1]||"");for(let i=0;i<hdr.length;i++){if(used.has(i))continue;if(/[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}/.test((sample[i]||"").trim())){iN2=i;break;}}}
 const out=[];
 for(let r=1;r<lines.length;r++){
 const c=parseCSVLine(lines[r]);if(!c.length)continue;
 const g=i=>i>=0&&i<c.length?c[i]:"";
-const name=String(g(iName)||"").trim();
+const name=String(g(iN2)||"").trim();
 if(/^(total|grand total|sum|toplam)/i.test(name))continue;
 const o={id:Math.random().toString(36).slice(2),name:name||"Listing",impressions:String(toNum(g(iImp))),clicks:String(toNum(g(iClk))),spend:String(toNum(g(iSpend))),orders:String(toNum(g(iOrd))),revenue:String(toNum(g(iRev)))};
 if(o.name==="Listing"&&!toNum(o.impressions)&&!toNum(o.spend)&&!toNum(o.revenue))continue;
@@ -1306,7 +1307,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM64 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM65 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
