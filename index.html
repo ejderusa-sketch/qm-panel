@@ -370,22 +370,22 @@ const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
 let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null;
 /* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
 const PERMS=[
- {key:"viewMarketing",group:"A · Marketing",tr:"Marketing görüntüle",en:"View Marketing"},
- {key:"editMarketing",group:"A · Marketing",tr:"Reklam aç/kapat",en:"Toggle ads"},
- {key:"deleteData",group:"A · Marketing",tr:"Veri sil",en:"Delete data"},
- {key:"viewFinance",group:"B · Finance",tr:"Finance görüntüle",en:"View Finance"},
- {key:"editFinance",group:"B · Finance",tr:"Ciro/gider düzenle",en:"Edit revenue/spend"},
- {key:"viewTrademark",group:"C · Trademark",tr:"Trademark görüntüle",en:"View Trademark"},
- {key:"editTrademark",group:"C · Trademark",tr:"Vaka ekle/düzenle",en:"Add/edit cases"},
- {key:"viewVisibility",group:"D · Görünürlük",tr:"Görünürlük görüntüle",en:"View Visibility"},
- {key:"editVisibility",group:"D · Görünürlük",tr:"Görünürlük düzenle",en:"Edit Visibility"},
- {key:"viewDashboard",group:"X · Shop Manager",tr:"Shop Manager görüntüle",en:"View Shop Manager"},
- {key:"viewIdentity",group:"Z · Kimlik",tr:"Kimlik görüntüle",en:"View Identity"},
- {key:"editIdentity",group:"Z · Kimlik",tr:"Kimlik düzenle",en:"Edit Identity"},
- {key:"manageStores",group:"Genel",tr:"Mağaza ekle/adlandır",en:"Add/rename stores"},
- {key:"connectGmail",group:"Genel",tr:"Gmail bağla/çek",en:"Connect/fetch Gmail"},
- {key:"manageTeam",group:"Ekip",tr:"Ekip yönetimi",en:"Manage team"},
- {key:"sendMessages",group:"Ekip",tr:"Mesaj gönder",en:"Send messages"},
+ {key:"viewMarketing",code:"A1",group:"A · Marketing",tr:"Marketing görüntüle",en:"View Marketing"},
+ {key:"editMarketing",code:"A2",group:"A · Marketing",tr:"Reklam aç/kapat",en:"Toggle ads"},
+ {key:"deleteData",code:"A3",group:"A · Marketing",tr:"Veri sil",en:"Delete data"},
+ {key:"viewFinance",code:"B1",group:"B · Finance",tr:"Finance görüntüle",en:"View Finance"},
+ {key:"editFinance",code:"B2",group:"B · Finance",tr:"Ciro/gider düzenle",en:"Edit revenue/spend"},
+ {key:"viewTrademark",code:"C1",group:"C · Trademark",tr:"Trademark görüntüle",en:"View Trademark"},
+ {key:"editTrademark",code:"C2",group:"C · Trademark",tr:"Vaka ekle/düzenle",en:"Add/edit cases"},
+ {key:"viewVisibility",code:"D1",group:"D · Görünürlük",tr:"Görünürlük görüntüle",en:"View Visibility"},
+ {key:"editVisibility",code:"D2",group:"D · Görünürlük",tr:"Görünürlük düzenle",en:"Edit Visibility"},
+ {key:"viewDashboard",code:"X1",group:"X · Shop Manager",tr:"Shop Manager görüntüle",en:"View Shop Manager"},
+ {key:"viewIdentity",code:"Z1",group:"Z · Kimlik",tr:"Kimlik görüntüle",en:"View Identity"},
+ {key:"editIdentity",code:"Z2",group:"Z · Kimlik",tr:"Kimlik düzenle",en:"Edit Identity"},
+ {key:"manageStores",code:"G1",group:"Genel",tr:"Mağaza ekle/adlandır",en:"Add/rename stores"},
+ {key:"connectGmail",code:"G2",group:"Genel",tr:"Gmail bağla/çek",en:"Connect/fetch Gmail"},
+ {key:"manageTeam",code:"Y1",group:"Ekip",tr:"Ekip yönetimi",en:"Manage team"},
+ {key:"sendMessages",code:"Y2",group:"Ekip",tr:"Mesaj gönder",en:"Send messages"},
 ];
 function defaultPerms(role){
  const set=v=>PERMS.reduce((o,p)=>{o[p.key]=v;return o},{});
@@ -625,8 +625,37 @@ function SectionOutline({m}){return(<div style={{padding:"8px 0 40px"}}>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:8,marginTop:8}}>{m.items.map((it,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span>{it[1]}</span>{it[0]}</div>)}</div>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>{TT("Bu bölüm planın sıradaki fazlarında adım adım doldurulacak.","This section will be filled in step by step in the plan's upcoming phases.")}</div></div>
 </div>);}
+function ProfilePanel(){
+const[prof,setProf]=useState(null);
+const[acc,setAcc]=useState(null);
+const[saved,setSaved]=useState("");
+useEffect(()=>{getProfile().then(setProf);getAccountInfo().then(setAcc);},[]);
+if(!prof||!acc)return <div id="boot" style={{minHeight:180}}>{TT("Yükleniyor…","Loading…")}</div>;
+const isAdmin=currentRole==="admin";
+const upP=(k,v)=>setProf(p=>({...p,[k]:v}));
+const flash=m=>{setSaved(m);setTimeout(()=>setSaved(""),1600);};
+const saveP=async()=>{await saveProfile(prof);flash(TT("Profil kaydedildi.","Profile saved."));};
+const saveA=async()=>{await saveAccountInfo({company_name:acc.company_name});flash(TT("Şirket bilgisi kaydedildi.","Company info saved."));};
+const inp=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={prof[k]||""} placeholder={ph||""} onChange={e=>upP(k,e.target.value)} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
+return(<div style={{padding:"8px 0 40px"}}>
+{saved&&<div className="busy" style={{background:"var(--green-s)",borderColor:"rgba(15,157,99,.3)",color:"var(--green)"}}>{saved}</div>}
+<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>👤 {TT("Profil","Profile")}</span></div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:"4px 20px"}}>
+<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("E-posta","Email")}<input value={prof.email||""} disabled style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5,background:"var(--panel2)",color:"var(--faint)"}}/></label>
+{inp(TT("Ad Soyad","Full name"),"full_name",TT("Adın Soyadın","Your full name"))}
+{inp(TT("Telefon","Phone"),"phone","+1 ...")}
+{inp(TT("Ülke","Country"),"country","US / TR ...")}
+{inp(TT("Saat dilimi","Timezone"),"timezone","America/New_York")}
+</div>
+<div><button className="btn pri" style={{marginTop:16}} onClick={saveP}>{TT("Profili kaydet","Save profile")}</button></div>
+{isAdmin&&<div style={{marginTop:20,paddingTop:16,borderTop:"1px solid var(--line)"}}>
+<div style={{fontSize:13,fontWeight:600,marginBottom:6}}>{TT("Şirket / Hesap adı (Admin)","Company / Account name (Admin)")}</div>
+<input value={acc.company_name||""} onChange={e=>setAcc(a=>({...a,company_name:e.target.value}))} style={{width:"100%",maxWidth:360,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5}}/>
+<div><button className="btn" style={{marginTop:10}} onClick={saveA}>{TT("Şirket bilgisini kaydet","Save company info")}</button></div></div>}
+</div></div>);}
 function SettingsPanel({settings,setSettings,accounts,setAccounts}){
-const[sub,setSub]=useState("profil");
+const[sub,setSub]=useState("abonelik");
 const[prof,setProf]=useState(null);
 const[acc,setAcc]=useState(null);
 const[saved,setSaved]=useState("");
@@ -643,27 +672,26 @@ const upP=(k,v)=>setProf(p=>({...p,[k]:v}));
 const flash=m=>{setSaved(m);setTimeout(()=>setSaved(""),1600);};
 const saveP=async()=>{await saveProfile(prof);flash(TT("Profil kaydedildi.","Profile saved."));};
 const saveA=async()=>{await saveAccountInfo({company_name:acc.company_name});flash(TT("Şirket bilgisi kaydedildi.","Company info saved."));};
-const SUBS=[["profil","Q1 · 👤 "+TT("Profil","Profile")],["abonelik","Q2 · 💳 "+TT("Abonelik","Subscription")],["baglanti","Q3 · 🔗 "+TT("Bağlantı","Connection")],["kaynak","Q4 · 📥 "+TT("Veri Kaynakları","Data Sources")],["dil","Q5 · 🌐 "+TT("Dil","Language")],["kurallar","Q6 · 🔒 "+TT("Kurallar & Hatırlatmalar","Rules & Reminders")],["kapatma","Q7 · 🚫 "+TT("Kapatma Sebepleri","Closure Reasons")],["benzerlik","Q8 · 🧬 "+TT("Benzerlik","Similarity")]];
+const SUBS=[["abonelik","Q1 · 💳 "+TT("Abonelik","Subscription")],["baglanti","Q2 · 🔗 "+TT("Bağlantı","Connection")],["kaynak","Q3 · 📥 "+TT("Veri Kaynakları","Data Sources")],["dil","Q4 · 🌐 "+TT("Dil","Language")],["kurallar","Q5 · 🔒 "+TT("Kurallar & Hatırlatmalar","Rules & Reminders")],["kapatma","Q6 · 🚫 "+TT("Kapatma Sebepleri","Closure Reasons")],["benzerlik","Q7 · 🧬 "+TT("Benzerlik","Similarity")],["yetki","Q8 · 🔐 "+TT("Yetkilendirme","Permissions")]];
 const inp=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={prof[k]||""} placeholder={ph||""} onChange={e=>upP(k,e.target.value)} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
 const DS=[["📷 "+TT("Screenshot yükle","Upload screenshot"),"ready"],["📄 "+TT("CSV yükle","Upload CSV"),"ready"],["📋 "+TT("Kopyala-yapıştır","Copy-paste"),"ready"],["⌨️ "+TT("Elle giriş","Manual entry"),"ready"],["📎 "+TT("Doküman yükle","Upload document"),"soon"],["✉️ "+TT("Bağlı e-posta (Gmail)","Connected email (Gmail)"),"soon"],["🔌 "+TT("API (Etsy/Amazon)","API (Etsy/Amazon)"),"soon"]];
 return(<div style={{padding:"8px 0 40px"}}>
 <div className="tabs" style={{marginBottom:14}}>{SUBS.map(([k,lb])=><button key={k} className={sub===k?"on":""} onClick={()=>setSub(k)}>{lb}</button>)}</div>
 {saved&&<div className="busy" style={{background:"var(--green-s)",borderColor:"rgba(15,157,99,.3)",color:"var(--green)"}}>{saved}</div>}
-{sub==="profil"&&<div className="rules">
-<div className="rh"><span style={{fontSize:15}}>👤 {TT("Profil","Profile")}</span></div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:"4px 20px"}}>
-<label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("E-posta","Email")}<input value={prof.email||""} disabled style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5,background:"var(--panel2)",color:"var(--faint)"}}/></label>
-{inp(TT("Ad Soyad","Full name"),"full_name",TT("Adın Soyadın","Your full name"))}
-{inp(TT("Telefon","Phone"),"phone","+1 ...")}
-{inp(TT("Ülke","Country"),"country","US / TR ...")}
-{inp(TT("Saat dilimi","Timezone"),"timezone","America/New_York")}
-</div>
-<div><button className="btn pri" style={{marginTop:16}} onClick={saveP}>{TT("Profili kaydet","Save profile")}</button></div>
-{isAdmin&&<div style={{marginTop:20,paddingTop:16,borderTop:"1px solid var(--line)"}}>
-<div style={{fontSize:13,fontWeight:600,marginBottom:6}}>{TT("Şirket / Hesap adı (Admin)","Company / Account name (Admin)")}</div>
-<input value={acc.company_name||""} onChange={e=>setAcc(a=>({...a,company_name:e.target.value}))} style={{width:"100%",maxWidth:360,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5}}/>
-<div><button className="btn" style={{marginTop:10}} onClick={saveA}>{TT("Şirket bilgisini kaydet","Save company info")}</button></div></div>}
-</div>}
+{sub==="yetki"&&(()=>{const defMgr=defaultPerms("manager");const mp=settings.managerPerms||defMgr;return(<div className="rules">
+<div className="rh"><span style={{fontSize:15}}>🔐 {TT("Yetkilendirme — Shop Manager","Permissions — Shop Manager")}</span></div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Shop Manager rolünün görebileceği/yapabileceği bölümler. AÇIK = izinli, KAPALI = gizli. Kod (A1, B1…) ilgili bölümü gösterir.","What the Shop Manager role can see/do. ON = allowed, OFF = hidden. The code (A1, B1…) marks the section.")}</div>
+{isAdmin?[...new Set(PERMS.map(p=>p.group))].map(g=><div key={g} style={{marginBottom:14}}>
+<div style={{fontSize:11.5,fontWeight:800,color:"var(--faint)",letterSpacing:".03em",margin:"4px 0 7px"}}>{g.toUpperCase()}</div>
+<div style={{display:"flex",flexDirection:"column",gap:7}}>
+{PERMS.filter(p=>p.group===g).map(p=>{const on=(p.key in mp)?!!mp[p.key]:!!defMgr[p.key];return(
+<div key={p.key} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 11px",border:"1px solid var(--line2)",borderRadius:9,background:on?"var(--green-s)":"var(--panel)"}}>
+<span style={{fontFamily:"'Space Grotesk'",fontWeight:800,fontSize:12,minWidth:32,color:"var(--azure)"}}>{p.code}</span>
+<span style={{flex:1,fontSize:13,fontWeight:600}}>{TT(p.tr,p.en)}</span>
+<button onClick={()=>setSettings(s=>({...s,managerPerms:{...(s.managerPerms||defMgr),[p.key]:!on}}))} style={{fontFamily:"'Space Grotesk'",fontWeight:800,fontSize:11.5,padding:"5px 15px",borderRadius:8,cursor:"pointer",whiteSpace:"nowrap",border:"1px solid "+(on?"var(--green)":"var(--line2)"),background:on?"var(--green)":"var(--panel2)",color:on?"#fff":"var(--faint)"}}>{on?TT("AÇIK","ON"):TT("KAPALI","OFF")}</button>
+</div>);})}
+</div></div>):<div style={{fontSize:13,color:"var(--muted)"}}>{TT("Bu bölümü yalnızca Admin düzenleyebilir.","Only an Admin can edit this.")}</div>}
+</div>);})()}
 {sub==="abonelik"&&<div className="rules">
 <div className="rh"><span style={{fontSize:15}}>💳 {TT("Abonelik","Subscription")}</span><span className="vd" style={{marginLeft:"auto",background:"var(--green-s)",color:"var(--green)"}}>{(acc.subscription_plan||"beginner").toUpperCase()}</span></div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:12,marginTop:10}}>
@@ -796,17 +824,8 @@ return(<div style={{padding:"8px 0 40px"}}>
 <td className="l" style={{fontWeight:600}}>{m.email}</td>
 <td className="l">{isAdmin?<select className="cur-sel" value={m.role} onChange={e=>chRole(m.id,e.target.value)}>{roleOpts}</select>:roleName(m.role)}</td>
 <td className="l"><span className="vd" style={m.user_id?{background:"var(--green-s)",color:"var(--green)"}:{background:"var(--amber-s)",color:"var(--amber)"}}>{m.user_id?TT("Katıldı","Joined"):TT("Davet bekliyor","Pending")}</span></td>
-<td><span style={{display:"flex",gap:6,justifyContent:"flex-end",alignItems:"center"}}>{isAdmin&&m.role!=="admin"&&<button className="btn" style={{fontSize:11,padding:"3px 9px"}} onClick={()=>setOpenId(openId===m.id?null:m.id)}>{TT("İzinler","Permissions")} {openId===m.id?"▴":"▾"}</button>}{isAdmin&&<button className="dl" onClick={()=>del(m.id)} title={TT("Çıkar","Remove")}>✕</button>}</span></td></tr>
-{isAdmin&&m.role!=="admin"&&openId===m.id&&<tr><td colSpan={4} style={{background:"var(--bg2)",padding:"12px 14px"}}>
-<div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>{TT("Bu üyenin görebileceği/yapabileceği işlemler (aç/kapat):","What this member can see/do (on/off):")}</div>
-{[...new Set(PERMS.map(p=>p.group))].map(g=><div key={g} style={{marginBottom:10}}>
-<div style={{fontSize:11.5,fontWeight:800,color:"var(--faint)",letterSpacing:".03em",margin:"4px 0 6px"}}>{g.toUpperCase()}</div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:8}}>
-{PERMS.filter(p=>p.group===g).map(p=>{const on=!!(m.permissions&&m.permissions[p.key]);return(
-<label key={p.key} style={{display:"flex",alignItems:"center",gap:8,fontSize:13,cursor:"pointer",padding:"6px 8px",border:"1px solid var(--line2)",borderRadius:8,background:on?"var(--green-s)":"var(--panel)"}}>
-<input type="checkbox" checked={on} onChange={async()=>{const np={...(m.permissions||{}),[p.key]:!on};await updateMemberPerms(m.id,np);load();}}/>{TT(p.tr,p.en)}</label>);})}
-</div></div>)}
-</td></tr>}
+<td><span style={{display:"flex",gap:6,justifyContent:"flex-end",alignItems:"center"}}>{isAdmin&&<button className="dl" onClick={()=>del(m.id)} title={TT("Çıkar","Remove")}>✕</button>}</span></td></tr>
+{isAdmin&&m.role!=="admin"&&<tr><td colSpan={4} style={{background:"var(--bg2)",padding:"9px 14px",fontSize:12,color:"var(--muted)"}}>🔐 {TT("İzinler artık Ayarlar › Q8 · Yetkilendirme altında (Shop Manager için AÇ/KAPA).","Permissions are now under Settings › Q8 · Permissions (ON/OFF for Shop Manager).")}</td></tr>}
 </React.Fragment>))}
 </tbody></table></div></div>
 <div className="rules">
@@ -1058,7 +1077,9 @@ const hiRef=useRef();
 const gmStoreTok=useRef({});
 
 const key=`${act}|${period}`;
-const rows=dm[key]||[];
+const rangeMonths=(p)=>{const now=new Date();const y=now.getFullYear(),m=now.getMonth();const out=[];if(p==="l1m"){out.push(y+"-"+String(m+1).padStart(2,"0"));}else if(p==="l3m"){for(let i=0;i<3;i++){const d=new Date(y,m-i,1);out.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"));}}else if(p==="ytd"){for(let mm=0;mm<=m;mm++){out.push(y+"-"+String(mm+1).padStart(2,"0"));}}return out;};
+const aggRows=(months)=>{const mp={};for(const mo of months){const arr=dm[act+"|"+mo]||[];for(const r of arr){const k=(r.name||"Listing").trim().toLowerCase();if(!mp[k])mp[k]={id:"agg-"+k,name:r.name||"Listing",ads:r.ads||"on",months:"",_i:0,_c:0,_s:0,_o:0,_r:0};mp[k]._i+=toNum(r.impressions);mp[k]._c+=toNum(r.clicks);mp[k]._s+=toNum(r.spend);mp[k]._o+=toNum(r.orders);mp[k]._r+=toNum(r.revenue);}}return Object.values(mp).map(o=>({id:o.id,name:o.name,ads:o.ads,months:"",impressions:String(o._i),clicks:String(o._c),spend:String(o._s),orders:String(o._o),revenue:String(o._r)}));};
+const rows=/^(l1m|l3m|ytd)$/.test(period)?aggRows(rangeMonths(period)):(dm[key]||[]);
 const vkey=`V::${act}|${date}`;
 const vrows=dm[vkey]||[];
 
@@ -1333,7 +1354,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM83 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM85 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1366,10 +1387,10 @@ return(
 </aside>
 
 <main className="main">
-<div className="hero"><span className="mk">{tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?TT("D — GÖRÜNÜRLÜK","D — VISIBILITY"):tab==="dashboard"?"X — SHOP MANAGER":tab==="zidentity"?TT("Z — STORE KİMLİK","Z — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"A — MARKETING"}</span>
+<div className="hero"><span className="mk">{tab==="profil"?TT("PROFİL","PROFILE"):tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?TT("D — GÖRÜNÜRLÜK","D — VISIBILITY"):tab==="dashboard"?"X — SHOP MANAGER":tab==="zidentity"?TT("Z — STORE KİMLİK","Z — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"A — MARKETING"}</span>
 <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
 <button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")}>⚙ {TT("Ayarlar","Settings")}</button>
-<button className="btn" onClick={()=>setTab("ayarlar")} title={TT("Profil","Profile")}>👤 {TT("Profil","Profile")}</button>
+<button className={"btn"+(tab==="profil"?" pri":"")} onClick={()=>setTab("profil")} title={TT("Profil","Profile")}>👤 {TT("Profil","Profile")}</button>
 <select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
 <button className="btn" onClick={()=>sb.auth.signOut()}>{TT("Çıkış","Log out")}</button>
 </div></div>
@@ -1402,6 +1423,7 @@ return(
 </div>}
 {tab==="zidentity"&&<ZKimlik accounts={accounts} act={act} setAccounts={setAccounts}/>}
 {tab==="ayarlar"&&<SettingsPanel settings={settings} setSettings={setSettings} accounts={accounts} setAccounts={setAccounts}/>}
+{tab==="profil"&&<ProfilePanel/>}
 
 {/* ===== MARKETING TAB ===== */}
 {tab==="marketing"&&(<>
@@ -1414,6 +1436,7 @@ return(
 {PERIODS.map(([k,tr,en])=><option key={k} value={k}>{TT(tr,en)}</option>)}
 </select>
 <input type="month" value={/^\d{4}-\d{2}$/.test(period)?period:""} onChange={e=>{if(e.target.value)setPeriod(e.target.value)}} className="cur-sel" style={{fontFamily:"'Inter'",fontSize:13,padding:"7px 10px"}} title={TT("Özel ay seç","Custom month")}/>
+{[["l1m",TT("Son 1 Ay","Last 1 Mo")],["l3m",TT("Son 3 Ay","Last 3 Mo")],["ytd",TT("Yıl (YTD)","Year (YTD)")]].map(([k,lb])=><button key={k} onClick={()=>setPeriod(k)} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(period===k?"var(--azure)":"var(--line2)"),background:period===k?"var(--azure)":"var(--panel)",color:period===k?"#fff":"var(--ink)"}}>{lb}</button>)}
 <span style={{fontSize:11.5,color:"var(--faint)"}}>{TT("Tüm oranlar bu döneme göre hesaplanır. Etsy'den bu dönemi seçip veri çek.","All ratios are computed for this period. Select this period on Etsy when exporting data.")}</span>
 </div>
 <div style={{display:"flex",gap:6,marginBottom:12}}>
@@ -1451,7 +1474,7 @@ const adsOn=(r.ads||"on")!=="off";const isSel=sel.has(r.id);
 return(
 <tr key={r.id} style={{verticalAlign:"top",background:isSel?"rgba(31,122,224,.06)":undefined,opacity:adsOn?1:0.6}}>
 <td style={{paddingTop:13}}><input type="checkbox" checked={isSel} onChange={()=>toggleSel(r.id)}/></td>
-<td className="l" style={{fontWeight:a.strong?700:600,fontSize:12,whiteSpace:"normal",maxWidth:240,lineHeight:1.35,paddingTop:11}}>{r.name||"Listing"}</td>
+<td className="l" style={{maxWidth:250,paddingTop:9,paddingBottom:9}}><div style={{fontWeight:a.strong?700:600,fontSize:12,whiteSpace:"normal",lineHeight:1.35,border:"1px solid var(--line2)",borderRadius:9,padding:"8px 11px",background:"var(--panel)"}}>{r.name||"Listing"}</div></td>
 <td style={{paddingTop:11}}><input className="ci" style={{width:48,textAlign:"center"}} value={r.months||""} placeholder="—" onChange={ev=>upRow(r.id,"months",ev.target.value)}/></td>
 <td style={{paddingTop:11}}><button onClick={()=>upRow(r.id,"ads",adsOn?"off":"on")} title={TT("Reklam AÇ/KAPAT","Toggle ads ON/OFF")} style={{fontFamily:"'Space Grotesk'",fontSize:11,fontWeight:700,padding:"4px 9px",borderRadius:7,cursor:"pointer",whiteSpace:"nowrap",border:"1px solid "+(adsOn?"var(--green)":"var(--line2)"),background:adsOn?"var(--green-s)":"var(--panel2)",color:adsOn?"var(--green)":"var(--faint)"}}>{adsOn?TT("● AÇIK","● ON"):TT("○ KAPALI","○ OFF")}</button></td>
 <td className="calc" style={{paddingTop:11}}>{numFmt(e.imp)}</td>
