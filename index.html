@@ -655,7 +655,7 @@ return(<div style={{padding:"8px 0 40px"}}>
 <div><button className="btn" style={{marginTop:10}} onClick={saveA}>{TT("Şirket bilgisini kaydet","Save company info")}</button></div></div>}
 </div></div>);}
 function SettingsPanel({settings,setSettings,accounts,setAccounts}){
-const[sub,setSub]=useState("abonelik");
+const[sub,setSub]=useState("baglanti");
 const[prof,setProf]=useState(null);
 const[acc,setAcc]=useState(null);
 const[saved,setSaved]=useState("");
@@ -672,7 +672,7 @@ const upP=(k,v)=>setProf(p=>({...p,[k]:v}));
 const flash=m=>{setSaved(m);setTimeout(()=>setSaved(""),1600);};
 const saveP=async()=>{await saveProfile(prof);flash(TT("Profil kaydedildi.","Profile saved."));};
 const saveA=async()=>{await saveAccountInfo({company_name:acc.company_name});flash(TT("Şirket bilgisi kaydedildi.","Company info saved."));};
-const SUBS=[["abonelik","Q1 · 💳 "+TT("Abonelik","Subscription")],["baglanti","Q2 · 🔗 "+TT("Bağlantı","Connection")],["kaynak","Q3 · 📥 "+TT("Veri Kaynakları","Data Sources")],["dil","Q4 · 🌐 "+TT("Dil","Language")],["kurallar","Q5 · 🔒 "+TT("Kurallar & Hatırlatmalar","Rules & Reminders")],["kapatma","Q6 · 🚫 "+TT("Kapatma Sebepleri","Closure Reasons")],["benzerlik","Q7 · 🧬 "+TT("Benzerlik","Similarity")],["yetki","Q8 · 🔐 "+TT("Yetkilendirme","Permissions")]];
+const SUBS=[["baglanti","Q1 · 🔗 API"],["kurallar","Q2 · 🔒 "+TT("Kurallar & Hatırlatmalar","Rules & Reminders")],["kapatma","Q3 · 🚫 "+TT("Kapatma Sebepleri","Closure Reasons")],["benzerlik","Q4 · 🧬 "+TT("Benzerlik","Similarity")],["yetki","Q5 · 🔐 "+TT("Yetkilendirme","Permissions")]];
 const inp=(label,k,ph)=><label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{label}<input value={prof[k]||""} placeholder={ph||""} onChange={e=>upP(k,e.target.value)} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5}}/></label>;
 const DS=[["📷 "+TT("Screenshot yükle","Upload screenshot"),"ready"],["📄 "+TT("CSV yükle","Upload CSV"),"ready"],["📋 "+TT("Kopyala-yapıştır","Copy-paste"),"ready"],["⌨️ "+TT("Elle giriş","Manual entry"),"ready"],["📎 "+TT("Doküman yükle","Upload document"),"soon"],["✉️ "+TT("Bağlı e-posta (Gmail)","Connected email (Gmail)"),"soon"],["🔌 "+TT("API (Etsy/Amazon)","API (Etsy/Amazon)"),"soon"]];
 return(<div style={{padding:"8px 0 40px"}}>
@@ -700,13 +700,13 @@ return(<div style={{padding:"8px 0 40px"}}>
 </div>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:12}}>{TT("Ödeme & yükseltme yakında. Şu an tüm özellikler açık (geliştirme sürümü).","Payment & upgrades coming soon. All features are currently open (development build).")}</div></div>}
 {sub==="baglanti"&&<div className="rules">
-<div className="rh"><span style={{fontSize:15}}>🔗 {TT("Bağlantı (Connect)","Connection")}</span></div>
+<div className="rh"><span style={{fontSize:15}}>🔗 API — {TT("Google / Gmail Bağlantısı","Google / Gmail Connection")}</span></div>
 <div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6,marginTop:6}}>{TT("Her mağazanın e-postasını sol taraftaki mağaza listesinden ekle, sonra \"Google ile Bağlan\"a bas. Şifre GİRME — Google izin ekranı açılır, sadece okuma yetkisi verirsin.","Add each store's email from the store list on the left, then click \"Connect with Google\". Do NOT enter a password — Google's own consent screen opens and you grant read-only access.")}</div>
 <div style={{marginTop:12,padding:"9px 12px",borderRadius:9,background:"var(--green-s)",color:"var(--green)",fontSize:12.5,fontWeight:700}}>✓ {TT("Google bağlantısı hazır — Client ID gömülü.","Google connection ready — Client ID is built in.")}</div>
 <label style={{display:"block",fontSize:12.5,fontWeight:700,marginTop:12}}>Google OAuth Client ID {TT("(isteğe bağlı — değiştirmek için)","(optional — to override)")}
 <input value={settings.googleClientId||DEFAULT_GCID} onChange={e=>setSettings(s=>({...s,googleClientId:e.target.value}))} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:12.5}}/></label>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:6,lineHeight:1.6}}>{TT("Google Cloud Console → APIs & Services → Credentials → OAuth Client ID (Web). İzinli JavaScript origin olarak https://ejderusa-sketch.github.io ekle. Gmail API'yi aç. Test kullanıcısına kendi e-postanı ekle.","Google Cloud Console → APIs & Services → Credentials → OAuth Client ID (Web). Add https://ejderusa-sketch.github.io as an authorized JavaScript origin. Enable the Gmail API. Add your email as a test user.")}</div>
-<div style={{marginTop:10,padding:"10px 13px",border:"1px dashed var(--line2)",borderRadius:10,fontSize:13,color:"var(--faint)"}}>🔌 {TT("Etsy / Amazon API bağlantısı — yakında (planın Faz 10).","Etsy / Amazon API connection — coming soon (plan Phase 10).")}</div></div>}
+<div style={{marginTop:16,paddingTop:14,borderTop:"1px solid var(--line)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:4}}>{TT("Her mağaza için ayrı Client ID (isteğe bağlı)","Separate Client ID per store (optional)")}</div><div style={{fontSize:11.5,color:"var(--faint)",marginBottom:10,lineHeight:1.5}}>{TT("Boş bırakırsan yukarıdaki ortak ID kullanılır (bu yeterlidir). Tam izolasyon istersen her mağazaya kendi Google projesinin Client ID kodunu gir — mağazalar birbirine hiç bağlanmaz.","Leave blank to use the shared ID above (this is enough). For full isolation, give each store its own Google project Client ID — stores never link to each other.")}</div>{accts.filter(a=>a.email).map(a=><div key={a.id} style={{marginBottom:10}}><div style={{fontSize:11.5,fontWeight:700,color:"var(--ink)"}}>{a.name||"—"} <span style={{color:"var(--faint)",fontWeight:500}}>· {a.email}</span></div><input value={a.gcid||""} placeholder={DEFAULT_GCID} onChange={e=>upStore(a.id,"gcid",e.target.value)} style={{display:"block",width:"100%",marginTop:3,padding:"7px 10px",border:"1px solid var(--line2)",borderRadius:8,fontFamily:"'JetBrains Mono'",fontSize:11.5}}/></div>)}{accts.filter(a=>a.email).length===0&&<div style={{fontSize:12,color:"var(--faint)"}}>{TT("Önce soldan mağaza e-postası ekle.","Add a store email on the left first.")}</div>}</div><div style={{marginTop:10,padding:"10px 13px",border:"1px dashed var(--line2)",borderRadius:10,fontSize:13,color:"var(--faint)"}}>🔌 {TT("Etsy / Amazon API bağlantısı — yakında (planın Faz 10).","Etsy / Amazon API connection — coming soon (plan Phase 10).")}</div></div>}
 {sub==="kaynak"&&<div className="rules">
 <div className="rh"><span style={{fontSize:15}}>📥 {TT("Veri Kaynakları","Data Sources")}</span></div>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 8px"}}>{TT("QM'ye veri şu yollarla girer:","Data enters QM in these ways:")}</div>
@@ -1256,7 +1256,7 @@ setGmData({email:prof.emailAddress,etsyAll:ed,ssAll:sd,orderCount:oc,shipCount:s
 catch(e){setGmErr("Çekilemedi: "+(e.message||"hata"))}finally{setGmLoad(false)}};
 
 /* QM19: mağaza başına Gmail bağlantısı */
-const connectStore=(acc,andFetch)=>{const cid=(settings.googleClientId||DEFAULT_GCID||"").trim();
+const connectStore=(acc,andFetch)=>{const cid=((acc&&acc.gcid)||settings.googleClientId||DEFAULT_GCID||"").trim();
 if(!cid){setToast(TT("Google Client ID bulunamadı.","Google Client ID not found."));setShowSet(true);return;}
 if(!window.google||!window.google.accounts){setToast(TT("Google kütüphanesi yüklenemedi.","Google library not loaded."));return;}
 try{window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",login_hint:acc.email||"",prompt:"",callback:async r=>{
@@ -1354,7 +1354,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM88 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM89 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
