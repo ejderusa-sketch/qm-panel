@@ -366,6 +366,7 @@ const SB_URL="https://pepvzsffeyvzhxvlliex.supabase.co";
 const SB_KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const DEFAULT_GCID="507868834696-m1gnrlcu7ba620knq4ck1cj58fs5qu97.apps.googleusercontent.com";
+const STORE_COLORS=["#ef6606","#1f7ae0","#0f9d63","#8b5cf6","#e11d48","#0891b2","#d97706","#db2777","#4f46e5","#16a34a","#0284c7","#dc2626","#7c3aed","#ca8a04","#059669"];
 const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
 let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null;
 /* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
@@ -1347,6 +1348,7 @@ const history=useMemo(()=>{const ds=Object.keys(dm).filter(k=>k.startsWith(act+"
 if(!ds.includes(date))ds.push(date);return[...new Set(ds)].sort().reverse().slice(0,8)},[dm,act,date]);
 const acctStats=useMemo(()=>{const m={};for(const a of accounts){const rs=dm[`${a.id}|${period}`]||[];let cl=0;for(const r of rs)if(evaluate(r,settings).verdict==="KAPAT")cl++;m[a.id]={count:rs.length,close:cl}}return m},[accounts,dm,period,settings]);
 const acctName=(accounts.find(a=>a.id===act)||{}).name||"";
+const actColor=STORE_COLORS[(Math.max(0,accounts.findIndex(a=>a.id===act)))%STORE_COLORS.length];
 const pct=v=>(v*100).toFixed(2)+"%";
 const lang=settings.lang||"tr";uiLang=lang;
 const t=L[lang]||L.tr;
@@ -1356,19 +1358,20 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM92 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM93 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
 <div className="sl">
 {accounts.map((a,i)=>{
 const on=a.id===act;
+const col=STORE_COLORS[i%STORE_COLORS.length];
 const st=acctStats[a.id]||{count:0,close:0};
 const gmailUrl=a.email?("https://mail.google.com/mail/u/0/#search/"+encodeURIComponent("from:"+a.email+" (has:attachment OR csv OR screenshot)")):null;
 return(
-<div key={a.id} className={"si"+(on?" on":"")} style={{flexDirection:"column",alignItems:"stretch",gap:6}}>
+<div key={a.id} className={"si"+(on?" on":"")} style={{flexDirection:"column",alignItems:"stretch",gap:6,...(on?{borderColor:col,boxShadow:"inset 4px 0 0 "+col,background:col+"14"}:{})}}>
 <div style={{display:"flex",alignItems:"center",gap:9,cursor:"pointer"}} onClick={()=>setAct(a.id)} onDoubleClick={()=>renAcct(a.id)} title={lang==="tr"?"Çift tık = adı değiştir":"Double-click = rename"}>
-<span className="ic">{String(i+1).padStart(2,"0")}</span>
+<span className="ic" style={{background:col,color:"#fff",cursor:"pointer"}} title={TT("Bu mağazaya geç","Switch to this store")}>{String(i+1).padStart(2,"0")}</span>
 <input value={a.name||""} onClick={e=>e.stopPropagation()} onFocus={()=>setAct(a.id)} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>s.id===a.id?{...s,name:v}:s))}} placeholder={lang==="tr"?"Mağaza adı…":"Store name…"} title={lang==="tr"?"Adı elle düzenle":"Edit name manually"} style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,fontFamily:"'Inter'",border:"1px solid var(--line2)",borderRadius:6,padding:"3px 6px",background:"var(--panel)",color:"var(--ink)"}}/>
 {st.count>0&&<span className={"sb"+(st.close?" red":"")}>{st.count}</span>}
 </div>
@@ -1391,7 +1394,7 @@ return(
 </aside>
 
 <main className="main">
-<div className="hero"><span className="mk">{tab==="profil"?TT("PROFİL","PROFILE"):tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?TT("D — GÖRÜNÜRLÜK","D — VISIBILITY"):tab==="dashboard"?"X — SHOP MANAGER":tab==="zidentity"?TT("Z — STORE KİMLİK","Z — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"A — MARKETING"}</span>{["marketing","finance","trademark","visibility","zidentity"].includes(tab)&&<span style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:6,fontSize:13.5,fontWeight:800,color:"#fff",background:"var(--orange)",borderRadius:999,padding:"5px 15px",whiteSpace:"nowrap"}} title={TT("Aktif mağaza","Active store")}>🏪 {acctName||TT("Mağaza seç","Select store")}</span>}
+<div className="hero"><span className="mk">{tab==="profil"?TT("PROFİL","PROFILE"):tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"B — FINANCE":tab==="trademark"?"C — TRADEMARK":tab==="visibility"?TT("D — GÖRÜNÜRLÜK","D — VISIBILITY"):tab==="dashboard"?"X — SHOP MANAGER":tab==="zidentity"?TT("Z — STORE KİMLİK","Z — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"A — MARKETING"}</span>{["marketing","finance","trademark","visibility","zidentity"].includes(tab)&&<span style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:6,fontSize:13.5,fontWeight:800,color:"#fff",background:actColor,borderRadius:999,padding:"5px 15px",whiteSpace:"nowrap"}} title={TT("Aktif mağaza","Active store")}>🏪 {acctName||TT("Mağaza seç","Select store")}</span>}
 <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
 <button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")}>⚙ {TT("Ayarlar","Settings")}</button>
 <button className={"btn"+(tab==="profil"?" pri":"")} onClick={()=>setTab("profil")} title={TT("Profil","Profile")}>👤 {TT("Profil","Profile")}</button>
