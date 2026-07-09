@@ -1006,6 +1006,7 @@ const[tab,setTab]=useState("marketing");
 const TAB_PERM={marketing:"viewMarketing",finance:"viewFinance",trademark:"viewTrademark",visibility:"viewVisibility",dashboard:"viewDashboard",zidentity:"viewIdentity",ekip:"manageTeam"};
 useEffect(()=>{if(TAB_PERM[tab]&&!can(TAB_PERM[tab])){const first=["marketing","finance","trademark","visibility","dashboard","zidentity"].find(x=>can(TAB_PERM[x]));setTab(first||"ayarlar");}},[tab]);
 const[mktFilter,setMktFilter]=useState("all");
+const[mSub,setMSub]=useState("a1");
 const[mktSearch,setMktSearch]=useState("");
 const[sel,setSel]=useState(()=>new Set());
 const[showPaste,setShowPaste]=useState(false);
@@ -1301,7 +1302,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM57 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM58 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1386,12 +1387,16 @@ return(
 </select>
 <span style={{fontSize:11.5,color:"var(--faint)"}}>{TT("Tüm oranlar bu döneme göre hesaplanır. Etsy'den bu dönemi seçip veri çek.","All ratios are computed for this period. Select this period on Etsy when exporting data.")}</span>
 </div>
+<div style={{display:"flex",gap:6,marginBottom:12}}>
+{[["a1",TT("A1 · Kurallar","A1 · Rules")],["a2",TT("A2 · Analiz","A2 · Analysis")]].map(([k,lb])=><button key={k} onClick={()=>setMSub(k)} style={{fontFamily:"'Space Grotesk'",fontSize:12.5,fontWeight:700,padding:"7px 14px",borderRadius:9,cursor:"pointer",border:"1px solid "+(mSub===k?"var(--azure)":"var(--line2)"),background:mSub===k?"var(--azure)":"var(--panel)",color:mSub===k?"#fff":"var(--ink)"}}>{lb}</button>)}
+</div>
 {imgErr&&<div className="err">⚠ {imgErr}</div>}
 {imgBusy&&<div className="busy"><span className="sp"/>{imgMsg}</div>}
 
-<RulesPanel settings={settings} setSettings={setSettings} periodLabel={(()=>{const p=PERIODS.find(x=>x[0]===period);return p?TT(p[1],p[2]):"";})()}/>
+{mSub==="a1"&&<RulesPanel settings={settings} setSettings={setSettings} periodLabel={(()=>{const p=PERIODS.find(x=>x[0]===period);return p?TT(p[1],p[2]):"";})()}/>}
 
-{rows.length>0 && (<>
+{mSub==="a2"&&rows.length===0&&<div className="rules" style={{textAlign:"center",color:"var(--faint)",padding:"26px 10px"}}>{TT("Bu dönemde henüz veri yok. Soldan bağlı mağazanın e-postasına tıklayıp çek ya da CSV yükle.","No data yet for this period. Fetch from the connected email on the left, or upload a CSV.")}</div>}
+{mSub==="a2"&&rows.length>0 && (<>
 <div className="sec"><h2><span className="bar"/>{t.analysis}</h2>
 <div className="brow">{can("deleteData")&&<button className="btn" onClick={()=>{if(rows.length&&window.confirm(t.delAllQ)){setRows([]);setSel(new Set());}}}>{t.delAll}</button>}</div></div>
 
@@ -1444,7 +1449,7 @@ return(
 </tbody></table></div>
 </>)}
 
-{(()=>{
+{mSub==="a2"&&(()=>{
 const totSpend=evals.reduce((s,x)=>s+x.e.spend,0);
 if(totSpend<=0)return null;
 const catOf=nm=>{const s=(nm||"").toLowerCase();for(const c of CATS){if(c.kw.test(s))return c.label}return t.spUncat;};
