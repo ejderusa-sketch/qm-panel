@@ -823,6 +823,19 @@ const PARAMS=[
  {type:"imp_no_clk",tr:"10 · Gösterim (Impressions)",en:"10 · Impressions / Ad views",unit:"",st:100,hint:TT("Bu kadar gösterimde 0 tıklama varsa → KAPAT.","This many impressions with 0 clicks → CLOSE.")},
  {type:"aov_lt",tr:"11 · AOV (ortalama sepet)",en:"11 · AOV (avg order value)",unit:cur,st:5,hint:TT("Gelir ÷ Sipariş. Ortalama sepet bu değerin altındaysa → İZLE.","Revenue ÷ Orders. Below this avg basket → WATCH.")},
 ];
+const NOTES={
+roas_lt:{tr:["Ne: Reklam gelirinin harcamaya oranı (Gelir÷Harcama).","Sorun: 1×'in altı = harcadığından az kazanç, zarar.","Olmalı: En az 2×; yükseldikçe reklamı büyüt."],en:["What: Ad revenue ÷ spend.","Issue: Below 1× = earning less than you spend, loss.","Target: At least 2×; scale up as it rises."]},
+acos_gt:{tr:["Ne: Harcamanın gelire oranı (Harcama÷Gelir×100).","Sorun: Yüksek ACOS = kârın reklama gidiyor.","Olmalı: %30–40 altı iyi; üstündeyse kıs/kapat."],en:["What: Spend ÷ revenue ×100.","Issue: High ACOS = profit eaten by ads.","Target: Under 30–40%; above → cut/close."]},
+cpa_gt:{tr:["Ne: Bir sipariş için ödenen reklam (Harcama÷Sipariş).","Sorun: Ürün kârından yüksekse her sipariş zarar.","Olmalı: Kâr marjının altında tut."],en:["What: Ad cost per order (Spend÷Orders).","Issue: Above product margin = each order loses money.","Target: Keep below your profit margin."]},
+conv_lt:{tr:["Ne: Tıklayanların kaçı sipariş verdi (Sipariş÷Tıklama×100).","Sorun: Düşük CVR = tık geliyor ama satış yok.","Olmalı: %1–3+; düşükse fiyat/görsel/ürünü düzelt."],en:["What: Orders ÷ clicks ×100.","Issue: Low CVR = clicks but no sales.","Target: 1–3%+; if low fix price/image/listing."]},
+ctr_fix:{tr:["Ne: Görenlerin kaçı tıkladı (Tıklama÷Gösterim×100).","Sorun: Düşük CTR = ilan ilgi çekmiyor.","Olmalı: %0.5+; düşükse başlık/görsel düzelt (kapatma)."],en:["What: Clicks ÷ impressions ×100.","Issue: Low CTR = listing not attractive.","Target: 0.5%+; if low fix title/image (don't close)."]},
+cpc_gt:{tr:["Ne: Bir tık için ödenen (Harcama÷Tıklama).","Sorun: Yüksek CPC bütçeyi hızlı bitirir.","Olmalı: Düşük tut; yüksekse teklifi/kelimeyi kıs."],en:["What: Cost per click (Spend÷Clicks).","Issue: High CPC burns budget fast.","Target: Keep low; if high cut bid/keywords."]},
+ord_lt:{tr:["Ne: Reklamdan gelen sipariş adedi.","Sorun: Harcama var ama sipariş yoksa boşa gidiyor.","Olmalı: Belirlediğin minimumun üstünde olmalı."],en:["What: Number of orders from ads.","Issue: Spending but no orders = wasted.","Target: Above your set minimum."]},
+rev_lt:{tr:["Ne: Reklamdan gelen toplam satış tutarı.","Sorun: Düşük gelir = reklam kendini çıkarmıyor.","Olmalı: Harcamayı rahat karşılayacak seviyede."],en:["What: Total sales from ads.","Issue: Low revenue = ad doesn't pay off.","Target: Comfortably covers the spend."]},
+spend_gte:{tr:["Ne: Bu dönemde reklamda harcanan toplam.","Sorun: Satış olmadan artması bütçeyi tüketir.","Olmalı: Bütçe sınırını aşınca dur/kapat."],en:["What: Total ad spend this period.","Issue: Rising without sales drains budget.","Target: Stop/close once budget cap is hit."]},
+imp_no_clk:{tr:["Ne: İlanın kaç kez gösterildiği.","Sorun: Çok gösterim + 0 tık = yanlış kitle/ilan.","Olmalı: Gösterim tıklamaya dönüşmeli."],en:["What: How often the listing was shown.","Issue: Many views + 0 clicks = wrong audience/listing.","Target: Impressions should turn into clicks."]},
+aov_lt:{tr:["Ne: Sipariş başına ortalama tutar (Gelir÷Sipariş).","Sorun: Düşük AOV = kâr marjı ince, reklam zor çıkar.","Olmalı: Paket/ek ürünle yükselt; düşükse izle."],en:["What: Avg order value (Revenue÷Orders).","Issue: Low AOV = thin margin, hard to profit on ads.","Target: Raise with bundles/upsells; watch if low."]},
+};
 const Step=({v,set,st,unit})=><span style={{display:"inline-flex",alignItems:"center",gap:6}}>
 <button onClick={()=>set(Math.max(0,Math.round((v-st)*100)/100))} style={{width:28,height:28,borderRadius:8,border:"1px solid var(--line2)",background:"var(--panel)",cursor:"pointer",fontWeight:800,fontSize:16,lineHeight:1,color:"var(--red)"}}>−</button>
 <span style={{minWidth:56,textAlign:"center",fontFamily:"'JetBrains Mono'",fontWeight:700,fontSize:14}}>{v}{unit}</span>
@@ -844,7 +857,9 @@ return(<div className="rules" style={{marginBottom:14}}>
 <div style={{display:"flex",alignItems:"center",gap:10}}>
 <Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/>
 <span style={{fontSize:13,fontWeight:700,flex:1}}>{TT(p.tr,p.en)}</span></div>
-<div style={{fontSize:11.5,color:"var(--muted)",lineHeight:1.4,marginTop:6,opacity:r.on?1:0.6}}>{p.hint}</div>
+<div style={{marginTop:6,marginBottom:2,opacity:r.on?1:0.7,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"4px 14px"}}>
+{(NOTES[p.type]?TT(NOTES[p.type].tr,NOTES[p.type].en):[p.hint]).map((ln,i)=><div key={i} style={{fontSize:11,color:"var(--muted)",lineHeight:1.45,display:"flex",gap:6,alignItems:"baseline"}}><b style={{color:"var(--azure)",flex:"none",fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}
+</div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginTop:8,opacity:r.on?1:0.5}}>
 <Sq label={TT("KAPAT","CLOSE")} color="var(--red)" v={toNum(r.n)} set={v=>setR(p.type,{n:v})} st={p.st} unit={p.unit}/>
 <Sq label={TT("AÇ","OPEN")} color="var(--green)" v={toNum(r.ac)} set={v=>setR(p.type,{ac:v})} st={p.st} unit={p.unit}/>
@@ -1240,7 +1255,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM41 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM42 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
