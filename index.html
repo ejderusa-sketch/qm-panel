@@ -903,22 +903,30 @@ return(<div style={{padding:"8px 0 40px"}}>
 <label style={{display:"block",fontSize:12.5,fontWeight:600,marginTop:12}}>{TT("Notlar","Notes")}<textarea value={z.notes||""} onChange={e=>up("notes",e.target.value)} rows={3} style={{display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontSize:13.5,fontFamily:"'Inter'"}}/></label>
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
 </div></div>);}
-function CTrademark({settings,setSettings,accounts}){
+function CTrademark({settings,setSettings,accounts,act,onFetch}){
 const cases=Array.isArray(settings.cases)?settings.cases:[];
+const acc=accounts.find(a=>a.id===act);
+const[showAll,setShowAll]=useState(false);
+const shown=cases.filter(c=>showAll||!acc||c.storeId===act||c.store===(acc&&acc.name));
 const setCases=(fn)=>setSettings(s=>({...s,cases:fn(Array.isArray(s.cases)?s.cases:[])}));
-const blank=()=>({title:"",type:"trademark",status:"notice",store:"",date:new Date().toISOString().slice(0,10),notes:""});
+const blank=()=>({title:"",type:"trademark",status:"notice",store:acc?acc.name:"",date:new Date().toISOString().slice(0,10),notes:""});
 const[form,setForm]=useState(blank());
 const add=()=>{if(!form.title.trim())return;const id="c"+Date.now().toString(36);setCases(cs=>[{...form,id},...cs]);setForm(blank());};
 const del=id=>setCases(cs=>cs.filter(c=>c.id!==id));
 const chStatus=(id,v)=>setCases(cs=>cs.map(c=>c.id===id?{...c,status:v}:c));
-const cnt=st=>cases.filter(c=>c.status===st).length;
+const cnt=st=>shown.filter(c=>c.status===st).length;
 const stL=st=>({notice:TT("Bildirim","Notice"),responded:TT("Yanıtlandı","Responded"),removed:TT("Kaldırıldı","Removed"),restored:TT("Geri alındı","Restored")}[st]||st);
 const iS={display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1px solid var(--line2)",borderRadius:9,fontFamily:"'JetBrains Mono'",fontSize:13.5};
 const lS={display:"block",fontSize:12.5,fontWeight:600,marginTop:12};
 return(<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
 <div className="rh"><span style={{fontSize:16}}>⚖️ C — TRADEMARK & COPYRIGHT</span></div>
-<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{TT("IP/telif ihlal bildirimlerini takip eden vaka merkezi. Bağlı Gmail'den gelen bildirimleri buraya kaydet.","A case center tracking IP/copyright infringement notices. Log notices from the connected Gmail here.")}</div></div>
+<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{TT("IP/telif ihlal bildirimlerini takip eden vaka merkezi. Bağlı Gmail'den gelen bildirimleri buraya kaydet.","A case center tracking IP/copyright infringement notices. Log notices from the connected Gmail here.")}</div>
+<div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginTop:12}}>
+<button className="btn pri" onClick={()=>{if(acc&&onFetch)onFetch(acc);}} disabled={!acc}>📥 {acc?TT(acc.name+" — e-postadan çek",acc.name+" — fetch from email"):TT("Önce soldan mağaza seç","Select a store on the left")}</button>
+<button className="btn" onClick={()=>setShowAll(v=>!v)}>{showAll?TT("🔎 Sadece seçili mağaza","🔎 Selected store only"):TT("🗂 Tüm mağazalar","🗂 All stores")}</button>
+<span style={{fontSize:11.5,color:"var(--faint)"}}>{showAll?TT("Tüm mağazaların vakaları","Cases from all stores"):TT("Filtre: ","Filter: ")+(acc?acc.name:"—")}</span>
+</div></div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12,margin:"2px 0 12px"}}>
 {[[stL("notice"),cnt("notice"),"var(--amber)"],[stL("removed"),cnt("removed"),"var(--red)"],[stL("restored"),cnt("restored"),"var(--green)"],[stL("responded"),cnt("responded"),"var(--azure)"]].map((c,i)=><div key={i} className="rules" style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:c[2]}}>{c[1]}</div><div style={{fontSize:12,color:"var(--muted)"}}>{c[0]}</div></div>)}
 </div>
@@ -934,10 +942,10 @@ return(<div style={{padding:"8px 0 40px"}}>
 <div><button className="btn pri" style={{marginTop:12}} onClick={add}>{TT("Vaka ekle","Add case")}</button></div>
 </div>
 <div className="rules">
-<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📋 {TT("Vakalar","Cases")}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{cases.length}</span></div>
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📋 {TT("Vakalar","Cases")}</span><span style={{marginLeft:"auto",fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)"}}>{shown.length}</span></div>
 <div className="tw" style={{marginTop:8}}><table style={{minWidth:680}}><thead><tr><th className="l">{TT("Başlık","Title")}</th><th className="l">{TT("Tür","Type")}</th><th className="l">{TT("Mağaza","Store")}</th><th className="l">{TT("Tarih","Date")}</th><th className="l">{TT("Durum","Status")}</th><th></th></tr></thead><tbody>
-{cases.length===0&&<tr><td colSpan={6}><div className="empty" style={{padding:24}}><p>{TT("Henüz vaka yok. Yukarıdan ekle.","No cases yet. Add one above.")}</p></div></td></tr>}
-{cases.map(c=><tr key={c.id}>
+{shown.length===0&&<tr><td colSpan={6}><div className="empty" style={{padding:24}}><p>{TT("Henüz vaka yok. Yukarıdan ekle.","No cases yet. Add one above.")}</p></div></td></tr>}
+{shown.map(c=><tr key={c.id}>
 <td className="l" style={{fontWeight:600,whiteSpace:"normal",maxWidth:240}}>{c.title}{c.notes?<div style={{fontSize:11,color:"var(--faint)",fontWeight:400,marginTop:2}}>{c.notes}</div>:null}</td>
 <td className="l">{c.type==="copyright"?"Copyright":"Trademark"}</td>
 <td className="l">{c.store||"—"}</td>
@@ -1223,6 +1231,27 @@ const file=new File([txt],"gmail.csv",{type:"text/csv"});await handleCSV(file,mp
 if(imported){if(lastmp)setPeriod(lastmp);setToast(TT(imported+" evrak aya göre içeri alındı.",imported+" documents imported by month."));}
 else setToast(TT("Uygun/tarihli CSV eki bulunamadı.","No dated CSV attachment found."));}
 catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
+const fetchStoreTrademark=async(acc)=>{if(!acc){setToast(TT("Önce mağaza seç.","Select a store first."));return;}
+const tok=gmStoreTok.current[acc.id];
+if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,false);return;}
+setToast(TT("Trademark e-postaları taranıyor…","Scanning trademark emails…"));
+try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
+const q='(subject:(trademark OR copyright OR infringement OR \"intellectual property\" OR \"notice of\") OR \"intellectual property\" OR infringement OR trademark) newer_than:395d';
+const list=await gGet(tok,base+"?q="+encodeURIComponent(q)+"&maxResults=25");
+const msgs=list.messages||[];if(!msgs.length){setToast(TT("İlgili e-posta bulunamadı.","No related emails found."));return;}
+const existing=Array.isArray(settings.cases)?settings.cases:[];const have=new Set(existing.map(c=>c.gmId).filter(Boolean));
+let added=0,skipped=0;const news=[];
+for(const mm of msgs){if(have.has(mm.id))continue;
+const d=await gGet(tok,base+"/"+mm.id+"?format=metadata&metadataHeaders=Subject&metadataHeaders=From");
+const hs=(d.payload&&d.payload.headers)||[];const H=n=>{const h=hs.find(x=>x.name.toLowerCase()===n);return h?h.value:"";};
+const subj=H("subject")||TT("(konu yok)","(no subject)");
+const idt=d.internalDate?new Date(Number(d.internalDate)):null;
+if(!idt||isNaN(idt.getTime())){skipped++;continue;}
+const type=/copyright|telif/i.test(subj)?"copyright":"trademark";
+news.push({id:"c"+mm.id,gmId:mm.id,title:subj.slice(0,140),type,status:"notice",store:acc.name,storeId:acc.id,date:idt.toISOString().slice(0,10),notes:(d.snippet||"").slice(0,200)});added++;}
+if(added)setSettings(s=>({...s,cases:[...news,...(Array.isArray(s.cases)?s.cases:[])]}));
+setToast(added?(added+TT(" vaka eklendi"," cases added")+(skipped?" ("+skipped+TT(" atlandı"," skipped")+")":"")+"."):TT("Yeni vaka yok.","No new cases."));}
+catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
 
 /* memos */
 const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,settings)})),[rows,settings]);
@@ -1260,7 +1289,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM45 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM46 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1317,7 +1346,7 @@ return(
 
 {tab==="ekip"&&<EkipPanel settings={settings} setSettings={setSettings}/>}
 {tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
-{tab==="trademark"&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts}/>}
+{tab==="trademark"&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts} act={act} onFetch={fetchStoreTrademark}/>}
 {tab==="visibility"&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
 {tab==="dashboard"&&<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
