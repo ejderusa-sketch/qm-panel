@@ -846,7 +846,7 @@ return(<div style={{padding:"8px 0 40px"}}>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:6}}>{TT("Mesajlar hesabın tüm üyelerine görünür ve buluta kaydedilir.","Messages are visible to all account members and saved to the cloud.")}</div>
 </div>
 </div>);}
-function RulesPanel({settings,setSettings,periodLabel}){
+function RulesPanel({settings,setSettings,periodLabel,storeName}){
 const rules=Array.isArray(settings.rules)?settings.rules:[];
 const getR=type=>rules.find(r=>r.type===type)||{type,on:false,n:0};
 const setR=(type,patch)=>setSettings(s=>{const rs=Array.isArray(s.rules)?s.rules.map(r=>({...r})):[];const i=rs.findIndex(r=>r.type===type);const cur=i>=0?rs[i]:{id:type,type,on:false,n:0};const nx={...cur,...patch};if(i>=0)rs[i]=nx;else rs.push(nx);return{...s,rules:rs};});
@@ -904,7 +904,7 @@ const Sq=({label,color,v,set,st,unit})=><div style={{minWidth:0,border:"1px soli
 <button onClick={()=>set(Math.round((v+st)*100)/100)} style={{width:16,height:16,borderRadius:5,border:"1px solid var(--line2)",background:"var(--panel2)",cursor:"pointer",fontWeight:800,color:"var(--green)",fontSize:11,lineHeight:1}}>+</button>
 </div></div>;
 return(<div className="rules" style={{marginBottom:14}}>
-<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("A1 · Ayarlar — Marketing Parametreleri","A1 · Settings — Marketing Parameters")}</span></div>
+<div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("A1 · Ayarlar — Marketing Parametreleri","A1 · Settings — Marketing Parameters")}</span><span style={{marginLeft:"auto",fontSize:12,fontWeight:800,color:"var(--orange)",display:"inline-flex",alignItems:"center",gap:5}}>🏪 {storeName||"—"} <span style={{fontWeight:600,color:"var(--faint)"}}>{TT("(bu mağazaya özel)","(store-specific)")}</span></span></div>
 <div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametre için 3 aksiyon eşiği: KAPAT · KAPATMA · BEKLE. Metriği aç/kapat, her karenin eşiğini −/+ ile ayarla.","Each parameter has 3 action thresholds: CLOSE · SHUT · HOLD. Toggle the metric and set each square with −/+.")}</div>
 <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
@@ -1322,7 +1322,11 @@ setToast(added?(added+TT(" vaka eklendi"," cases added")+(skipped?" ("+skipped+T
 catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
 
 /* memos */
-const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,settings)})),[rows,settings]);
+const MKT_KEYS=["rules","minClicks","minSpend","minImp","targetRoas","watchRoas","enMinImp","enMinClk","enMinSpend","enWatch","enTarget"];
+const storeCfgOf=(id)=>{const c=settings.storeCfg&&settings.storeCfg[id];return c?{...settings,...c}:settings;};
+const mktS=storeCfgOf(act);
+const setMktS=(updater)=>setSettings(gs=>{const eff={...gs,...((gs.storeCfg&&gs.storeCfg[act])||{})};const ne=typeof updater==="function"?updater(eff):{...eff,...updater};const slice={};for(const k of MKT_KEYS)if(k in ne)slice[k]=ne[k];return {...gs,storeCfg:{...(gs.storeCfg||{}),[act]:{...((gs.storeCfg&&gs.storeCfg[act])||{}),...slice}}};});
+const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,mktS)})),[rows,mktS]);
 /* QM7: ShipStation tarzı filtre/arama/seçim */
 const baseEvals=evals.filter(x=>x.e.imp||x.e.spend);
 const verdictCounts=useMemo(()=>{const c={all:0,"BÜYÜT":0,"İZLE":0,"DÜZELT":0,"KAPAT":0,"VERİ AZ":0};for(const x of baseEvals){c.all++;if(c[x.e.verdict]!=null)c[x.e.verdict]++;}return c;},[rows,settings]);
@@ -1346,7 +1350,7 @@ if(totals.close)p.push(`${totals.close} listing kapat`);if(totals.grow)p.push(`$
 let l=p.join(", ")+".";if(totals.wasted>0)l+=` ${money(totals.wasted,settings.cur)} boşa gidiyor.`;return l},[evals,totals,settings.cur]);
 const history=useMemo(()=>{const ds=Object.keys(dm).filter(k=>k.startsWith(act+"|")&&!k.startsWith("V::")&&(dm[k]||[]).length).map(k=>k.split("|")[1]);
 if(!ds.includes(date))ds.push(date);return[...new Set(ds)].sort().reverse().slice(0,8)},[dm,act,date]);
-const acctStats=useMemo(()=>{const m={};for(const a of accounts){const rs=dm[`${a.id}|${period}`]||[];let cl=0;for(const r of rs)if(evaluate(r,settings).verdict==="KAPAT")cl++;m[a.id]={count:rs.length,close:cl}}return m},[accounts,dm,period,settings]);
+const acctStats=useMemo(()=>{const m={};for(const a of accounts){const rs=dm[`${a.id}|${period}`]||[];let cl=0;for(const r of rs)if(evaluate(r,storeCfgOf(a.id)).verdict==="KAPAT")cl++;m[a.id]={count:rs.length,close:cl}}return m},[accounts,dm,period,settings]);
 const acctName=(accounts.find(a=>a.id===act)||{}).name||"";
 const actColor=STORE_COLORS[(Math.max(0,accounts.findIndex(a=>a.id===act)))%STORE_COLORS.length];
 const pct=v=>(v*100).toFixed(2)+"%";
@@ -1358,7 +1362,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM93 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM94 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1452,7 +1456,7 @@ return(
 {imgErr&&<div className="err">⚠ {imgErr}</div>}
 {imgBusy&&<div className="busy"><span className="sp"/>{imgMsg}</div>}
 
-{mSub==="a1"&&<RulesPanel settings={settings} setSettings={setSettings} periodLabel={(()=>{const p=PERIODS.find(x=>x[0]===period);return p?TT(p[1],p[2]):"";})()}/>}
+{mSub==="a1"&&<RulesPanel settings={mktS} setSettings={setMktS} storeName={acctName} periodLabel={(()=>{const p=PERIODS.find(x=>x[0]===period);return p?TT(p[1],p[2]):"";})()}/>}
 
 {mSub==="a2"&&rows.length===0&&<div className="rules" style={{textAlign:"center",color:"var(--faint)",padding:"26px 10px"}}>{TT("Bu dönemde henüz veri yok.","No data yet for this period.")}<div style={{marginTop:14}}>{can("editMarketing")&&/^\d{4}-\d{2}$/.test(period)&&<button className="btn pri" onClick={()=>{const el=document.getElementById("csvInput");if(el)el.click();}}>📄 {TT("CSV yükle → seçili aya","Upload CSV → selected month")}</button>}</div><div style={{marginTop:8,fontSize:12}}>{TT("Etsy Ads → tarihi seç → listing tablosunu Google Sheets'e kopyala → CSV indir → buradan yükle.","Etsy Ads → pick the date → copy the listings table to Google Sheets → download CSV → upload here.")}</div></div>}
 {mSub==="a2"&&rows.length>0 && (<>
