@@ -815,9 +815,9 @@ const setNum=(k,v)=>setSettings(s=>({...s,[k]:Math.max(0,v)}));
 const cur=settings.cur||"$";
 const PARAMS=[
  {type:"roas_lt",tr:"A1.1 · ROAS",en:"A1.1 · ROAS",unit:"×",st:0.1,hint:TT("Gelir ÷ Harcama. Bu değerin altındaysa zarar → KAPAT.","Revenue ÷ Spend. Below this = loss → CLOSE.")},
- {type:"acos_gt",tr:"A1.2 · ACOS",en:"A1.2 · ACOS",unit:"%",st:5,hint:TT("Harcama ÷ Gelir ×100. Bu %'nin üstündeyse → KAPAT.","Spend ÷ Revenue ×100. Above this % → CLOSE.")},
+ {type:"conv_lt",tr:"A1.2 · CVR (dönüşüm)",en:"A1.2 · CVR (conversion)",unit:"%",st:0.5,hint:TT("Sipariş ÷ Tıklama ×100. Bu %'nin altındaysa → KAPAT.","Orders ÷ Clicks ×100. Below this % → CLOSE.")},
  {type:"cpc_gt",tr:"A1.3 · CPC (tık maliyeti)",en:"A1.3 · CPC (cost/click)",unit:cur,st:0.1,hint:TT("Harcama ÷ Tıklama. Tık başı maliyet bu değerin üstündeyse → KAPAT.","Spend ÷ Clicks. Above this cost per click → CLOSE.")},
- {type:"conv_lt",tr:"A1.4 · CVR (dönüşüm)",en:"A1.4 · CVR (conversion)",unit:"%",st:0.5,hint:TT("Sipariş ÷ Tıklama ×100. Bu %'nin altındaysa → KAPAT.","Orders ÷ Clicks ×100. Below this % → CLOSE.")},
+ {type:"acos_gt",tr:"A1.4 · ACOS",en:"A1.4 · ACOS",unit:"%",st:5,hint:TT("Harcama ÷ Gelir ×100. Bu %'nin üstündeyse → KAPAT.","Spend ÷ Revenue ×100. Above this % → CLOSE.")},
  {type:"ctr_fix",tr:"A1.5 · CTR",en:"A1.5 · CTR",unit:"%",st:0.1,hint:TT("Tıklama ÷ Gösterim ×100. 1000+ gösterimde bunun altındaysa → DÜZELT (kapatma).","Clicks ÷ Impressions ×100. Below this with 1000+ impressions → FIX (don't close).")},
  {type:"cpa_gt",tr:"A1.6 · CPA (sipariş maliyeti)",en:"A1.6 · CPA (cost/order)",unit:cur,st:1,hint:TT("Harcama ÷ Sipariş. Sipariş başı maliyet bu değerin üstündeyse → KAPAT.","Spend ÷ Orders. Above this cost per order → CLOSE.")},
  {type:"ord_lt",tr:"A1.7 · Sipariş (reklamdan)",en:"A1.7 · Orders from ads",unit:"",st:1,hint:TT("Harcama var ama sipariş bu sayının altındaysa → KAPAT.","Spending but orders below this count → CLOSE.")},
@@ -1304,7 +1304,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM49 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM50 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
