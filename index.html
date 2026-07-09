@@ -1251,7 +1251,7 @@ collect(d.payload);
 if(!parts.csv.length&&!parts.img.length)continue;
 const idt=d.internalDate?new Date(Number(d.internalDate)):null;if(!idt||isNaN(idt.getTime()))continue;
 const mp=idt.getFullYear()+"-"+String(idt.getMonth()+1).padStart(2,"0");
-for(const cp of parts.csv){const at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);const b64=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(b64)));}catch(_){txt=atob(b64);}const file=new File([txt],"gmail.csv",{type:"text/csv"});await handleCSV(file,mp,acc.id);imported++;lastmp=mp;}
+for(const cp of parts.csv){let fmp=mp;const fn=cp.filename||"";const dms=[...fn.matchAll(/(20\d{2})[-_.](0[1-9]|1[0-2])(?:[-_.](0[1-9]|[12]\d|3[01]))?/g)];if(dms.length){const last=dms[dms.length-1];fmp=last[1]+"-"+last[2];}const at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);const b64=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(b64)));}catch(_){txt=atob(b64);}const file=new File([txt],"gmail.csv",{type:"text/csv"});await handleCSV(file,fmp,acc.id);imported++;lastmp=fmp;}
 for(const ip of parts.img){try{setToast(TT("Görsel okunuyor…","Reading image…"));const at=await gGet(tok,base+"/"+m.id+"/attachments/"+ip.body.attachmentId);const b64u=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");const rows=await imgToRows(b64u,ip.mimeType);const added=addRows(mp,rows);if(added){imported++;lastmp=mp;}}catch(_){}}
 }
 if(imported){if(lastmp)setPeriod(lastmp);setToast(TT("İçeri alındı (e-posta CSV + görsel).","Imported (email CSV + image)."));}
@@ -1315,7 +1315,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM70 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM71 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
