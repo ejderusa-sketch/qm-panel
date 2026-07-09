@@ -1205,8 +1205,8 @@ hiRef.current=f=>handleImage(f);
 useEffect(()=>{const h=e=>{const it=e.clipboardData&&e.clipboardData.items;if(!it)return;for(const i of it){if(i.type&&i.type.indexOf("image")===0){const f=i.getAsFile();if(f){e.preventDefault();hiRef.current(f);break}}}};window.addEventListener("paste",h);return()=>window.removeEventListener("paste",h)},[]);
 
 const applyPaste=()=>{const p=parseReport(pt);if(!p.length){flash("Okunamadı.");return}setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);setPt("");setShowPaste(false);flash(`${p.length} listing eklendi.`)};
-const handleCSV=async(file,targetPeriod,targetAct)=>{if(!file)return;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
-try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} yeni listing → ${tp}`)}
+const handleCSV=async(file,targetPeriod,targetAct,requireNames)=>{if(!file)return false;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
+try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} → ${tp}`);return true}
 catch(err){setImgErr("CSV hatası: "+(err&&err.message||"bilinmeyen"))}
 finally{const el=document.getElementById("csvInput");if(el)el.value=""}};
 
@@ -1261,20 +1261,17 @@ const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",heade
 if(!r.ok)throw new Error("API "+r.status);const dj=await r.json();let t2=(dj.content||[]).map(i=>i.type==="text"?i.text:"").join("").trim().replace(/```json|```/g,"").trim();const a=t2.indexOf("["),b=t2.lastIndexOf("]");if(a!==-1&&b!==-1)t2=t2.slice(a,b+1);const arr=JSON.parse(t2);return (Array.isArray(arr)?arr:[]).map(o=>({id:Math.random().toString(36).slice(2),name:String(o.name||"Listing"),impressions:String(toNum(o.impressions)),clicks:String(toNum(o.clicks)),spend:String(toNum(o.spend)),orders:String(toNum(o.orders)),revenue:String(toNum(o.revenue))}));}
 if(!window.Tesseract)return [];const o=await window.Tesseract.recognize("data:"+(mt||"image/png")+";base64,"+bb,"eng");return parseReport((o&&o.data&&o.data.text)||"");};
 const addRows=(mp,rows)=>{if(!rows||!rows.length)return 0;const kk=acc.id+"|"+mp;let n=0;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of rows){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);n++;}}return{...m,[kk]:out};});return n;};
-let imported=0,lastmp=null;
-for(const m of msgs){const d=await gGet(tok,base+"/"+m.id+"?format=full");
+let imported=0;
+for(let mi=0;mi<msgs.length;mi++){const m=msgs[mi];const d=await gGet(tok,base+"/"+m.id+"?format=full");
 const parts={csv:[],img:[]};
 const collect=(pl)=>{if(!pl)return;if(pl.filename&&pl.body&&pl.body.attachmentId){if(/\.csv$/i.test(pl.filename))parts.csv.push(pl);else if(/^image\//.test(pl.mimeType||"")||/\.(png|jpe?g|gif|webp)$/i.test(pl.filename))parts.img.push(pl);}if(pl.parts)pl.parts.forEach(collect);};
 collect(d.payload);
 if(!parts.csv.length&&!parts.img.length)continue;
-const idt=d.internalDate?new Date(Number(d.internalDate)):null;if(!idt||isNaN(idt.getTime()))continue;
-const mp=idt.getFullYear()+"-"+String(idt.getMonth()+1).padStart(2,"0");
-for(const cp of parts.csv){let fmp=mp;const fn=cp.filename||"";const dms=[...fn.matchAll(/(20\d{2})[-_.](0[1-9]|1[0-2])(?:[-_.](0[1-9]|[12]\d|3[01]))?/g)];if(dms.length){const last=dms[dms.length-1];fmp=last[1]+"-"+last[2];}const at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);const b64=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(b64)));}catch(_){txt=atob(b64);}const file=new File([txt],"gmail.csv",{type:"text/csv"});await handleCSV(file,period,acc.id);imported++;lastmp=period;}
-for(const ip of parts.img){try{setToast(TT("Görsel okunuyor…","Reading image…"));const at=await gGet(tok,base+"/"+m.id+"/attachments/"+ip.body.attachmentId);const b64u=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");const rows=await imgToRows(b64u,ip.mimeType);const added=addRows(period,rows);if(added){imported++;lastmp=period;}}catch(_){}}
-if(imported>0)break;
+for(const cp of parts.csv){const at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);const b64=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(b64)));}catch(_){txt=atob(b64);}const file=new File([txt],"gmail.csv",{type:"text/csv"});const ok=await handleCSV(file,period,acc.id,true);if(ok)imported++;}
+if(mi===0){for(const ip of parts.img){try{setToast(TT("Görsel okunuyor…","Reading image…"));const at=await gGet(tok,base+"/"+m.id+"/attachments/"+ip.body.attachmentId);const b64u=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");const rows=await imgToRows(b64u,ip.mimeType);const added=addRows(period,rows);if(added)imported++;}catch(_){}}}
 }
-if(imported){if(lastmp)setPeriod(lastmp);setToast(TT("İçeri alındı (e-posta CSV + görsel).","Imported (email CSV + image)."));}
-else setToast(TT("Uygun ek bulunamadı.","No suitable attachment found."));}
+if(imported)setToast(TT(imported+" rapor içeri alındı (her biri ayına).",imported+" reports imported (each to its month)."));
+else setToast(TT("Uygun rapor bulunamadı.","No suitable report found."));}
 catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
 const fetchStoreTrademark=async(acc)=>{if(!acc){setToast(TT("Önce mağaza seç.","Select a store first."));return;}
 const tok=gmStoreTok.current[acc.id];
@@ -1334,7 +1331,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM76 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM77 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
