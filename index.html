@@ -1052,6 +1052,7 @@ const[gmLoad,setGmLoad]=useState(false);
 const[gmData,setGmData]=useState(null);
 const[gmErr,setGmErr]=useState("");
 const tRef=useRef();
+const skipSave=useRef(false);
 const fRef=useRef();
 const hiRef=useRef();
 const gmStoreTok=useRef({});
@@ -1080,7 +1081,7 @@ setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5
 const mig={};Object.keys(dmSaved||{}).forEach(k=>{if(k.startsWith("V::")){mig[k]=dmSaved[k];return;}const md=k.match(/^(.+)\|(\d{4})-(\d{2})-\d{2}$/);if(md){const nk=md[1]+"|"+md[2]+"-"+md[3];if((dmSaved[k]||[]).length>=((mig[nk]||[]).length))mig[nk]=dmSaved[k];return;}if(/\|\d{4}-\d{2}$/.test(k)){mig[k]=dmSaved[k];}});
 const _sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");Object.keys(mig).forEach(k=>{if(k.startsWith("V::"))return;const arr=mig[k]||[];const seen=new Set();const out=[];for(const r of arr){const sg=_sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);}}mig[k]=out;});setDm(mig);setLoaded(true)})()},[]);
 
-useEffect(()=>{if(!loaded)return;const t=setTimeout(async()=>{const err=await store.set("q:d",{__v:2,dm,accts:accounts});if(err)setToast("⚠ Buluta kaydedilemedi: "+(err.message||err.hint||err.code||JSON.stringify(err)).slice(0,120));},600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
+useEffect(()=>{if(!loaded)return;if(skipSave.current){skipSave.current=false;return;}const t=setTimeout(async()=>{const err=await store.set("q:d",{__v:2,dm,accts:accounts});if(err)setToast("⚠ Buluta kaydedilemedi: "+(err.message||err.hint||err.code||JSON.stringify(err)).slice(0,120));},600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
 useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>store.set("q:s",settings),600);return()=>clearTimeout(t)},[settings,loaded]);
 
 const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
@@ -1332,7 +1333,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM81 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM82 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1425,7 +1426,7 @@ return(
 
 {mSub==="a2"&&rows.length===0&&<div className="rules" style={{textAlign:"center",color:"var(--faint)",padding:"26px 10px"}}>{TT("Bu dönemde henüz veri yok. Soldan bağlı mağazanın e-postasına tıklayıp çek ya da CSV yükle.","No data yet for this period. Fetch from the connected email on the left, or upload a CSV.")}</div>}
 {mSub==="a2"&&rows.length>0 && (<>
-<div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>{can("deleteData")&&<button className="btn" onClick={()=>{setRows([]);setSel(new Set());setToast(TT("Temizlendi","Cleared"));}}>{t.delAll}</button>}</div>
+<div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>{can("deleteData")&&<button className="btn" onClick={()=>{skipSave.current=true;setRows([]);setSel(new Set());setToast(TT("Ekran temizlendi (buluttan silinmedi) — 🔄 Refresh ile geri gelir","Screen cleared (not deleted) — Refresh to restore"));}}>🧹 {TT("Ekranı temizle","Clear screen")}</button>}</div>
 
 
 <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:10}}>
