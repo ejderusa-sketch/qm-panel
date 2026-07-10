@@ -966,9 +966,9 @@ const caseCard=(typeKey,heading,accent)=>{const rows=shown.filter(c=>typeKey==="
 <div key={c.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 11px",border:"1px solid var(--line2)",borderRadius:9,background:"var(--panel)"}}>
 <span style={{flex:"none",width:26,height:26,borderRadius:7,background:accent,color:"#fff",fontFamily:"'Space Grotesk'",fontWeight:800,fontSize:12.5,display:"flex",alignItems:"center",justifyContent:"center"}}>{ri+1}</span>
 <span style={{flex:"none",fontFamily:"'JetBrains Mono'",fontSize:11.5,fontWeight:700,color:"var(--ink)",minWidth:84}}>{c.date||"—"}</span>
-<span style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:"var(--ink)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} title={c.mark||c.title||""}>{c.mark||c.title||TT("(konu yok)","(no subject)")}</span>
+<span style={{flex:"none",fontSize:13,fontWeight:800,color:"var(--ink)"}} title={c.mark||c.title||""}>We removed</span>{c.listing?<span style={{flex:"none",fontSize:11.5,color:"var(--faint)"}}>{TT("→ tasarım:","→ design:")}</span>:null}
 {c.listing?<a href={/^https?:/.test(c.listing)?c.listing:("https://"+c.listing)} target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()} style={{flex:"none",fontSize:11,color:"var(--azure)",textDecoration:"underline",maxWidth:160,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.listing}</a>:null}
-<span style={{flex:"none",fontSize:11,fontWeight:600,color:"var(--faint)",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.company||""}</span>
+<span style={{flex:1}}/><span style={{flex:"none",fontSize:11,fontWeight:600,color:"var(--faint)",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.company||""}</span>
 <button className="dl" onClick={()=>del(c.id)} title={TT("Sil","Delete")} style={{flex:"none"}}>✕</button>
 </div>);})}
 </div></div>);};
@@ -1351,7 +1351,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM129 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM130 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
