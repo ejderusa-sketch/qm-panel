@@ -990,17 +990,6 @@ const iS={display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1p
 const lS={display:"block",fontSize:12.5,fontWeight:600,marginTop:12};
 return(<div style={{padding:"8px 0 40px"}}>
 {accounts.filter(x=>x.name||x.email).length>0&&<div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>{accounts.map((a,i)=>(a.name||a.email)?<button key={a.id} onClick={()=>setAct&&setAct(a.id)} title={a.email||""} style={{display:"inline-flex",alignItems:"center",gap:7,padding:"6px 13px",borderRadius:999,cursor:"pointer",border:"1.5px solid "+(a.id===act?STORE_COLORS[i%STORE_COLORS.length]:"var(--line2)"),background:a.id===act?STORE_COLORS[i%STORE_COLORS.length]:"var(--panel)",color:a.id===act?"#fff":"var(--ink)",fontWeight:700,fontSize:12.5}}><span style={{fontFamily:"'Space Grotesk'",fontWeight:800,fontSize:11,opacity:.9}}>{String(i+1).padStart(2,"0")}</span>{a.name||"—"}</button>:null)}</div>}
-<div className="rules" style={{background:"var(--panel2)"}}>
-<div className="rh"><span style={{fontSize:16}}>⚖️ 3 — TRADEMARK & COPYRIGHT</span></div>
-<div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{TT("IP/telif ihlal bildirimlerini takip eden vaka merkezi. Bağlı Gmail'den gelen bildirimleri buraya kaydet.","A case center tracking IP/copyright infringement notices. Log notices from the connected Gmail here.")}</div>
-<div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginTop:12}}>
-<button className="btn pri" onClick={()=>{if(acc&&onFetch)onFetch(acc);}} disabled={!acc}>📥 {acc?TT(acc.name+" — e-postadan çek",acc.name+" — fetch from email"):TT("Önce soldan mağaza seç","Select a store on the left")}</button>
-<button className="btn" onClick={()=>setShowAll(v=>!v)}>{showAll?TT("🔎 Sadece seçili mağaza","🔎 Selected store only"):TT("🗂 Tüm mağazalar","🗂 All stores")}</button>
-<span style={{fontSize:11.5,color:"var(--faint)"}}>{showAll?TT("Tüm mağazaların vakaları","Cases from all stores"):TT("Filtre: ","Filter: ")+(acc?acc.name:"—")}</span>
-</div></div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12,margin:"2px 0 12px"}}>
-{[[TT("Toplam","Total"),shown.length,"var(--azure)"],[TT("Kaldırıldı","Removed"),shown.filter(c=>c.removed).length,"var(--green)"],[TT("Devam eden","Ongoing"),shown.filter(c=>c.ongoing&&!c.removed).length,"var(--amber)"]].map((c,i)=><div key={i} className="rules" style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:c[2]}}>{c[1]}</div><div style={{fontSize:12,color:"var(--muted)"}}>{c[0]}</div></div>)}
-</div>
 {caseCard("trademark","⚖️ "+TT("Trademark Vakaları","Trademark Cases"),"var(--orange)")}
 {caseCard("copyright","© "+TT("Copyright Vakaları","Copyright Cases"),"var(--azure)")}
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
@@ -1275,7 +1264,7 @@ if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectSto
 setAct(acc.id);
 setToast(TT("Gmail'den çekiliyor…","Fetching from Gmail…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
-const list=await gGet(tok,base+"?q="+encodeURIComponent("has:attachment newer_than:395d")+"&maxResults=30");
+const list=await gGet(tok,base+"?q="+encodeURIComponent("has:attachment newer_than:395d in:anywhere")+"&maxResults=30");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("Son 1 yılda ekli e-posta bulunamadı.","No email with attachments in the last year."));return;}
 const ak=(settings.apiKey||"").trim();const inC=typeof window!=="undefined"&&window.storage;
 const sysP="Sen veri cikarma asistanisin. Etsy Ads raporu gorselindeki HER listing satirini oku. Yalnizca JSON dizisi dondur - markdown yok. Her oge: {\"name\":\"metin\",\"impressions\":sayi,\"clicks\":sayi,\"spend\":sayi,\"orders\":sayi,\"revenue\":sayi}. Sutun sirasi: Views·Clicks·%·Orders·Revenue·Spend·ROAS. Revenue ile Spend karistirma. % ve ROAS yok say. $ TL kaldir. Bos=0. Toplam satirini dahil etme.";
@@ -1302,7 +1291,7 @@ const tok=gmStoreTok.current[acc.id];
 if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,false);return;}
 setToast(TT("Trademark e-postaları taranıyor…","Scanning trademark emails…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
-const q='(subject:(removed OR deactivated OR suspended OR closed OR infringement OR trademark OR copyright OR DMCA OR \"policy violation\" OR \"intellectual property\") OR \"policy violation\" OR infringement OR \"counter notice\") newer_than:395d';
+const q='(subject:(removed OR deactivated OR suspended OR closed OR infringement OR trademark OR copyright OR DMCA OR \"policy violation\" OR \"intellectual property\") OR \"policy violation\" OR infringement OR \"counter notice\") newer_than:395d in:anywhere';
 const list=await gGet(tok,base+"?q="+encodeURIComponent(q)+"&maxResults=25");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("İlgili e-posta bulunamadı.","No related emails found."));return;}
 const existing=Array.isArray(settings.cases)?settings.cases:[];const have=new Set(existing.map(c=>c.gmId).filter(Boolean));
@@ -1367,7 +1356,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM108 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM110 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
