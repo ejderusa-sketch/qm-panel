@@ -948,7 +948,7 @@ const cases=Array.isArray(settings.cases)?settings.cases:[];
 const acc=accounts.find(a=>a.id===act);
 const[showAll,setShowAll]=useState(false);
 const isEtsyCase=c=>(!c.gmId)||/etsy\.com/i.test(c.gmail||"")||/(^|\W)etsy(\W|$)/i.test(c.company||"")||/etsy\.com/i.test(c.listing||"");
-const shown=cases.filter(c=>(showAll||!acc||c.storeId===act)&&isEtsyCase(c));
+const shown=cases.filter(c=>(showAll||!acc||c.storeId===act)&&isEtsyCase(c)&&!/processed your counter notice|we[\u2019\u2018\x27`]?ve processed/i.test((c.mark||c.title||"")));
 const setCases=(fn)=>setSettings(s=>({...s,cases:fn(Array.isArray(s.cases)?s.cases:[])}));
 const blank=()=>({type:"trademark",storeId:act,store:acc?acc.name:"",count:"",mark:"",listing:"",company:"",gmail:acc?acc.email:"",date:new Date().toISOString().slice(0,10),emailCount:"",lastDate:"",prepared:false,sent:false,answer:"",removed:false,ongoing:true,notes:""});
 const[form,setForm]=useState(blank());
@@ -1296,7 +1296,7 @@ const decBody=(pl)=>{let o="";const w=(pp)=>{if(!pp)return;if(pp.body&&pp.body.d
 for(const mm of msgs){
 const d=await gGet(tok,base+"/"+mm.id+"?format=full");
 const hs=(d.payload&&d.payload.headers)||[];const H=n=>{const h=hs.find(x=>x.name.toLowerCase()===n);return h?h.value:"";};
-const subj=H("subject")||TT("(konu yok)","(no subject)");
+const subj=H("subject")||TT("(konu yok)","(no subject)");if(/processed your counter notice|we[\u2019\u2018\x27`]?ve processed/i.test(subj)){skipped++;continue;}
 const _body=decBody(d.payload).slice(0,8000);
 const _txt=(subj+" "+(d.snippet||"")+" "+_body);
 if(!/policy violation|counter[\s-]?notice|\bdmca\b|\btrademark\b|\bcopyright\b|infring|removed[^.]{0,40}(listing|item|shop)|listing[^.]{0,20}removed|removed from your shop|closed (my|your|the) shop|shop (closed|suspend|deactivat)|account (suspend|deactivat)|deactivat|(intellectual property)\s*(infringement|complaint|violation|claim|notice|report)/i.test(_txt)){skipped++;continue;}
@@ -1351,7 +1351,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM126 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM127 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
