@@ -972,7 +972,7 @@ const addRow=(ty)=>{const id="c"+Date.now().toString(36);setCases(cs=>[{...blank
 const pill=(on,color)=>({fontSize:11,fontWeight:800,padding:"4px 8px",borderRadius:7,cursor:"pointer",whiteSpace:"nowrap",border:"1px solid "+(on?color:"var(--line2)"),background:on?color:"var(--panel)",color:on?"#fff":"var(--faint)"});
 const ci={width:"100%",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 6px",fontSize:11.5,fontFamily:"'Inter'",boxSizing:"border-box"};
 const clearEmpty=()=>setCases(cs=>cs.filter(c=>(c.mark||c.title||c.listing||c.company||c.notes||"").toString().trim()));
-const caseCard=(typeKey,heading,accent)=>{const rows=shown.filter(c=>typeKey==="copyright"?c.type==="copyright":(c.type||"trademark")!=="copyright");return(<div className="rules"><div className="rh"><span style={{width:3,height:15,background:accent,borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{heading}</span><button className="btn" style={{marginLeft:"auto",fontSize:12,padding:"5px 10px"}} onClick={clearEmpty} title={TT("Boş satırları sil","Delete empty rows")}>🧹 {TT("Boşları temizle","Clear empty")}</button><button className="btn pri" style={{marginLeft:8,fontSize:12,padding:"5px 12px"}} onClick={()=>addRow(typeKey)}>➕ {TT("Vaka ekle","Add case")}</button><span style={{fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)",marginLeft:10}}>{rows.length}</span></div>
+const caseCard=(typeKey,heading,accent)=>{const rows=shown.filter(c=>typeKey==="copyright"?c.type==="copyright":(c.type||"trademark")!=="copyright");return(<div className="rules"><div className="rh"><span style={{width:3,height:15,background:accent,borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{heading}</span><button className="btn" style={{marginLeft:"auto",fontSize:12,padding:"5px 10px",color:"var(--red)",borderColor:"var(--red)"}} onClick={()=>{if(rows.length)setCases(cs=>cs.filter(c=>!rows.includes(c)));}} title={TT("Bu tablodaki tüm vakaları sil","Delete all cases in this table")}>🗑 {TT("Tümünü sil","Delete all")}</button><button className="btn" style={{marginLeft:8,fontSize:12,padding:"5px 10px"}} onClick={clearEmpty} title={TT("Boş satırları sil","Delete empty rows")}>🧹 {TT("Boşları temizle","Clear empty")}</button><button className="btn pri" style={{marginLeft:8,fontSize:12,padding:"5px 12px"}} onClick={()=>addRow(typeKey)}>➕ {TT("Vaka ekle","Add case")}</button><span style={{fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)",marginLeft:10}}>{rows.length}</span></div>
 <div className="tw" style={{marginTop:8}}><table style={{minWidth:1560,fontSize:11.5}}><thead><tr>
 {["NO","MAĞAZA","ADET",typeKey==="copyright"?"COPYRIGHT":"TRADEMARK","LISTING","ŞİRKET","GMAIL","NE ZAMAN YEDİ","KAÇ EMAIL","EN SON","HAZIRLA","GÖNDER","CEVAP","KALDIRILDI","DEVAM",""].map((h,i)=><th key={i} className="l" style={{fontSize:10,fontWeight:800,whiteSpace:"nowrap",letterSpacing:".02em"}}>{h}</th>)}
 </tr></thead><tbody>
@@ -1316,7 +1316,7 @@ const tok=gmStoreTok.current[acc.id];
 if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,false);return;}
 setToast(TT("Trademark e-postaları taranıyor…","Scanning trademark emails…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
-const q='(subject:(trademark OR copyright OR infringement OR \"intellectual property\" OR \"notice of\") OR \"intellectual property\" OR infringement OR trademark) newer_than:395d';
+const q='subject:(trademark OR copyright OR DMCA OR infringement OR \"intellectual property\") newer_than:395d';
 const list=await gGet(tok,base+"?q="+encodeURIComponent(q)+"&maxResults=25");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("İlgili e-posta bulunamadı.","No related emails found."));return;}
 const existing=Array.isArray(settings.cases)?settings.cases:[];const have=new Set(existing.map(c=>c.gmId).filter(Boolean));
@@ -1327,8 +1327,8 @@ const hs=(d.payload&&d.payload.headers)||[];const H=n=>{const h=hs.find(x=>x.nam
 const subj=H("subject")||TT("(konu yok)","(no subject)");
 const idt=d.internalDate?new Date(Number(d.internalDate)):null;
 if(!idt||isNaN(idt.getTime())){skipped++;continue;}
-const blob=(subj+" "+(d.snippet||""));const type=/trademark|marka|®|™|brand name/i.test(blob)?"trademark":/copyright|dmca|©|telif|artwork|image|photo|design/i.test(blob)?"copyright":"trademark";
-news.push({id:"c"+mm.id,gmId:mm.id,title:subj.slice(0,140),mark:subj.slice(0,140),company:H("from")||"",type,status:"notice",store:acc.name,storeId:acc.id,date:idt.toISOString().slice(0,10),notes:(d.snippet||"").slice(0,200)});added++;}
+const from=H("from")||"";const fromEmail=(from.match(/<([^>]+)>/)||[])[1]||(from.match(/[\w.+-]+@[\w.-]+/)||[])[0]||"";const fromName=(from.replace(/<[^>]+>/,"").replace(/["]/g,"").trim())||fromEmail;const blob=(subj+" "+(d.snippet||""));const type=/trademark|marka|®|™|brand name/i.test(blob)?"trademark":/copyright|dmca|©|telif|artwork|image|photo|design/i.test(blob)?"copyright":"trademark";
+news.push({id:"c"+mm.id,gmId:mm.id,title:subj.slice(0,140),mark:subj.slice(0,140),company:fromName,gmail:fromEmail,type,status:"notice",store:acc.name,storeId:acc.id,date:idt.toISOString().slice(0,10),notes:(d.snippet||"").slice(0,200)});added++;}
 if(added)setSettings(s=>({...s,cases:[...news,...(Array.isArray(s.cases)?s.cases:[])]}));
 setToast(added?(added+TT(" vaka eklendi"," cases added")+(skipped?" ("+skipped+TT(" atlandı"," skipped")+")":"")+"."):TT("Yeni vaka yok.","No new cases."));}
 catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
@@ -1374,7 +1374,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM99 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM100 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
