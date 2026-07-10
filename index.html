@@ -1063,7 +1063,7 @@ const skipSave=useRef(false);
 const[showBulk,setShowBulk]=useState(false);const[bulkText,setBulkText]=useState("");
 const fRef=useRef();
 const hiRef=useRef();
-const gmStoreTok=useRef({});
+const gmStoreTok=useRef((()=>{try{return JSON.parse(sessionStorage.getItem("qmGmTok")||"{}")}catch(e){return{}}})());
 
 const key=`${act}|${period}`;
 const rangeMonths=(p)=>{const now=new Date();const y=now.getFullYear(),m=now.getMonth();const out=[];if(p==="l1m"){out.push(y+"-"+String(m+1).padStart(2,"0"));}else if(p==="l3m"){for(let i=0;i<3;i++){const d=new Date(y,m-i,1);out.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"));}}else if(p==="ytd"){for(let mm=0;mm<=m;mm++){out.push(y+"-"+String(mm+1).padStart(2,"0"));}}return out;};
@@ -1251,14 +1251,14 @@ if(!cid){setToast(TT("Google Client ID bulunamadı.","Google Client ID not found
 if(!window.google||!window.google.accounts){setToast(TT("Google kütüphanesi yüklenemedi.","Google library not loaded."));return;}
 try{window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",login_hint:acc.email||"",prompt:"",callback:async r=>{
 if(r.error){setToast(TT("Bağlantı iptal edildi.","Connection cancelled."));return;}
-gmStoreTok.current[acc.id]=r.access_token;
+gmStoreTok.current[acc.id]=r.access_token;try{sessionStorage.setItem("qmGmTok",JSON.stringify(gmStoreTok.current))}catch(e){}
 try{const prof=await gGet(r.access_token,"https://www.googleapis.com/gmail/v1/users/me/profile");
 setAccounts(x=>x.map(s=>{if(s.id!==acc.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=((prof.emailAddress||"").split("@")[0]||"").trim();return{...s,email:prof.emailAddress,gmailConnected:true,name:(def&&lp)?lp.toUpperCase():s.name}}));
 setToast("✓ "+prof.emailAddress+" "+TT("bağlandı","connected"));if(andFetch)setTimeout(()=>fetchStoreCSV(acc),400);}
 catch(e){setToast(TT("Profil alınamadı: ","Profile error: ")+(e.message||""));}
 }}).requestAccessToken();}
 catch(e){setToast(TT("Bağlanılamadı: ","Connect error: ")+(e.message||""));}};
-const disconnectStore=(acc)=>{delete gmStoreTok.current[acc.id];setAccounts(x=>x.map(s=>s.id===acc.id?{...s,gmailConnected:false}:s));};
+const disconnectStore=(acc)=>{delete gmStoreTok.current[acc.id];try{sessionStorage.setItem("qmGmTok",JSON.stringify(gmStoreTok.current))}catch(e){}setAccounts(x=>x.map(s=>s.id===acc.id?{...s,gmailConnected:false}:s));};
 const fetchStoreCSV=async(acc)=>{const tok=gmStoreTok.current[acc.id];
 if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,true);return;}
 setAct(acc.id);
@@ -1356,7 +1356,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM111 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM113 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1373,9 +1373,9 @@ return(
 <input value={a.name||""} onClick={e=>e.stopPropagation()} onFocus={()=>setAct(a.id)} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>s.id===a.id?{...s,name:v}:s))}} placeholder={lang==="tr"?"Mağaza adı…":"Store name…"} title={lang==="tr"?"Adı elle düzenle":"Edit name manually"} style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,fontFamily:"'Inter'",border:"1px solid var(--line2)",borderRadius:6,padding:"3px 6px",background:"var(--panel)",color:"var(--ink)"}}/>
 {st.count>0&&<span className={"sb"+(st.close?" red":"")}>{st.count}</span>}
 </div>
-<div style={{display:"flex",gap:5,alignItems:"center"}}>
+<div style={{display:"flex",gap:4,alignItems:"center",flexWrap:"wrap"}}>
 <input value={a.email||""} placeholder={lang==="tr"?"✉️ e-posta ekle…":"✉️ add email…"} title={a.gmailConnected?TT("Tıkla → e-postadan çek","Click → fetch from email"):""} onClick={e=>{e.stopPropagation();if(a.gmailConnected)fetchStoreCSV(a);}} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>{if(s.id!==a.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=(v.split("@")[0]||"").trim();return{...s,email:v,name:(def&&lp)?lp.toUpperCase():s.name}}))}} style={{flex:1,minWidth:0,fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 7px",background:"var(--panel)",color:"var(--ink)"}}/>
-{a.email&&a.gmailConnected&&<span onClick={e=>e.stopPropagation()} title={TT("Bağlı","Connected")} style={{fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:5,padding:"3px 6px",whiteSpace:"nowrap",flex:"none"}}>✓ {TT("Bağlı","OK")}</span>}
+{a.email&&a.gmailConnected&&<span onClick={e=>e.stopPropagation()} title={TT("Bağlı","Connected")} style={{fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:5,padding:"3px 6px",whiteSpace:"nowrap",flex:"none"}}>✓ {TT("Bağlı","OK")}</span>}{a.email&&!a.gmailConnected&&<span style={{fontSize:9,fontWeight:800,color:"#fff",background:"var(--red)",borderRadius:5,padding:"3px 6px",whiteSpace:"nowrap",flex:"none"}}>✕ {TT("Bağlı değil","Offline")}</span>}{a.email&&a.gmailConnected&&<button onClick={e=>{e.stopPropagation();fetchStoreCSV(a);}} title={TT("Marketing verisini çek","Fetch marketing")} style={{fontSize:11,background:"var(--panel)",border:"1px solid var(--line2)",borderRadius:5,cursor:"pointer",flex:"none",padding:"2px 5px"}}>📥</button>}{a.email&&a.gmailConnected&&<button onClick={e=>{e.stopPropagation();fetchStoreCSV(a);fetchStoreTrademark(a);}} title={TT("Bu mağazayı senkronize et (Marketing + Trademark)","Sync this store")} style={{fontSize:11,background:"var(--azure)",color:"#fff",border:"none",borderRadius:5,cursor:"pointer",flex:"none",padding:"2px 6px"}}>🔄</button>}
 {a.email&&a.gmailConnected&&<button onClick={e=>{e.stopPropagation();disconnectStore(a);}} title={TT("Bağlantıyı kes","Disconnect")} style={{fontSize:11,color:"var(--faint)",background:"none",border:"none",cursor:"pointer",flex:"none",padding:0}}>✕</button>}
 </div>
 {a.email&&!a.gmailConnected&&<button onClick={e=>{e.stopPropagation();connectStore(a)}} style={{fontSize:10.5,fontWeight:700,color:"#fff",background:"#1b2a6b",border:"none",borderRadius:6,padding:"4px 9px",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5,alignSelf:"flex-start",marginTop:4}}>🔗 {TT("Google ile Bağlan","Connect with Google")}</button>}
