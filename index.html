@@ -1307,16 +1307,19 @@ const list=await gGet(tok,base+"?q="+encodeURIComponent(q)+"&maxResults=25");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("İlgili e-posta bulunamadı.","No related emails found."));return;}
 const existing=Array.isArray(settings.cases)?settings.cases:[];const have=new Set(existing.map(c=>c.gmId).filter(Boolean));
 let added=0,skipped=0;const news=[];
+const decB64=(x)=>{const y=String(x||"").replace(/-/g,"+").replace(/_/g,"/");try{return decodeURIComponent(escape(atob(y)))}catch(_){try{return atob(y)}catch(e){return""}}};
+const decBody=(pl)=>{let o="";const w=(pp)=>{if(!pp)return;if(pp.body&&pp.body.data)o+=decB64(pp.body.data)+" ";if(pp.parts)pp.parts.forEach(w);};w(pl);return o;};
 for(const mm of msgs){
-const d=await gGet(tok,base+"/"+mm.id+"?format=metadata&metadataHeaders=Subject&metadataHeaders=From");
+const d=await gGet(tok,base+"/"+mm.id+"?format=full");
 const hs=(d.payload&&d.payload.headers)||[];const H=n=>{const h=hs.find(x=>x.name.toLowerCase()===n);return h?h.value:"";};
 const subj=H("subject")||TT("(konu yok)","(no subject)");
-const _txt=(subj+" "+(d.snippet||""));
+const _body=decBody(d.payload).slice(0,8000);
+const _txt=(subj+" "+(d.snippet||"")+" "+_body);
 if(!/policy violation|counter[\s-]?notice|\bdmca\b|\btrademark\b|\bcopyright\b|infring|removed[^.]{0,40}(listing|item|shop)|listing[^.]{0,20}removed|removed from your shop|closed (my|your|the) shop|shop (closed|suspend|deactivat)|account (suspend|deactivat)|deactivat|(intellectual property)\s*(infringement|complaint|violation|claim|notice|report)/i.test(_txt)){skipped++;continue;}
-const _lm=_txt.match(/["\u201c\u201d\u2018\u2019']([^"\u201c\u201d\u2018\u2019']{6,90})["\u201c\u201d\u2018\u2019']/);const listing=_lm?_lm[1].trim():"";
+const _url=_body.match(/etsy\.com\/listing\/(\d+)/i);const _lm=_txt.match(/["\u201c\u201d\u2018\u2019']([^"\u201c\u201d\u2018\u2019']{6,90})["\u201c\u201d\u2018\u2019']/);const listing=_url?("etsy.com/listing/"+_url[1]):(_lm?_lm[1].trim():"");
 const idt=d.internalDate?new Date(Number(d.internalDate)):null;
 if(!idt||isNaN(idt.getTime())){skipped++;continue;}
-const from=H("from")||"";const fromEmail=(from.match(/<([^>]+)>/)||[])[1]||(from.match(/[\w.+-]+@[\w.-]+/)||[])[0]||"";const fromName=(from.replace(/<[^>]+>/,"").replace(/["]/g,"").trim())||fromEmail;const blob=(subj+" "+(d.snippet||""));const type=/counter[\s-]?notice/i.test(blob)?"copyright":(/trademark|marka|®|™|registration\s*(number|no|#)|reg\.?\s*no|brand/i.test(blob)?"trademark":(/copyright|dmca|©|telif|artwork/i.test(blob)?"copyright":"trademark"));
+const from=H("from")||"";const fromEmail=(from.match(/<([^>]+)>/)||[])[1]||(from.match(/[\w.+-]+@[\w.-]+/)||[])[0]||"";const fromName=(from.replace(/<[^>]+>/,"").replace(/["]/g,"").trim())||fromEmail;const blob=(subj+" "+(d.snippet||"")+" "+_body);const type=/counter[\s-]?notice/i.test(blob)?"copyright":(/trademark|marka|®|™|registration\s*(number|no|#)|reg\.?\s*no|brand/i.test(blob)?"trademark":(/copyright|dmca|©|telif|artwork/i.test(blob)?"copyright":"trademark"));
 news.push({id:"c"+mm.id,gmId:mm.id,title:subj.slice(0,140),mark:subj.slice(0,140),listing:listing,company:fromName,gmail:fromEmail,type,status:"notice",store:acc.name,storeId:acc.id,date:idt.toISOString().slice(0,10),notes:(d.snippet||"").slice(0,200)});added++;}
 setSettings(s=>{const others=(Array.isArray(s.cases)?s.cases:[]).filter(c=>!(c.storeId===acc.id&&c.gmId));return{...s,cases:[...news,...others]};});
 setToast(added?(added+TT(" vaka eklendi"," cases added")+(skipped?" ("+skipped+TT(" atlandı"," skipped")+")":"")+"."):TT("Yeni vaka yok.","No new cases."));}
@@ -1364,7 +1367,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM107 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM108 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
