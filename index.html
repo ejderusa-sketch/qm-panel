@@ -1364,7 +1364,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM104 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM105 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1381,15 +1381,12 @@ return(
 <input value={a.name||""} onClick={e=>e.stopPropagation()} onFocus={()=>setAct(a.id)} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>s.id===a.id?{...s,name:v}:s))}} placeholder={lang==="tr"?"Mağaza adı…":"Store name…"} title={lang==="tr"?"Adı elle düzenle":"Edit name manually"} style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,fontFamily:"'Inter'",border:"1px solid var(--line2)",borderRadius:6,padding:"3px 6px",background:"var(--panel)",color:"var(--ink)"}}/>
 {st.count>0&&<span className={"sb"+(st.close?" red":"")}>{st.count}</span>}
 </div>
-<input value={a.email||""} placeholder={lang==="tr"?"✉️ e-posta ekle…":"✉️ add email…"} title={a.gmailConnected?TT("Tıkla → e-postadan çek","Click → fetch from email"):""} onClick={e=>{e.stopPropagation();if(a.gmailConnected)fetchStoreCSV(a);}} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>{if(s.id!==a.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=(v.split("@")[0]||"").trim();return{...s,email:v,name:(def&&lp)?lp.toUpperCase():s.name}}))}} style={{width:"100%",fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 7px",background:"var(--panel)",color:"var(--ink)"}}/>
-{a.email&&(a.gmailConnected?
-<div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}} onClick={e=>e.stopPropagation()}>
-<span style={{fontSize:10,fontWeight:800,color:"var(--green)"}}>✓ {TT("Bağlı","Connected")}</span>
-
-<button onClick={()=>disconnectStore(a)} title={TT("Bağlantıyı kes","Disconnect")} style={{fontSize:10.5,color:"var(--faint)",background:"none",border:"none",cursor:"pointer"}}>✕</button>
+<div style={{display:"flex",gap:5,alignItems:"center"}}>
+<input value={a.email||""} placeholder={lang==="tr"?"✉️ e-posta ekle…":"✉️ add email…"} title={a.gmailConnected?TT("Tıkla → e-postadan çek","Click → fetch from email"):""} onClick={e=>{e.stopPropagation();if(a.gmailConnected)fetchStoreCSV(a);}} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>{if(s.id!==a.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=(v.split("@")[0]||"").trim();return{...s,email:v,name:(def&&lp)?lp.toUpperCase():s.name}}))}} style={{flex:1,minWidth:0,fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 7px",background:"var(--panel)",color:"var(--ink)"}}/>
+{a.email&&a.gmailConnected&&<span onClick={e=>e.stopPropagation()} title={TT("Bağlı","Connected")} style={{fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:5,padding:"3px 6px",whiteSpace:"nowrap",flex:"none"}}>✓ {TT("Bağlı","OK")}</span>}
+{a.email&&a.gmailConnected&&<button onClick={e=>{e.stopPropagation();disconnectStore(a);}} title={TT("Bağlantıyı kes","Disconnect")} style={{fontSize:11,color:"var(--faint)",background:"none",border:"none",cursor:"pointer",flex:"none",padding:0}}>✕</button>}
 </div>
-:<button onClick={e=>{e.stopPropagation();connectStore(a)}} style={{fontSize:10.5,fontWeight:700,color:"#fff",background:"#1b2a6b",border:"none",borderRadius:6,padding:"4px 9px",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5,alignSelf:"flex-start"}}>🔗 {TT("Google ile Bağlan","Connect with Google")}</button>
-)}
+{a.email&&!a.gmailConnected&&<button onClick={e=>{e.stopPropagation();connectStore(a)}} style={{fontSize:10.5,fontWeight:700,color:"#fff",background:"#1b2a6b",border:"none",borderRadius:6,padding:"4px 9px",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5,alignSelf:"flex-start",marginTop:4}}>🔗 {TT("Google ile Bağlan","Connect with Google")}</button>}
 </div>);
 })}
 {accounts.length===0&&<div style={{padding:"16px 10px 6px",textAlign:"center",color:"var(--faint)",fontSize:12,lineHeight:1.6}}>{TT("Henüz mağaza yok.","No stores yet.")}<br/>{TT("Aşağıdan bağla.","Connect below.")}</div>}
