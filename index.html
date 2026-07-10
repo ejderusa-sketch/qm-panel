@@ -1259,7 +1259,7 @@ if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectSto
 setAct(acc.id);
 setToast(TT("Gmail'den çekiliyor…","Fetching from Gmail…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
-const list=await gGet(tok,base+"?q="+encodeURIComponent("has:attachment newer_than:395d in:anywhere")+"&maxResults=30");
+const list=await gGet(tok,base+"?q="+encodeURIComponent("has:attachment newer_than:760d in:anywhere")+"&maxResults=30");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("Son 1 yılda ekli e-posta bulunamadı.","No email with attachments in the last year."));return;}
 const ak=(settings.apiKey||"").trim();const inC=typeof window!=="undefined"&&window.storage;
 const sysP="Sen veri cikarma asistanisin. Etsy Ads raporu gorselindeki HER listing satirini oku. Yalnizca JSON dizisi dondur - markdown yok. Her oge: {\"name\":\"metin\",\"impressions\":sayi,\"clicks\":sayi,\"spend\":sayi,\"orders\":sayi,\"revenue\":sayi}. Sutun sirasi: Views·Clicks·%·Orders·Revenue·Spend·ROAS. Revenue ile Spend karistirma. % ve ROAS yok say. $ TL kaldir. Bos=0. Toplam satirini dahil etme.";
@@ -1286,8 +1286,8 @@ let tok=await getToken(acc);
 if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,false);return;}
 setToast(TT("Trademark e-postaları taranıyor…","Scanning trademark emails…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
-const q='(subject:(removed OR deactivated OR suspended OR closed OR infringement OR trademark OR copyright OR DMCA OR \"policy violation\" OR \"intellectual property\") OR \"policy violation\" OR infringement OR \"counter notice\") newer_than:395d in:anywhere';
-const list=await gGet(tok,base+"?q="+encodeURIComponent(q)+"&maxResults=25");
+const q='(subject:(removed OR deactivated OR suspended OR closed OR infringement OR trademark OR copyright OR DMCA OR \"policy violation\" OR \"intellectual property\") OR \"policy violation\" OR infringement OR \"counter notice\") newer_than:1460d in:anywhere';
+const list=await gGet(tok,base+"?q="+encodeURIComponent(q)+"&maxResults=100");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("İlgili e-posta bulunamadı.","No related emails found."));return;}
 const existing=Array.isArray(settings.cases)?settings.cases:[];const have=new Set(existing.map(c=>c.gmId).filter(Boolean));
 let added=0,skipped=0;const news=[];
@@ -1351,7 +1351,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM134 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM135 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
