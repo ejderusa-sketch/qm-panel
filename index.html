@@ -329,22 +329,12 @@ const ctr=imp?clk/imp:0,cpc=clk?spend/clk:0,conv=clk?ord/clk:0,roas=spend?rev/sp
 const _minImp=(s.enMinImp===false)?0:(toNum(s.minImp)||1000),_minClk=(s.enMinClk===false)?0:(toNum(s.minClicks)||30);
 if(imp<_minImp&&clk<_minClk)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"VERİ AZ",tone:"muted",reason:`Yeterli veri yok — en az ${numFmt(_minImp)} gösterim veya ${_minClk} tıklama biriksin.`};
 const R=s.rules||[];
-if(Array.isArray(R)){for(const rule of R){if(!rule.on)continue;const rv=toNum(rule.n);
-if(rule.type==="spend_gte"&&spend>=rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: harcama ${money(spend,s.cur)} ≥ ${money(rv,s.cur)} — kapat.`};
-if(rule.type==="clk_no_sale"&&clk>=rv&&ord<=0)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ${numFmt(clk)} tıklama var ama 0 satış — kapat.`};
-if(rule.type==="roas_lt"&&spend>0&&roas<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ROAS ${roas.toFixed(2)}× < ${rv}× — kapat.`};
-if(rule.type==="ctr_lt"&&imp>0&&ctr*100<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: CTR ${(ctr*100).toFixed(2)}% < ${rv}% — kapat.`};
-if(rule.type==="ctr_fix"&&imp>=1000&&ctr*100<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"DÜZELT",tone:"amber",reason:`Kural: ${numFmt(imp)} gösterim + CTR ${(ctr*100).toFixed(2)}% < ${rv}% — görsel/başlık düzelt.`};
-if(rule.type==="imp_no_clk"&&imp>=rv&&clk<=0)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ${numFmt(imp)} gösterim var ama 0 tıklama — kapat.`};
-if(rule.type==="spend_no_sale"&&spend>=rv&&ord<=0)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ${money(spend,s.cur)} harcanmış ama 0 satış — kapat.`};
-if(rule.type==="rev_lt"&&spend>0&&rev<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: gelir ${money(rev,s.cur)} < ${money(rv,s.cur)} eşiği — kapat.`};
-if(rule.type==="acos_gt"&&rev>0&&acos*100>rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: ACOS ${(acos*100).toFixed(1)}% > ${rv}% — kapat.`};
-if(rule.type==="conv_lt"&&clk>0&&conv*100<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: dönüşüm ${(conv*100).toFixed(2)}% < ${rv}% — kapat.`};
-if(rule.type==="cpa_gt"&&ord>0&&(spend/ord)>rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: sipariş maliyeti ${money(spend/ord,s.cur)} > ${money(rv,s.cur)} — kapat.`};
-if(rule.type==="cpc_gt"&&clk>0&&cpc>rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: tık maliyeti ${money(cpc,s.cur)} > ${money(rv,s.cur)} — kapat.`};
-if(rule.type==="ord_lt"&&spend>0&&ord<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`Kural: sipariş ${numFmt(ord)} < ${rv} — kapat.`};
-if(rule.type==="aov_lt"&&ord>0&&(rev/ord)<rv)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"İZLE",tone:"amber",reason:`Kural: ortalama sepet ${money(rev/ord,s.cur)} < ${money(rv,s.cur)} — izle.`};
-}}
+const AOVv=ord?rev/ord:0,CPAv=ord?spend/ord:0;
+const RDEF={roas_lt:{lo:1,hi:2,dir:1,v:roas},conv_lt:{lo:1,hi:2,dir:1,v:conv*100},ctr_fix:{lo:0.5,hi:1,dir:1,v:ctr*100},acos_gt:{lo:25,hi:40,dir:-1,v:acos*100},cpc_gt:{lo:0.3,hi:0.6,dir:-1,v:cpc},cpa_gt:{lo:5,hi:10,dir:-1,v:CPAv},ord_lt:{lo:1,hi:3,dir:1,v:ord},rev_lt:{lo:20,hi:50,dir:1,v:rev},spend_gte:{lo:20,hi:50,dir:-1,v:spend},imp_no_clk:{lo:500,hi:1000,dir:1,v:imp},aov_lt:{lo:15,hi:25,dir:1,v:AOVv}};
+let worst=null,wr=null;
+if(Array.isArray(R))for(const rule of R){if(!rule.on)continue;const D=RDEF[rule.type];if(!D)continue;const lo=(rule.lo!=null&&rule.lo!=="")?toNum(rule.lo):D.lo,hi=(rule.hi!=null&&rule.hi!=="")?toNum(rule.hi):D.hi,v=D.v;let z;if(D.dir>0)z=(v<lo?0:v<hi?1:2);else z=(v>hi?0:v>lo?1:2);if(worst==null||z<worst){worst=z;wr={type:rule.type,v,lo,hi};}}
+if(spend>0&&rev<=0)return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict:"KAPAT",tone:"red",reason:`${money(spend,s.cur)} harcandı, 0 satış — kapat.`};
+if(worst!=null){const verdict=worst===0?"KAPAT":worst===1?"İZLE":"BÜYÜT";const tone=worst===0?"red":worst===1?"amber":"green";const zt=worst===0?"KAPAT aralığında":worst===1?"BEKLE aralığında":"AÇ aralığında";return{imp,clk,spend,ord,rev,ctr,cpc,conv,roas,acos,net,verdict,tone,reason:`${wr.type}: ${Math.round(wr.v*100)/100} → ${zt} (alt ${wr.lo} · üst ${wr.hi}).`};}
 let verdict="VERİ AZ",tone="muted",reason="";
 const _mClk=(s.enMinClk===false)?0:s.minClicks,_mSpend=(s.enMinSpend===false)?0:s.minSpend;
 if(clk<_mClk&&spend<_mSpend){reason=`Sadece ${numFmt(clk)} tıklama / ${money(spend,s.cur)} harcama. En az ${s.minClicks} tıklama biriksin.`}
@@ -908,17 +898,13 @@ const Sq=({label,color,v,set,st,unit})=><div style={{minWidth:0,border:"1px soli
 </div></div>;
 return(<div className="rules" style={{marginBottom:14}}>
 <div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("A1 · Ayarlar — Marketing Parametreleri","A1 · Settings — Marketing Parameters")}</span><span style={{marginLeft:"auto",fontSize:12,fontWeight:800,color:"var(--orange)",display:"inline-flex",alignItems:"center",gap:5}}>🏪 {storeName||"—"} <span style={{fontWeight:600,color:"var(--faint)"}}>{TT("(bu mağazaya özel)","(store-specific)")}</span></span></div>
-<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her parametre için 3 aksiyon eşiği: KAPAT · KAPATMA · BEKLE. Metriği aç/kapat, her karenin eşiğini −/+ ile ayarla.","Each parameter has 3 action thresholds: CLOSE · SHUT · HOLD. Toggle the metric and set each square with −/+.")}</div>
+<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her metrikte 2 sınır (ALT · ÜST) → 3 aralık: 🔴 KAPAT · 🟡 BEKLE · 🟢 AÇ. Değer hangi aralıktaysa o karar verilir. Metriği aç/kapat, sınırları −/+ ile ayarla.","Each metric has 2 bounds (LOW · HIGH) → 3 zones: 🔴 CLOSE · 🟡 HOLD · 🟢 OPEN. The value falls into one zone. Toggle and set bounds with −/+.")}</div>
 <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
 <div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:10,maxWidth:1040,padding:"4px 12px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
 <div style={{display:"flex",gap:12,alignItems:"flex-start",flexWrap:"wrap"}}>
 <div style={{display:"flex",alignItems:"center",gap:8,width:148,flex:"none"}}><Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/><span style={{fontSize:12.5,fontWeight:700}}>{TT(p.tr,p.en)}</span></div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,108px))",gap:6,flex:"none",opacity:r.on?1:0.5}}>
-<Sq label={TT("KAPAT","CLOSE")} color="var(--red)" v={toNum(r.n)} set={v=>setR(p.type,{n:v})} st={p.st} unit={p.unit}/>
-<Sq label={TT("KAPATMA","SHUT")} color="var(--orange)" v={toNum(r.kapatma)} set={v=>setR(p.type,{kapatma:v})} st={p.st} unit={p.unit}/>
-<Sq label={TT("BEKLE","HOLD")} color="var(--amber)" v={toNum(r.bekle)} set={v=>setR(p.type,{bekle:v})} st={p.st} unit={p.unit}/>
-</div>
+{(()=>{const DEF=({roas_lt:{lo:1,hi:2,dir:1},conv_lt:{lo:1,hi:2,dir:1},ctr_fix:{lo:0.5,hi:1,dir:1},acos_gt:{lo:25,hi:40,dir:-1},cpc_gt:{lo:0.3,hi:0.6,dir:-1},cpa_gt:{lo:5,hi:10,dir:-1},ord_lt:{lo:1,hi:3,dir:1},rev_lt:{lo:20,hi:50,dir:1},spend_gte:{lo:20,hi:50,dir:-1},imp_no_clk:{lo:500,hi:1000,dir:1},aov_lt:{lo:15,hi:25,dir:1}})[p.type]||{lo:0,hi:0,dir:1};const lo=(r.lo!=null&&r.lo!=="")?toNum(r.lo):DEF.lo,hi=(r.hi!=null&&r.hi!=="")?toNum(r.hi):DEF.hi,u=p.unit,dir=DEF.dir;const kapatTxt=dir>0?("< "+lo+u):("> "+hi+u),bekleTxt=lo+u+"–"+hi+u,acTxt=dir>0?("≥ "+hi+u):("≤ "+lo+u);return(<div style={{display:"flex",flexDirection:"column",gap:5,flex:"none",opacity:r.on?1:0.5}}><div style={{display:"flex",gap:6}}><Sq label={TT("ALT SINIR","LOW")} color="var(--azure)" v={lo} set={v=>setR(p.type,{lo:v})} st={p.st} unit={p.unit}/><Sq label={TT("ÜST SINIR","HIGH")} color="var(--azure)" v={hi} set={v=>setR(p.type,{hi:v})} st={p.st} unit={p.unit}/></div><div style={{display:"flex",gap:4,fontSize:9,fontWeight:800,flexWrap:"wrap"}}><span style={{color:"var(--red)",padding:"2px 6px",background:"var(--red-s)",borderRadius:5,whiteSpace:"nowrap"}}>🔴 {kapatTxt}</span><span style={{color:"var(--amber)",padding:"2px 6px",background:"var(--amber-s)",borderRadius:5,whiteSpace:"nowrap"}}>🟡 {bekleTxt}</span><span style={{color:"var(--green)",padding:"2px 6px",background:"var(--green-s)",borderRadius:5,whiteSpace:"nowrap"}}>🟢 {acTxt}</span></div></div>);})()}
 <div style={{flex:1,minWidth:200}}>{(RNOTES[p.type]?TT(RNOTES[p.type].tr,RNOTES[p.type].en):[]).map((ln,i)=><div key={i} style={{fontSize:10.5,color:"var(--muted)",lineHeight:1.22,display:"flex",gap:6,marginBottom:0}}><b style={{color:"var(--azure)",flex:"none",fontWeight:800,fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}</div>
 </div>
 </div>);})}
@@ -1374,7 +1360,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM101 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM102 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
