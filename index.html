@@ -1052,7 +1052,7 @@ const skipSave=useRef(false);
 const[showBulk,setShowBulk]=useState(false);const[bulkText,setBulkText]=useState("");
 const fRef=useRef();
 const hiRef=useRef();
-const gmStoreTok=useRef((()=>{try{return JSON.parse(sessionStorage.getItem("qmGmTok")||"{}")}catch(e){return{}}})());
+const gmStoreTok=useRef((()=>{try{return JSON.parse(localStorage.getItem("qmGmTok")||sessionStorage.getItem("qmGmTok")||"{}")}catch(e){return{}}})());
 
 const key=`${act}|${period}`;
 const rangeMonths=(p)=>{const now=new Date();const y=now.getFullYear(),m=now.getMonth();const out=[];if(p==="l1m"){out.push(y+"-"+String(m+1).padStart(2,"0"));}else if(p==="l3m"){for(let i=0;i<3;i++){const d=new Date(y,m-i,1);out.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"));}}else if(p==="ytd"){for(let mm=0;mm<=m;mm++){out.push(y+"-"+String(mm+1).padStart(2,"0"));}}return out;};
@@ -1235,20 +1235,23 @@ setGmData({email:prof.emailAddress,etsyAll:ed,ssAll:sd,orderCount:oc,shipCount:s
 catch(e){setGmErr("Çekilemedi: "+(e.message||"hata"))}finally{setGmLoad(false)}};
 
 /* QM19: mağaza başına Gmail bağlantısı */
+const silentGm=(acc)=>new Promise((res)=>{try{const cid=((acc&&acc.gcid)||settings.googleClientId||DEFAULT_GCID||"").trim();if(!cid||!window.google||!window.google.accounts){res(null);return;}const tc=window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",login_hint:acc.email||"",prompt:"",callback:(r)=>{if(r&&r.access_token){gmStoreTok.current[acc.id]=r.access_token;try{localStorage.setItem("qmGmTok",JSON.stringify(gmStoreTok.current))}catch(e){}res(r.access_token);}else{res(null);}}});tc.requestAccessToken({prompt:""});}catch(e){res(null);}});
 const connectStore=(acc,andFetch)=>{const cid=((acc&&acc.gcid)||settings.googleClientId||DEFAULT_GCID||"").trim();
 if(!cid){setToast(TT("Google Client ID bulunamadı.","Google Client ID not found."));setShowSet(true);return;}
 if(!window.google||!window.google.accounts){setToast(TT("Google kütüphanesi yüklenemedi.","Google library not loaded."));return;}
 try{window.google.accounts.oauth2.initTokenClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly",login_hint:acc.email||"",prompt:"",callback:async r=>{
 if(r.error){setToast(TT("Bağlantı iptal edildi.","Connection cancelled."));return;}
-gmStoreTok.current[acc.id]=r.access_token;try{sessionStorage.setItem("qmGmTok",JSON.stringify(gmStoreTok.current))}catch(e){}
+gmStoreTok.current[acc.id]=r.access_token;try{localStorage.setItem("qmGmTok",JSON.stringify(gmStoreTok.current))}catch(e){}
 try{const prof=await gGet(r.access_token,"https://www.googleapis.com/gmail/v1/users/me/profile");
 setAccounts(x=>x.map(s=>{if(s.id!==acc.id)return s;const def=/^0?\d+\s+(MAĞAZA|STORE)$/i.test((s.name||"").trim());const lp=((prof.emailAddress||"").split("@")[0]||"").trim();return{...s,email:prof.emailAddress,gmailConnected:true,name:(def&&lp)?lp.toUpperCase():s.name}}));
 setToast("✓ "+prof.emailAddress+" "+TT("bağlandı","connected"));if(andFetch)setTimeout(()=>fetchStoreCSV(acc),400);}
 catch(e){setToast(TT("Profil alınamadı: ","Profile error: ")+(e.message||""));}
 }}).requestAccessToken();}
 catch(e){setToast(TT("Bağlanılamadı: ","Connect error: ")+(e.message||""));}};
-const disconnectStore=(acc)=>{delete gmStoreTok.current[acc.id];try{sessionStorage.setItem("qmGmTok",JSON.stringify(gmStoreTok.current))}catch(e){}setAccounts(x=>x.map(s=>s.id===acc.id?{...s,gmailConnected:false}:s));};
-const fetchStoreCSV=async(acc)=>{const tok=gmStoreTok.current[acc.id];
+const disconnectStore=(acc)=>{delete gmStoreTok.current[acc.id];try{localStorage.setItem("qmGmTok",JSON.stringify(gmStoreTok.current))}catch(e){}setAccounts(x=>x.map(s=>s.id===acc.id?{...s,gmailConnected:false}:s));};
+useEffect(()=>{let stop=false;const run=async()=>{for(const a of (accounts||[])){if(a&&a.gmailConnected&&a.email){try{await silentGm(a);}catch(e){}}}};let tries=0;const iv=setInterval(()=>{if(window.google&&window.google.accounts){clearInterval(iv);if(!stop)run();}else if(++tries>40){clearInterval(iv);}},300);const rf=setInterval(()=>{if(!stop)run();},40*60*1000);return()=>{stop=true;clearInterval(iv);clearInterval(rf);};},[loaded,accounts.length]);
+const fetchStoreCSV=async(acc)=>{let tok=gmStoreTok.current[acc.id];
+if(!tok){tok=await silentGm(acc);}
 if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,true);return;}
 setAct(acc.id);
 setToast(TT("Gmail'den çekiliyor…","Fetching from Gmail…"));
@@ -1276,7 +1279,8 @@ if(imported)setToast(TT(imported+" rapor içeri alındı (her biri ayına).",imp
 else setToast(TT("Uygun rapor bulunamadı.","No suitable report found."));}
 catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
 const fetchStoreTrademark=async(acc)=>{if(!acc){setToast(TT("Önce mağaza seç.","Select a store first."));return;}
-const tok=gmStoreTok.current[acc.id];
+let tok=gmStoreTok.current[acc.id];
+if(!tok){tok=await silentGm(acc);}
 if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,false);return;}
 setToast(TT("Trademark e-postaları taranıyor…","Scanning trademark emails…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
@@ -1345,7 +1349,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM120 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM121 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
