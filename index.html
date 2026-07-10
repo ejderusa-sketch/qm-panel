@@ -979,7 +979,7 @@ const iS={display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1p
 const lS={display:"block",fontSize:12.5,fontWeight:600,marginTop:12};
 return(<div style={{padding:"8px 0 40px"}}>
 
-{acc&&onFetch&&<div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap",alignItems:"center"}}><button className="btn pri" onClick={()=>onFetch(acc)}>📥 {(acc.name||"—")+" — "+TT("Gmail'den çek","Fetch from Gmail")}</button><span style={{fontSize:11.5,color:"var(--faint)"}}>{TT("Bu mağazanın kutusundan IP/trademark bildirimlerini çeker.","Fetches IP/trademark notices from this store's inbox.")}</span></div>}
+{acc&&onFetch&&(()=>{const _tm=shown.filter(c=>(c.type||"trademark")!=="copyright").length;const _cp=shown.filter(c=>c.type==="copyright").length;return(<div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap",alignItems:"center"}}><button className="btn pri" style={{fontSize:12,padding:"7px 13px"}} onClick={()=>onFetch(acc)}>📥 {(acc.name||"—")+" — "+TT("Gmail'den çek","Fetch from Gmail")}</button><span style={{fontSize:12.5,fontWeight:800,color:"#fff",background:"#ef6606",borderRadius:8,padding:"6px 12px"}}>⚖️ Trademark: {_tm}</span><span style={{fontSize:12.5,fontWeight:800,color:"#fff",background:"#1f7ae0",borderRadius:8,padding:"6px 12px"}}>© Copyright: {_cp}</span><span style={{fontSize:11.5,color:"var(--faint)"}}>{TT("Bu mağazanın kutusundan IP/trademark bildirimlerini çeker.","Fetches IP/trademark notices from this store's inbox.")}</span></div>);})()}
 {caseCard("trademark","⚖️ "+TT("Trademark Vakaları","Trademark Cases"),"var(--orange)")}
 {caseCard("copyright","© "+TT("Copyright Vakaları","Copyright Cases"),"var(--azure)")}
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
@@ -1351,7 +1351,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM133 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM134 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1433,7 +1433,7 @@ return(
 {PERIODS.map(([k,tr,en])=><option key={k} value={k}>{TT(tr,en)}</option>)}
 </select>
 <input type="month" value={/^\d{4}-\d{2}$/.test(period)?period:""} onChange={e=>{if(e.target.value)setPeriod(e.target.value)}} className="cur-sel" style={{fontFamily:"'Inter'",fontSize:13,padding:"7px 10px"}} title={TT("Özel ay seç","Custom month")}/>
-{[["l1m",TT("Son 1 Ay","Last 1 Mo")],["l3m",TT("Son 3 Ay","Last 3 Mo")],["ytd",TT("Yıl (YTD)","Year (YTD)")]].map(([k,lb])=><button key={k} onClick={()=>setPeriod(k)} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(period===k?"var(--azure)":"var(--line2)"),background:period===k?"var(--azure)":"var(--panel)",color:period===k?"#fff":"var(--ink)"}}>{lb}</button>)}
+{(()=>{const _n=new Date();const _cm=_n.getFullYear()+"-"+String(_n.getMonth()+1).padStart(2,"0");const _on=period===_cm;return <button onClick={()=>setPeriod(_cm)} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(_on?"var(--azure)":"var(--line2)"),background:_on?"var(--azure)":"var(--panel)",color:_on?"#fff":"var(--ink)"}}>{TT("Bu Ay","This Month")}</button>;})()}{[["l1m",TT("Son 1 Ay","Last 1 Mo")],["l3m",TT("Son 3 Ay","Last 3 Mo")],["ytd",TT("Yıl (YTD)","Year (YTD)")]].map(([k,lb])=><button key={k} onClick={()=>setPeriod(k)} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(period===k?"var(--azure)":"var(--line2)"),background:period===k?"var(--azure)":"var(--panel)",color:period===k?"#fff":"var(--ink)"}}>{lb}</button>)}
 
 </div>
 <div style={{display:"flex",gap:6,marginBottom:12}}>
