@@ -1341,7 +1341,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM138 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM139 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1427,7 +1427,7 @@ return(
 
 </div>
 <div style={{display:"flex",gap:6,marginBottom:12}}>
-{[["a1",TT("1.1 · Ayarlar","1.1 · Settings")],["a2",TT("1.2 · Analiz","1.2 · Analysis")]].map(([k,lb])=><button key={k} onClick={()=>setMSub(k)} style={{fontFamily:"'Space Grotesk'",fontSize:12.5,fontWeight:700,padding:"7px 14px",borderRadius:9,cursor:"pointer",border:"1px solid "+(mSub===k?"var(--azure)":"var(--line2)"),background:mSub===k?"var(--azure)":"var(--panel)",color:mSub===k?"#fff":"var(--ink)"}}>{lb}</button>)}
+{[["a1",TT("1.1 · Ayarlar","1.1 · Settings")],["a2",TT("1.2 · ACTION","1.2 · ACTION")],["a3",TT("1.3 · Dağılım","1.3 · Distribution")]].map(([k,lb])=><button key={k} onClick={()=>setMSub(k)} style={{fontFamily:"'Space Grotesk'",fontSize:12.5,fontWeight:700,padding:"7px 14px",borderRadius:9,cursor:"pointer",border:"1px solid "+(mSub===k?"var(--azure)":"var(--line2)"),background:mSub===k?"var(--azure)":"var(--panel)",color:mSub===k?"#fff":"var(--ink)"}}>{lb}</button>)}
 </div>
 {imgErr&&<div className="err">⚠ {imgErr}</div>}
 {imgBusy&&<div className="busy"><span className="sp"/>{imgMsg}</div>}
@@ -1477,7 +1477,7 @@ return(
 </tbody></table></div>
 </>)}
 
-{mSub==="a2"&&(()=>{
+{mSub==="a3"&&(()=>{
 const totSpend=evals.reduce((s,x)=>s+x.e.spend,0);
 if(totSpend<=0)return null;
 const catOf=nm=>{const s=(nm||"").toLowerCase();for(const c of CATS){if(c.kw.test(s))return c.label}return t.spUncat;};
@@ -1490,30 +1490,30 @@ const pal=["var(--orange)","var(--green)","var(--amber)","var(--red)","var(--azu
 const colOf=(c,i)=>/Embroidery/i.test(c.label)?"var(--azure)":pal[i%pal.length];
 return(
 <div className="rules" style={{marginTop:0,marginBottom:18}}>
-<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:16}}>{t.spTitle}</span></div>
+<div className="rh"><span className="bar" style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:22}}>{t.spTitle}</span></div>
 <div style={{display:"flex",gap:10,flexWrap:"wrap",margin:"8px 0 16px"}}>
 <div style={{flex:1,minWidth:160,background:"rgba(31,122,224,.09)",border:"1px solid var(--azure)",borderRadius:11,padding:"12px 14px"}}>
 <div style={{fontSize:12,color:"var(--muted)"}}>{t.spEmb}</div>
-<div className="mono" style={{fontSize:23,fontWeight:700,color:"var(--azure)"}}>%{embPct.toFixed(1)}</div>
+<div className="mono" style={{fontSize:32,fontWeight:700,color:"var(--azure)"}}>%{embPct.toFixed(1)}</div>
 <div className="mono" style={{fontSize:11.5,color:"var(--faint)"}}>{money(embSpend,settings.cur)}</div>
 </div>
 <div style={{flex:1,minWidth:160,background:"var(--panel2)",border:"1px solid var(--line2)",borderRadius:11,padding:"12px 14px"}}>
 <div style={{fontSize:12,color:"var(--muted)"}}>{t.spOther}</div>
-<div className="mono" style={{fontSize:23,fontWeight:700,color:"var(--ink)"}}>%{(100-embPct).toFixed(1)}</div>
+<div className="mono" style={{fontSize:32,fontWeight:700,color:"var(--ink)"}}>%{(100-embPct).toFixed(1)}</div>
 <div className="mono" style={{fontSize:11.5,color:"var(--faint)"}}>{money(totSpend-embSpend,settings.cur)}</div>
 </div>
 </div>
-<div style={{display:"flex",height:16,borderRadius:8,overflow:"hidden",border:"1px solid var(--line2)",marginBottom:16}}>
+<div style={{display:"flex",height:28,borderRadius:9,overflow:"hidden",border:"1px solid var(--line2)",marginBottom:20}}>
 {list.map((c,i)=>{const pct=c.spend/totSpend*100;return <div key={c.label} title={c.label} style={{width:pct+"%",background:colOf(c,i)}}/>;})}
 </div>
 <div style={{display:"flex",flexDirection:"column",gap:9}}>
 {list.map((c,i)=>{const pct=c.spend/totSpend*100;const col=colOf(c,i);return(
 <div key={c.label} style={{display:"flex",alignItems:"center",gap:12}}>
-<span style={{width:10,height:10,borderRadius:3,background:col,flexShrink:0}}/>
-<span style={{flex:"0 0 180px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{c.label} <span style={{color:"var(--faint)",fontWeight:400,fontSize:11.5}}>({c.n})</span></span>
-<div style={{flex:1,height:10,background:"var(--panel2)",borderRadius:6,overflow:"hidden"}}><div style={{width:pct+"%",height:"100%",background:col}}/></div>
-<span className="mono" style={{fontSize:12.5,fontWeight:700,minWidth:48,textAlign:"right"}}>%{pct.toFixed(1)}</span>
-<span className="mono" style={{fontSize:11.5,color:"var(--muted)",minWidth:72,textAlign:"right"}}>{money(c.spend,settings.cur)}</span>
+<span style={{width:14,height:14,borderRadius:4,background:col,flexShrink:0}}/>
+<span style={{flex:"0 0 250px",fontSize:15,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{c.label} <span style={{color:"var(--faint)",fontWeight:400,fontSize:11.5}}>({c.n})</span></span>
+<div style={{flex:1,height:16,background:"var(--panel2)",borderRadius:8,overflow:"hidden"}}><div style={{width:pct+"%",height:"100%",background:col}}/></div>
+<span className="mono" style={{fontSize:15,fontWeight:700,minWidth:56,textAlign:"right"}}>%{pct.toFixed(1)}</span>
+<span className="mono" style={{fontSize:13.5,color:"var(--muted)",minWidth:84,textAlign:"right"}}>{money(c.spend,settings.cur)}</span>
 </div>);})}
 </div>
 <div style={{fontSize:11.5,color:"var(--faint)",marginTop:12,lineHeight:1.5}}>{t.spNote}</div>
