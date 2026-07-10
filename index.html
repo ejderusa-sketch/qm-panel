@@ -963,9 +963,9 @@ const caseCard=(typeKey,heading,accent)=>{const rows=shown.filter(c=>typeKey==="
 {["NO","MAĞAZA","ADET",typeKey==="copyright"?"COPYRIGHT":"TRADEMARK","LISTING","ŞİRKET","GMAIL","NE ZAMAN YEDİ","KAÇ EMAIL","EN SON","HAZIRLA","GÖNDER","CEVAP","KALDIRILDI","DEVAM",""].map((h,i)=><th key={i} className="l" style={{fontSize:10,fontWeight:800,whiteSpace:"nowrap",letterSpacing:".02em"}}>{h}</th>)}
 </tr></thead><tbody>
 {rows.length===0&&<tr><td colSpan={16}><div className="empty" style={{padding:20}}><p>{TT("Bu bölümde vaka yok. ➕ Vaka ekle.","No cases here. ➕ Add case.")}</p></div></td></tr>}
-{rows.map(c=>{const si=accounts.findIndex(a=>a.id===(c.storeId||act));const idx=si<0?0:si;const col=STORE_COLORS[idx%STORE_COLORS.length];return(
+{rows.map((c,ri)=>{const si=accounts.findIndex(a=>a.id===(c.storeId||act));const idx=si<0?0:si;const col=STORE_COLORS[idx%STORE_COLORS.length];return(
 <tr key={c.id} style={{verticalAlign:"middle"}}>
-<td><span className="ic" style={{background:col,color:"#fff"}}>{String(idx+1).padStart(2,"0")}</span></td>
+<td><span className="ic" style={{background:col,color:"#fff"}}>{ri+1}</span></td>
 <td className="l" style={{fontWeight:700,whiteSpace:"nowrap",color:col}}>{c.store||(acc&&acc.name)||"—"}</td>
 <td><input value={c.count||""} onChange={e=>upC(c.id,"count",e.target.value)} style={{...ci,width:42,textAlign:"center"}}/></td>
 <td><input value={c.mark||c.title||""} onChange={e=>upC(c.id,"mark",e.target.value)} style={{...ci,minWidth:120}}/></td>
@@ -990,6 +990,7 @@ const iS={display:"block",width:"100%",marginTop:5,padding:"9px 12px",border:"1p
 const lS={display:"block",fontSize:12.5,fontWeight:600,marginTop:12};
 return(<div style={{padding:"8px 0 40px"}}>
 {accounts.filter(x=>x.name||x.email).length>0&&<div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>{accounts.map((a,i)=>(a.name||a.email)?<button key={a.id} onClick={()=>setAct&&setAct(a.id)} title={a.email||""} style={{display:"inline-flex",alignItems:"center",gap:7,padding:"6px 13px",borderRadius:999,cursor:"pointer",border:"1.5px solid "+(a.id===act?STORE_COLORS[i%STORE_COLORS.length]:"var(--line2)"),background:a.id===act?STORE_COLORS[i%STORE_COLORS.length]:"var(--panel)",color:a.id===act?"#fff":"var(--ink)",fontWeight:700,fontSize:12.5}}><span style={{fontFamily:"'Space Grotesk'",fontWeight:800,fontSize:11,opacity:.9}}>{String(i+1).padStart(2,"0")}</span>{a.name||"—"}</button>:null)}</div>}
+{acc&&onFetch&&<div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap",alignItems:"center"}}><button className="btn pri" onClick={()=>onFetch(acc)}>📥 {(acc.name||"—")+" — "+TT("Gmail'den çek","Fetch from Gmail")}</button><span style={{fontSize:11.5,color:"var(--faint)"}}>{TT("Bu mağazanın kutusundan IP/trademark bildirimlerini çeker.","Fetches IP/trademark notices from this store's inbox.")}</span></div>}
 {caseCard("trademark","⚖️ "+TT("Trademark Vakaları","Trademark Cases"),"var(--orange)")}
 {caseCard("copyright","© "+TT("Copyright Vakaları","Copyright Cases"),"var(--azure)")}
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
@@ -1219,7 +1220,7 @@ useEffect(()=>{const h=e=>{const it=e.clipboardData&&e.clipboardData.items;if(!i
 
 const applyPaste=()=>{const p=parseReport(pt);if(!p.length){flash("Okunamadı.");return}setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);setPt("");setShowPaste(false);flash(`${p.length} listing eklendi.`)};
 const handleCSV=async(file,targetPeriod,targetAct,requireNames)=>{if(!file)return false;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
-try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;if(requireNames&&!dmo)return false;const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} → ${tp}`);return true}
+try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} → ${tp}${dmo?"":" ⚠ tarih yok"}`);return true}
 catch(err){setImgErr("CSV hatası: "+(err&&err.message||"bilinmeyen"))}
 finally{const el=document.getElementById("csvInput");if(el)el.value=""}};
 
@@ -1305,7 +1306,7 @@ const subj=H("subject")||TT("(konu yok)","(no subject)");
 const _body=decBody(d.payload).slice(0,8000);
 const _txt=(subj+" "+(d.snippet||"")+" "+_body);
 if(!/policy violation|counter[\s-]?notice|\bdmca\b|\btrademark\b|\bcopyright\b|infring|removed[^.]{0,40}(listing|item|shop)|listing[^.]{0,20}removed|removed from your shop|closed (my|your|the) shop|shop (closed|suspend|deactivat)|account (suspend|deactivat)|deactivat|(intellectual property)\s*(infringement|complaint|violation|claim|notice|report)/i.test(_txt)){skipped++;continue;}
-const _url=_body.match(/etsy\.com\/listing\/(\d+)/i);const _lm=_txt.match(/["\u201c\u201d\u2018\u2019']([^"\u201c\u201d\u2018\u2019']{6,90})["\u201c\u201d\u2018\u2019']/);const listing=_url?("etsy.com/listing/"+_url[1]):(_lm?_lm[1].trim():"");
+const _url=_body.match(/etsy\.com\/listing\/(\d+)/i);const _lm=_txt.match(/["\u201c\u201d\u2018\u2019']([^"\u201c\u201d\u2018\u2019']{6,90})["\u201c\u201d\u2018\u2019']/);const listing=_url?("etsy.com/listing/"+_url[1]):"";
 const idt=d.internalDate?new Date(Number(d.internalDate)):null;
 if(!idt||isNaN(idt.getTime())){skipped++;continue;}
 const from=H("from")||"";const fromEmail=(from.match(/<([^>]+)>/)||[])[1]||(from.match(/[\w.+-]+@[\w.-]+/)||[])[0]||"";const fromName=(from.replace(/<[^>]+>/,"").replace(/["]/g,"").trim())||fromEmail;const blob=(subj+" "+(d.snippet||"")+" "+_body);const type=/counter[\s-]?notice/i.test(blob)?"copyright":(/trademark|marka|®|™|registration\s*(number|no|#)|reg\.?\s*no|brand/i.test(blob)?"trademark":(/copyright|dmca|©|telif|artwork/i.test(blob)?"copyright":"trademark"));
@@ -1356,7 +1357,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM113 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM116 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
