@@ -898,13 +898,13 @@ const Sq=({label,color,v,set,st,unit})=><div style={{minWidth:0,border:"1px soli
 </div></div>;
 return(<div className="rules" style={{marginBottom:14}}>
 <div className="rh"><span style={{width:3,height:15,background:"var(--orange)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>⚙ {TT("A1 · Ayarlar — Marketing Parametreleri","A1 · Settings — Marketing Parameters")}</span><span style={{marginLeft:"auto",fontSize:12,fontWeight:800,color:"var(--orange)",display:"inline-flex",alignItems:"center",gap:5}}>🏪 {storeName||"—"} <span style={{fontWeight:600,color:"var(--faint)"}}>{TT("(bu mağazaya özel)","(store-specific)")}</span></span></div>
-<div style={{fontSize:12.5,color:"var(--muted)",margin:"2px 0 12px"}}>{TT("Her metrikte 2 sınır (ALT · ÜST) → 3 aralık: 🔴 KAPAT · 🟡 BEKLE · 🟢 AÇ. Değer hangi aralıktaysa o karar verilir. Metriği aç/kapat, sınırları −/+ ile ayarla.","Each metric has 2 bounds (LOW · HIGH) → 3 zones: 🔴 CLOSE · 🟡 HOLD · 🟢 OPEN. The value falls into one zone. Toggle and set bounds with −/+.")}</div>
+
 <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10}}>
 {PARAMS.map(p=>{const r=getR(p.type);return(
 <div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:10,maxWidth:1040,padding:"4px 12px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
 <div style={{display:"flex",gap:12,alignItems:"flex-start",flexWrap:"wrap"}}>
 <div style={{display:"flex",alignItems:"center",gap:8,width:148,flex:"none"}}><Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/><span style={{fontSize:12.5,fontWeight:700}}>{TT(p.tr,p.en)}</span></div>
-{(()=>{const DEF=({roas_lt:{lo:1,hi:2,dir:1},conv_lt:{lo:1,hi:2,dir:1},ctr_fix:{lo:0.5,hi:1,dir:1},acos_gt:{lo:25,hi:40,dir:-1},cpc_gt:{lo:0.3,hi:0.6,dir:-1},cpa_gt:{lo:5,hi:10,dir:-1},ord_lt:{lo:1,hi:3,dir:1},rev_lt:{lo:20,hi:50,dir:1},spend_gte:{lo:20,hi:50,dir:-1},imp_no_clk:{lo:500,hi:1000,dir:1},aov_lt:{lo:15,hi:25,dir:1}})[p.type]||{lo:0,hi:0,dir:1};const lo=(r.lo!=null&&r.lo!=="")?toNum(r.lo):DEF.lo,hi=(r.hi!=null&&r.hi!=="")?toNum(r.hi):DEF.hi,u=p.unit,dir=DEF.dir;const kapatTxt=dir>0?("< "+lo+u):("> "+hi+u),bekleTxt=lo+u+"–"+hi+u,acTxt=dir>0?("≥ "+hi+u):("≤ "+lo+u);return(<div style={{display:"flex",flexDirection:"column",gap:5,flex:"none",opacity:r.on?1:0.5}}><div style={{display:"flex",gap:6}}><Sq label={TT("ALT SINIR","LOW")} color="var(--azure)" v={lo} set={v=>setR(p.type,{lo:v})} st={p.st} unit={p.unit}/><Sq label={TT("ÜST SINIR","HIGH")} color="var(--azure)" v={hi} set={v=>setR(p.type,{hi:v})} st={p.st} unit={p.unit}/></div><div style={{display:"flex",gap:4,fontSize:9,fontWeight:800,flexWrap:"wrap"}}><span style={{color:"var(--red)",padding:"2px 6px",background:"var(--red-s)",borderRadius:5,whiteSpace:"nowrap"}}>🔴 {kapatTxt}</span><span style={{color:"var(--amber)",padding:"2px 6px",background:"var(--amber-s)",borderRadius:5,whiteSpace:"nowrap"}}>🟡 {bekleTxt}</span><span style={{color:"var(--green)",padding:"2px 6px",background:"var(--green-s)",borderRadius:5,whiteSpace:"nowrap"}}>🟢 {acTxt}</span></div></div>);})()}
+{(()=>{const DEF=({roas_lt:{lo:1,hi:2,dir:1},conv_lt:{lo:1,hi:2,dir:1},ctr_fix:{lo:0.5,hi:1,dir:1},acos_gt:{lo:25,hi:40,dir:-1},cpc_gt:{lo:0.3,hi:0.6,dir:-1},cpa_gt:{lo:5,hi:10,dir:-1},ord_lt:{lo:1,hi:3,dir:1},rev_lt:{lo:20,hi:50,dir:1},spend_gte:{lo:20,hi:50,dir:-1},imp_no_clk:{lo:500,hi:1000,dir:1},aov_lt:{lo:15,hi:25,dir:1}})[p.type]||{lo:0,hi:0,dir:1};const lo=(r.lo!=null&&r.lo!=="")?toNum(r.lo):DEF.lo,hi=(r.hi!=null&&r.hi!=="")?toNum(r.hi):DEF.hi,u=p.unit,dir=DEF.dir;const kapatTxt=dir>0?("< "+lo+u):("> "+hi+u),bekleTxt=lo+u+"–"+hi+u,acTxt=dir>0?("≥ "+hi+u):("≤ "+lo+u);return(<div style={{display:"flex",flexDirection:"column",gap:5,flex:"none",opacity:r.on?1:0.5}}><div style={{display:"flex",gap:6}}><Sq label={TT("ALT SINIR","LOW")} color="var(--azure)" v={lo} set={v=>setR(p.type,{lo:v})} st={p.st} unit={p.unit}/><Sq label={TT("ÜST SINIR","HIGH")} color="var(--azure)" v={hi} set={v=>setR(p.type,{hi:v})} st={p.st} unit={p.unit}/></div></div>);})()}
 <div style={{flex:1,minWidth:200}}>{(RNOTES[p.type]?TT(RNOTES[p.type].tr,RNOTES[p.type].en):[]).map((ln,i)=><div key={i} style={{fontSize:10.5,color:"var(--muted)",lineHeight:1.22,display:"flex",gap:6,marginBottom:0}}><b style={{color:"var(--azure)",flex:"none",fontWeight:800,fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}</div>
 </div>
 </div>);})}
@@ -1302,7 +1302,7 @@ const tok=gmStoreTok.current[acc.id];
 if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectStore(acc,false);return;}
 setToast(TT("Trademark e-postaları taranıyor…","Scanning trademark emails…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
-const q='subject:(trademark OR copyright OR DMCA OR infringement OR \"intellectual property\") newer_than:395d';
+const q='(subject:(removed OR deactivated OR infringement OR trademark OR copyright OR DMCA OR \"policy violation\" OR \"intellectual property\") OR \"policy violation\" OR infringement OR \"counter notice\") newer_than:395d';
 const list=await gGet(tok,base+"?q="+encodeURIComponent(q)+"&maxResults=25");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("İlgili e-posta bulunamadı.","No related emails found."));return;}
 const existing=Array.isArray(settings.cases)?settings.cases:[];const have=new Set(existing.map(c=>c.gmId).filter(Boolean));
@@ -1311,10 +1311,13 @@ for(const mm of msgs){if(have.has(mm.id))continue;
 const d=await gGet(tok,base+"/"+mm.id+"?format=metadata&metadataHeaders=Subject&metadataHeaders=From");
 const hs=(d.payload&&d.payload.headers)||[];const H=n=>{const h=hs.find(x=>x.name.toLowerCase()===n);return h?h.value:"";};
 const subj=H("subject")||TT("(konu yok)","(no subject)");
+const _txt=(subj+" "+(d.snippet||""));
+if(!/policy violation|counter[\s-]?notice|\bdmca\b|(intellectual property|trademark|copyright)\s*(infringement|complaint|violation|claim|notice|report)|infring|removed[^.]{0,80}(infring|trademark|copyright|intellectual property|policy violation|rights)/i.test(_txt)){skipped++;continue;}
+const _lm=_txt.match(/["\u201c\u201d\u2018\u2019']([^"\u201c\u201d\u2018\u2019']{6,90})["\u201c\u201d\u2018\u2019']/);const listing=_lm?_lm[1].trim():"";
 const idt=d.internalDate?new Date(Number(d.internalDate)):null;
 if(!idt||isNaN(idt.getTime())){skipped++;continue;}
 const from=H("from")||"";const fromEmail=(from.match(/<([^>]+)>/)||[])[1]||(from.match(/[\w.+-]+@[\w.-]+/)||[])[0]||"";const fromName=(from.replace(/<[^>]+>/,"").replace(/["]/g,"").trim())||fromEmail;const blob=(subj+" "+(d.snippet||""));const type=/counter[\s-]?notice/i.test(blob)?"copyright":(/trademark|marka|®|™|registration\s*(number|no|#)|reg\.?\s*no|brand/i.test(blob)?"trademark":(/copyright|dmca|©|telif|artwork/i.test(blob)?"copyright":"trademark"));
-news.push({id:"c"+mm.id,gmId:mm.id,title:subj.slice(0,140),mark:subj.slice(0,140),company:fromName,gmail:fromEmail,type,status:"notice",store:acc.name,storeId:acc.id,date:idt.toISOString().slice(0,10),notes:(d.snippet||"").slice(0,200)});added++;}
+news.push({id:"c"+mm.id,gmId:mm.id,title:subj.slice(0,140),mark:subj.slice(0,140),listing:listing,company:fromName,gmail:fromEmail,type,status:"notice",store:acc.name,storeId:acc.id,date:idt.toISOString().slice(0,10),notes:(d.snippet||"").slice(0,200)});added++;}
 if(added)setSettings(s=>({...s,cases:[...news,...(Array.isArray(s.cases)?s.cases:[])]}));
 setToast(added?(added+TT(" vaka eklendi"," cases added")+(skipped?" ("+skipped+TT(" atlandı"," skipped")+")":"")+"."):TT("Yeni vaka yok.","No new cases."));}
 catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
@@ -1360,7 +1363,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM102 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM103 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
