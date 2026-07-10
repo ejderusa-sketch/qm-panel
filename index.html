@@ -904,7 +904,7 @@ return(<div className="rules" style={{marginBottom:14}}>
 <div key={p.type} style={{border:"1px solid "+(r.on?"var(--green)":"var(--line2)"),borderRadius:10,maxWidth:1040,padding:"4px 12px",background:r.on?"var(--green-s)":"var(--bg2)"}}>
 <div style={{display:"flex",gap:12,alignItems:"flex-start",flexWrap:"wrap"}}>
 <div style={{display:"flex",alignItems:"center",gap:8,width:148,flex:"none"}}><Toggle on={!!r.on} set={v=>setR(p.type,{on:v})}/><span style={{fontSize:12.5,fontWeight:700}}>{TT(p.tr,p.en)}</span></div>
-{(()=>{const DEF=({roas_lt:{lo:1,hi:2,dir:1},conv_lt:{lo:1,hi:2,dir:1},ctr_fix:{lo:0.5,hi:1,dir:1},acos_gt:{lo:25,hi:40,dir:-1},cpc_gt:{lo:0.3,hi:0.6,dir:-1},cpa_gt:{lo:5,hi:10,dir:-1},ord_lt:{lo:1,hi:3,dir:1},rev_lt:{lo:20,hi:50,dir:1},spend_gte:{lo:20,hi:50,dir:-1},imp_no_clk:{lo:500,hi:1000,dir:1},aov_lt:{lo:15,hi:25,dir:1}})[p.type]||{lo:0,hi:0,dir:1};const lo=(r.lo!=null&&r.lo!=="")?toNum(r.lo):DEF.lo,hi=(r.hi!=null&&r.hi!=="")?toNum(r.hi):DEF.hi,u=p.unit,dir=DEF.dir;const kapatTxt=dir>0?("< "+lo+u):("> "+hi+u),bekleTxt=lo+u+"–"+hi+u,acTxt=dir>0?("≥ "+hi+u):("≤ "+lo+u);return(<div style={{display:"flex",flexDirection:"column",gap:5,flex:"none",opacity:r.on?1:0.5}}><div style={{display:"flex",gap:6}}><Sq label={TT("ALT","LOW")} color="var(--azure)" v={lo} set={v=>setR(p.type,{lo:v})} st={p.st} unit={p.unit}/><Sq label={TT("ÜST","HIGH")} color="var(--azure)" v={hi} set={v=>setR(p.type,{hi:v})} st={p.st} unit={p.unit}/></div><div style={{fontSize:11.5,fontWeight:800,color:"var(--ink)",textAlign:"center",marginTop:1}}>{lo}{u}–{hi}{u} {TT("arası","range")}</div></div>);})()}
+{(()=>{const DEF=({roas_lt:{lo:1,hi:2,dir:1},conv_lt:{lo:1,hi:2,dir:1},ctr_fix:{lo:0.5,hi:1,dir:1},acos_gt:{lo:25,hi:40,dir:-1},cpc_gt:{lo:0.3,hi:0.6,dir:-1},cpa_gt:{lo:5,hi:10,dir:-1},ord_lt:{lo:1,hi:3,dir:1},rev_lt:{lo:20,hi:50,dir:1},spend_gte:{lo:20,hi:50,dir:-1},imp_no_clk:{lo:500,hi:1000,dir:1},aov_lt:{lo:15,hi:25,dir:1}})[p.type]||{lo:0,hi:0,dir:1};const lo=(r.lo!=null&&r.lo!=="")?toNum(r.lo):DEF.lo,hi=(r.hi!=null&&r.hi!=="")?toNum(r.hi):DEF.hi,u=p.unit,dir=DEF.dir;const mb=(c)=>({width:18,height:18,borderRadius:5,border:"1px solid var(--line2)",background:"var(--panel2)",cursor:"pointer",fontWeight:800,color:c,fontSize:12,lineHeight:1,padding:0});return(<div style={{flex:"none",opacity:r.on?1:0.5}}><div style={{border:"1px solid var(--line2)",borderRadius:8,padding:"5px 8px",textAlign:"center",background:"var(--panel)"}}><div style={{fontSize:9,fontWeight:800,color:"var(--azure)",letterSpacing:.3,marginBottom:3}}>{lo}{u}–{hi}{u} {TT("ARASI","RANGE")}</div><div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:3}}><button onClick={()=>setR(p.type,{lo:Math.max(0,Math.round((lo-p.st)*100)/100)})} style={mb("var(--red)")}>−</button><span style={{fontFamily:"'JetBrains Mono'",fontWeight:700,fontSize:12,minWidth:26,textAlign:"center"}}>{lo}{u}</span><button onClick={()=>setR(p.type,{lo:Math.round((lo+p.st)*100)/100})} style={mb("var(--green)")}>+</button><span style={{color:"var(--faint)",fontWeight:800,margin:"0 3px"}}>–</span><button onClick={()=>setR(p.type,{hi:Math.max(0,Math.round((hi-p.st)*100)/100)})} style={mb("var(--red)")}>−</button><span style={{fontFamily:"'JetBrains Mono'",fontWeight:700,fontSize:12,minWidth:26,textAlign:"center"}}>{hi}{u}</span><button onClick={()=>setR(p.type,{hi:Math.round((hi+p.st)*100)/100})} style={mb("var(--green)")}>+</button></div></div></div>);})()}
 <div style={{flex:1,minWidth:200}}>{(RNOTES[p.type]?TT(RNOTES[p.type].tr,RNOTES[p.type].en):[]).map((ln,i)=><div key={i} style={{fontSize:10.5,color:"var(--muted)",lineHeight:1.22,display:"flex",gap:6,marginBottom:0}}><b style={{color:"var(--azure)",flex:"none",fontWeight:800,fontFamily:"'JetBrains Mono'"}}>{i+1}</b><span>{ln}</span></div>)}</div>
 </div>
 </div>);})}
@@ -1307,7 +1307,7 @@ const list=await gGet(tok,base+"?q="+encodeURIComponent(q)+"&maxResults=25");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("İlgili e-posta bulunamadı.","No related emails found."));return;}
 const existing=Array.isArray(settings.cases)?settings.cases:[];const have=new Set(existing.map(c=>c.gmId).filter(Boolean));
 let added=0,skipped=0;const news=[];
-for(const mm of msgs){if(have.has(mm.id))continue;
+for(const mm of msgs){
 const d=await gGet(tok,base+"/"+mm.id+"?format=metadata&metadataHeaders=Subject&metadataHeaders=From");
 const hs=(d.payload&&d.payload.headers)||[];const H=n=>{const h=hs.find(x=>x.name.toLowerCase()===n);return h?h.value:"";};
 const subj=H("subject")||TT("(konu yok)","(no subject)");
@@ -1318,7 +1318,7 @@ const idt=d.internalDate?new Date(Number(d.internalDate)):null;
 if(!idt||isNaN(idt.getTime())){skipped++;continue;}
 const from=H("from")||"";const fromEmail=(from.match(/<([^>]+)>/)||[])[1]||(from.match(/[\w.+-]+@[\w.-]+/)||[])[0]||"";const fromName=(from.replace(/<[^>]+>/,"").replace(/["]/g,"").trim())||fromEmail;const blob=(subj+" "+(d.snippet||""));const type=/counter[\s-]?notice/i.test(blob)?"copyright":(/trademark|marka|®|™|registration\s*(number|no|#)|reg\.?\s*no|brand/i.test(blob)?"trademark":(/copyright|dmca|©|telif|artwork/i.test(blob)?"copyright":"trademark"));
 news.push({id:"c"+mm.id,gmId:mm.id,title:subj.slice(0,140),mark:subj.slice(0,140),listing:listing,company:fromName,gmail:fromEmail,type,status:"notice",store:acc.name,storeId:acc.id,date:idt.toISOString().slice(0,10),notes:(d.snippet||"").slice(0,200)});added++;}
-if(added)setSettings(s=>({...s,cases:[...news,...(Array.isArray(s.cases)?s.cases:[])]}));
+setSettings(s=>{const others=(Array.isArray(s.cases)?s.cases:[]).filter(c=>!(c.storeId===acc.id&&c.gmId));return{...s,cases:[...news,...others]};});
 setToast(added?(added+TT(" vaka eklendi"," cases added")+(skipped?" ("+skipped+TT(" atlandı"," skipped")+")":"")+"."):TT("Yeni vaka yok.","No new cases."));}
 catch(e){setToast(TT("Çekilemedi: ","Fetch error: ")+(e.message||"error"));}};
 
@@ -1364,7 +1364,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM105 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM106 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
