@@ -959,30 +959,18 @@ const pill=(on,color)=>({fontSize:11,fontWeight:800,padding:"4px 8px",borderRadi
 const ci={width:"100%",border:"1px solid var(--line2)",borderRadius:6,padding:"4px 6px",fontSize:11.5,fontFamily:"'Inter'",boxSizing:"border-box"};
 const clearEmpty=()=>setCases(cs=>cs.filter(c=>(c.mark||c.title||c.listing||c.company||c.notes||"").toString().trim()));
 const caseCard=(typeKey,heading,accent)=>{const rows=shown.filter(c=>typeKey==="copyright"?c.type==="copyright":(c.type||"trademark")!=="copyright");return(<div className="rules"><div className="rh"><span style={{width:3,height:15,background:accent,borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{heading}</span><button className="btn" style={{marginLeft:"auto",fontSize:12,padding:"5px 10px",color:"var(--red)",borderColor:"var(--red)"}} onClick={()=>{if(rows.length)setCases(cs=>cs.filter(c=>!rows.includes(c)));}} title={TT("Bu tablodaki tüm vakaları sil","Delete all cases in this table")}>🗑 {TT("Tümünü sil","Delete all")}</button><button className="btn" style={{marginLeft:8,fontSize:12,padding:"5px 10px"}} onClick={clearEmpty} title={TT("Boş satırları sil","Delete empty rows")}>🧹 {TT("Boşları temizle","Clear empty")}</button><button className="btn pri" style={{marginLeft:8,fontSize:12,padding:"5px 12px"}} onClick={()=>addRow(typeKey)}>➕ {TT("Vaka ekle","Add case")}</button><span style={{fontFamily:"'JetBrains Mono'",fontSize:11,color:"var(--faint)",marginLeft:10}}>{rows.length}</span></div>
-<div className="tw" style={{marginTop:8}}><table style={{minWidth:1560,fontSize:11.5}}><thead><tr>
-{["NO","MAĞAZA","ADET",typeKey==="copyright"?"COPYRIGHT":"TRADEMARK","LISTING","ŞİRKET","GMAIL","NE ZAMAN YEDİ","KAÇ EMAIL","EN SON","HAZIRLA","GÖNDER","CEVAP","KALDIRILDI","DEVAM",""].map((h,i)=><th key={i} className="l" style={{fontSize:10,fontWeight:800,whiteSpace:"nowrap",letterSpacing:".02em"}}>{h}</th>)}
-</tr></thead><tbody>
-{rows.length===0&&<tr><td colSpan={16}><div className="empty" style={{padding:20}}><p>{TT("Bu bölümde vaka yok. ➕ Vaka ekle.","No cases here. ➕ Add case.")}</p></div></td></tr>}
-{rows.map((c,ri)=>{const si=accounts.findIndex(a=>a.id===(c.storeId||act));const idx=si<0?0:si;const col=STORE_COLORS[idx%STORE_COLORS.length];return(
-<tr key={c.id} style={{verticalAlign:"middle"}}>
-<td><span className="ic" style={{background:col,color:"#fff"}}>{ri+1}</span></td>
-<td className="l" style={{fontWeight:700,whiteSpace:"nowrap",color:col}}>{c.store||(acc&&acc.name)||"—"}</td>
-<td><input value={c.count||""} onChange={e=>upC(c.id,"count",e.target.value)} style={{...ci,width:42,textAlign:"center"}}/></td>
-<td><input value={c.mark||c.title||""} onChange={e=>upC(c.id,"mark",e.target.value)} style={{...ci,minWidth:120}}/></td>
-<td><input value={c.listing||""} onChange={e=>upC(c.id,"listing",e.target.value)} style={{...ci,minWidth:140}}/></td>
-<td><input value={c.company||""} onChange={e=>upC(c.id,"company",e.target.value)} style={{...ci,minWidth:120}}/></td>
-<td><input value={c.gmail||""} onChange={e=>upC(c.id,"gmail",e.target.value)} style={{...ci,minWidth:130}}/></td>
-<td><input type="date" value={c.date||""} onChange={e=>upC(c.id,"date",e.target.value)} style={{...ci,minWidth:120}}/></td>
-<td><input value={c.emailCount||""} onChange={e=>upC(c.id,"emailCount",e.target.value)} style={{...ci,width:42,textAlign:"center"}}/></td>
-<td><input type="date" value={c.lastDate||""} onChange={e=>upC(c.id,"lastDate",e.target.value)} style={{...ci,minWidth:120}}/></td>
-<td><button onClick={()=>upC(c.id,"prepared",!c.prepared)} style={pill(c.prepared,"var(--azure)")}>{c.prepared?TT("Hazır ✓","Ready ✓"):TT("Hazırla","Prepare")}</button></td>
-<td><button onClick={()=>upC(c.id,"sent",!c.sent)} style={pill(c.sent,"var(--green)")}>{c.sent?TT("Gönderildi ✓","Sent ✓"):TT("Gönder","Send")}</button></td>
-<td><select value={c.answer||""} onChange={e=>upC(c.id,"answer",e.target.value)} className="cur-sel" style={{fontSize:11,padding:"3px 6px",fontWeight:800,border:"1px solid "+(c.answer==="pos"?"var(--green)":c.answer==="neg"?"var(--red)":"var(--line2)"),background:c.answer==="pos"?"var(--green-s)":c.answer==="neg"?"var(--red-s)":"var(--panel)",color:c.answer==="pos"?"var(--green)":c.answer==="neg"?"var(--red)":"var(--ink)"}}><option value="">—</option><option value="pos">{TT("Pozitif / Evet","Positive / Yes")}</option><option value="neg">{TT("Negatif / Hayır","Negative / No")}</option></select></td>
-<td><button onClick={()=>upC(c.id,"removed",!c.removed)} style={pill(c.removed,"var(--green)")}>{c.removed?TT("Evet","Yes"):TT("Hayır","No")}</button></td>
-<td><button onClick={()=>upC(c.id,"ongoing",!c.ongoing)} style={pill(c.ongoing,"var(--amber)")}>{c.ongoing?TT("Evet","Yes"):TT("Hayır","No")}</button></td>
-<td><button className="dl" onClick={()=>del(c.id)} title={TT("Sil","Delete")}>✕</button></td>
-</tr>);})}
-</tbody></table></div></div>);};
+<div style={{marginTop:8,display:"flex",flexDirection:"column",gap:6}}>
+{rows.length===0&&<div className="empty" style={{padding:18}}><p>{TT("Bu bölümde bildirim yok. ➕ Vaka ekle.","No notices here. ➕ Add case.")}</p></div>}
+{[...rows].sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map((c,ri)=>{const si=accounts.findIndex(a=>a.id===(c.storeId||act));const idx=si<0?0:si;return(
+<div key={c.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 11px",border:"1px solid var(--line2)",borderRadius:9,background:"var(--panel)"}}>
+<span style={{flex:"none",width:26,height:26,borderRadius:7,background:accent,color:"#fff",fontFamily:"'Space Grotesk'",fontWeight:800,fontSize:12.5,display:"flex",alignItems:"center",justifyContent:"center"}}>{ri+1}</span>
+<span style={{flex:"none",fontFamily:"'JetBrains Mono'",fontSize:11.5,fontWeight:700,color:"var(--ink)",minWidth:84}}>{c.date||"—"}</span>
+<span style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:"var(--ink)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} title={c.mark||c.title||""}>{c.mark||c.title||TT("(konu yok)","(no subject)")}</span>
+{c.listing?<a href={/^https?:/.test(c.listing)?c.listing:("https://"+c.listing)} target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()} style={{flex:"none",fontSize:11,color:"var(--azure)",textDecoration:"underline",maxWidth:160,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.listing}</a>:null}
+<span style={{flex:"none",fontSize:11,fontWeight:600,color:"var(--faint)",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.company||""}</span>
+<button className="dl" onClick={()=>del(c.id)} title={TT("Sil","Delete")} style={{flex:"none"}}>✕</button>
+</div>);})}
+</div></div>);};
 const chStatus=(id,v)=>setCases(cs=>cs.map(c=>c.id===id?{...c,status:v}:c));
 const cnt=st=>shown.filter(c=>c.status===st).length;
 const stL=st=>({notice:TT("Bildirim","Notice"),responded:TT("Yanıtlandı","Responded"),removed:TT("Kaldırıldı","Removed"),restored:TT("Geri alındı","Restored")}[st]||st);
@@ -1357,7 +1345,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM116 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM117 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
