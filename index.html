@@ -846,7 +846,7 @@ const setR=(type,patch)=>setSettings(s=>{const rs=Array.isArray(s.rules)?s.rules
 const setNum=(k,v)=>setSettings(s=>({...s,[k]:Math.max(0,v)}));
 const cur=settings.cur||"$";
 const PARAMS=[
- {type:"roas_lt",tr:"1.1.1 · ROAS",en:"1.1.1 · ROAS",unit:"×",st:0.1,hint:TT("Gelir ÷ Harcama. Bu değerin altındaysa zarar → KAPAT.","Revenue ÷ Spend. Below this = loss → CLOSE.")},
+ {type:"roas_lt",tr:"1.1.1 · ROAS",en:"1.1.1 · ROAS",unit:"",st:0.1,hint:TT("Gelir ÷ Harcama. Bu değerin altındaysa zarar → KAPAT.","Revenue ÷ Spend. Below this = loss → CLOSE.")},
  {type:"conv_lt",tr:"1.1.2 · CVR (dönüşüm)",en:"1.1.2 · CVR (conversion)",unit:"%",st:0.5,hint:TT("Sipariş ÷ Tıklama ×100. Bu %'nin altındaysa → KAPAT.","Orders ÷ Clicks ×100. Below this % → CLOSE.")},
  {type:"ctr_fix",tr:"1.1.3 · CTR",en:"1.1.3 · CTR",unit:"%",st:0.1,hint:TT("Tıklama ÷ Gösterim ×100. 1000+ gösterimde bunun altındaysa → DÜZELT (kapatma).","Clicks ÷ Impressions ×100. Below this with 1000+ impressions → FIX (don't close).")},
  {type:"acos_gt",tr:"1.1.4 · ACOS",en:"1.1.4 · ACOS",unit:"%",st:5,hint:TT("Harcama ÷ Gelir ×100. Bu %'nin üstündeyse → KAPAT.","Spend ÷ Revenue ×100. Above this % → CLOSE.")},
@@ -1356,7 +1356,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM110 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM111 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
