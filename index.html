@@ -371,6 +371,8 @@ const PERMS=[
  {key:"editFinance",code:"B2",group:"B · Finance",tr:"Ciro/gider düzenle",en:"Edit revenue/spend"},
  {key:"viewTrademark",code:"C1",group:"C · Trademark",tr:"Trademark görüntüle",en:"View Trademark"},
  {key:"editTrademark",code:"C2",group:"C · Trademark",tr:"Vaka ekle/düzenle",en:"Add/edit cases"},
+ {key:"trademarkSendEmail",code:"C3",group:"C · Trademark",tr:"E-posta gönderebilir",en:"Can send email"},
+ {key:"trademarkManage",code:"C4",group:"C · Trademark",tr:"Sayfayı yönetebilir",en:"Can manage page"},
  {key:"viewVisibility",code:"D1",group:"D · Görünürlük",tr:"Görünürlük görüntüle",en:"View Visibility"},
  {key:"editVisibility",code:"D2",group:"D · Görünürlük",tr:"Görünürlük düzenle",en:"Edit Visibility"},
  {key:"viewDashboard",code:"X1",group:"X · Shop Manager",tr:"Shop Manager görüntüle",en:"View Shop Manager"},
@@ -1386,7 +1388,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM198 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM199 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
