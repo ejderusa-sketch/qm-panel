@@ -43,9 +43,9 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 .qm-sub{font-size:10px;color:var(--faint);font-weight:500;line-height:1.3}
 .lang-btn{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.05em;padding:6px 12px;border-radius:8px;border:2px solid var(--orange);background:var(--orange-s);color:var(--orange);cursor:pointer;transition:.13s;white-space:nowrap}
 .lang-btn:hover{background:var(--orange);color:#fff}
-.sh{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.16em;color:var(--faint);padding:14px 10px 8px}
+.sh{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.16em;color:var(--faint);padding:6px 10px 2px}
 .sl{display:flex;flex-direction:column;gap:3px;flex:1;overflow-y:auto}
-.si{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;transition:.12s;font-size:13px}
+.si{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:5px 9px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;transition:.12s;font-size:13px}
 .si:hover{background:var(--panel2);color:var(--ink)}
 .si.on{background:var(--orange-s);border-color:var(--orange);color:var(--ink);box-shadow:inset 3px 0 0 var(--orange)}
 .si.on .ic{background:var(--orange);color:#fff}
@@ -53,7 +53,7 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 .sn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;color:var(--red);font-family:'Space Grotesk';font-size:13.5px}
 .sb{font-family:'JetBrains Mono';font-size:11px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--line2);color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb.red{background:var(--red);color:#fff}
-.sa{margin-top:8px;width:100%;text-align:left;padding:9px 10px;border-radius:9px;border:1px dashed var(--line2);background:transparent;color:var(--faint);cursor:pointer;font-size:12.5px;font-family:'Space Grotesk';font-weight:600}
+.sa{margin-top:8px;width:100%;text-align:left;padding:5px 9px;border-radius:8px;border:1px dashed var(--line2);background:transparent;color:var(--faint);cursor:pointer;font-size:12.5px;font-family:'Space Grotesk';font-weight:600}
 .sa:hover{color:var(--ink);border-color:var(--faint)}
 .sf{display:flex;gap:8px;align-items:center;padding-top:12px;margin-top:8px;border-top:1px solid var(--line)}
 .main{flex:1;min-width:0;padding:0 28px 80px}
@@ -1179,6 +1179,8 @@ flash(cats.length+" konu Marketing'ten çekildi — Son 1 Ay dolduruldu.");
 };
 
 const addAcct=()=>{const id="a"+Date.now().toString(36);const n="0"+(accounts.length+1)+" "+TT("MAĞAZA","STORE");setAccounts(a=>[...a,{id,name:n}]);setAct(id)};
+const[bulkO,setBulkO]=useState(false);const[bulkT,setBulkT]=useState("");
+const bulkAdd=()=>{const lines=String(bulkT||"").split(/\n/).map(l=>l.trim()).filter(Boolean);const news=[];for(const ln of lines){const em=(ln.match(/[\w.+\-]+@[\w.\-]+\.[a-z]{2,}/i)||[])[0]||"";let nm=ln.replace(em,"").replace(/\t/g," ").replace(/[|,;]+/g," ").replace(/\s{2,}/g," ").replace(/^\s*\d+\s*/,"").trim();if(!nm&&em)nm=em.split("@")[0].toUpperCase();if(!nm)continue;news.push({id:"a"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:nm.toUpperCase(),email:em});}if(news.length){setAccounts(a=>[...a,...news]);setToast(news.length+" "+TT("mağaza eklendi ✓","stores added ✓"));setBulkT("");setBulkO(false);}else{setToast(TT("Liste anlaşılamadı","Could not parse list"));}};
 const delAcct=(id)=>{const a0=accounts.find(x=>x.id===id)||{};const nm=a0.name||a0.email||"";if(typeof window!=="undefined"&&window.confirm&&!window.confirm(TT("Bu mağaza silinsin mi?\n","Delete this store?\n")+nm))return;const rest=accounts.filter(x=>x.id!==id);setAccounts(rest);if(act===id)setAct((rest[0]&&rest[0].id)||null);try{delete gmStoreTok.current[id];}catch(e){}gmailFn("disconnect",id);};
 const applyBulk=()=>{const lines=bulkText.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);const emRe=/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/;const toAdd=[];for(const ln of lines){const em=((ln.match(emRe)||[])[0]||"").toLowerCase();let rest=ln.replace(emRe,"").replace(/[,\t;|]+/g," ").replace(/\s{2,}/g," ").trim();rest=rest.replace(/^\d+\W*/,"").trim();const name=(rest||(em.split("@")[0]||"")).toUpperCase().trim();if(!em&&!name)continue;toAdd.push({email:em,name});}if(!toAdd.length){setToast(TT("Okunamadı — her satır: No, İsim, email","Could not read — each line: No, Name, email"));return;}const ex=new Set(accounts.map(a=>(a.email||"").toLowerCase()).filter(Boolean));const add=[];for(const t of toAdd){if(t.email&&ex.has(t.email))continue;if(t.email)ex.add(t.email);add.push({id:"a"+Date.now().toString(36)+Math.floor(Math.random()*100000),name:t.name,email:t.email});}if(!add.length){setToast(TT("Zaten ekli","Already added"));return;}setAccounts(prev=>[...prev,...add]);setBulkText("");setShowBulk(false);setToast(add.length+" "+TT("mağaza eklendi — her birini Google ile Bağla","stores added — Connect each with Google"));};
 const renAcct=id=>{const c=accounts.find(a=>a.id===id);const n=prompt(TT("Mağaza adı:","Store name:"),(c&&c.name)||"");if(n)setAccounts(a=>a.map(x=>x.id===id?{...x,name:n}:x))};
@@ -1363,7 +1365,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM165 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM166 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1374,7 +1376,7 @@ const col=STORE_COLORS[i%STORE_COLORS.length];
 const st=acctStats[a.id]||{count:0,close:0};
 const gmailUrl=a.email?("https://mail.google.com/mail/u/0/#search/"+encodeURIComponent("from:"+a.email+" (has:attachment OR csv OR screenshot)")):null;
 return(
-<div key={a.id} className={"si"+(on?" on":"")} style={{flexDirection:"column",alignItems:"stretch",gap:6,...(on?{borderColor:col,boxShadow:"inset 4px 0 0 "+col,background:col+"14"}:{})}}>
+<div key={a.id} className={"si"+(on?" on":"")} style={{flexDirection:"column",alignItems:"stretch",gap:3,...(on?{borderColor:col,boxShadow:"inset 4px 0 0 "+col,background:col+"14"}:{})}}>
 <div style={{display:"flex",alignItems:"center",gap:9,cursor:"pointer"}} onClick={()=>setAct(a.id)} onDoubleClick={()=>renAcct(a.id)} title={lang==="tr"?"Çift tık = adı değiştir":"Double-click = rename"}>
 <span className="ic" style={{background:col,color:"#fff",cursor:"pointer"}} title={TT("Bu mağazaya geç","Switch to this store")}>{String(i+1).padStart(2,"0")}</span>
 <input value={a.name||""} onClick={e=>e.stopPropagation()} onFocus={()=>setAct(a.id)} onChange={e=>{const v=e.target.value;setAccounts(x=>x.map(s=>s.id===a.id?{...s,name:v}:s))}} placeholder={lang==="tr"?"Mağaza adı…":"Store name…"} title={lang==="tr"?"Adı elle düzenle":"Edit name manually"} style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,fontFamily:"'Inter'",border:"1px solid var(--line2)",borderRadius:6,padding:"3px 6px",background:"var(--panel)",color:"var(--ink)"}}/>
@@ -1392,6 +1394,8 @@ return(
 {accounts.length===0&&<div style={{padding:"16px 10px 6px",textAlign:"center",color:"var(--faint)",fontSize:12,lineHeight:1.6}}>{TT("Henüz mağaza yok.","No stores yet.")}<br/>{TT("Aşağıdan bağla.","Connect below.")}</div>}
 </div>
 <button className="sa" onClick={addAcct} style={{display:"flex",flexDirection:"row",alignItems:"center",justifyContent:"center",gap:7,padding:"8px 12px",border:"1.5px dashed var(--red)",borderRadius:9,background:"var(--panel)",cursor:"pointer",width:"100%",marginTop:6}}><span style={{fontSize:16,lineHeight:1,color:"var(--red)",fontWeight:800}}>＋</span><span style={{fontSize:11.5,fontWeight:700,color:"var(--ink)"}}>{TT("E-posta veya Mağaza Bağla","Connect Email or Store")}</span></button>
+<button onClick={()=>setBulkO(v=>!v)} style={{width:"100%",marginTop:5,fontSize:11,fontWeight:600,color:"var(--muted)",background:"var(--panel2)",border:"1px solid var(--line2)",borderRadius:8,padding:"6px 8px",cursor:"pointer"}}>📋 {TT("Toplu Mağaza Ekle","Bulk Add Stores")}</button>
+{bulkO&&<div style={{marginTop:6}}><textarea value={bulkT} onChange={e=>setBulkT(e.target.value)} placeholder={TT("Her satır: MAĞAZA ADI  e-posta@...","Each line: STORE NAME  email@...")} style={{width:"100%",minHeight:96,fontSize:11,fontFamily:"'JetBrains Mono'",border:"1px solid var(--line2)",borderRadius:8,padding:"7px 8px",background:"var(--panel)",color:"var(--ink)",resize:"vertical",boxSizing:"border-box"}}/><div style={{display:"flex",gap:6,marginTop:5}}><button onClick={bulkAdd} style={{flex:1,fontSize:11.5,fontWeight:700,color:"#fff",background:"var(--green)",border:"none",borderRadius:7,padding:"6px 8px",cursor:"pointer"}}>✓ {TT("Hepsini Ekle","Add All")}</button><button onClick={()=>{setBulkO(false);setBulkT("");}} style={{fontSize:11.5,color:"var(--faint)",background:"none",border:"1px solid var(--line2)",borderRadius:7,padding:"6px 10px",cursor:"pointer"}}>{TT("İptal","Cancel")}</button></div></div>}
 
 {showBulk&&<div style={{marginTop:8}}><div style={{fontSize:11,color:"var(--faint)",marginBottom:5,lineHeight:1.5}}>{TT("Her satıra bir mağaza: No, İsim, email. ŞİFRE YAZMA.","One store per line: No, Name, email. Do NOT paste passwords.")}</div><textarea value={bulkText} onChange={e=>setBulkText(e.target.value)} rows={6} placeholder={"1  NEWCUSTOM  serdaretsyy@gmail.com\n2  BESTBABA  bestbabatee58@gmail.com"} style={{width:"100%",boxSizing:"border-box",fontFamily:"'JetBrains Mono'",fontSize:11,padding:8,border:"1px solid var(--line2)",borderRadius:8}}/><div style={{display:"flex",gap:6,marginTop:6}}><button onClick={applyBulk} style={{flex:1,fontSize:12,fontWeight:700,color:"#fff",background:"var(--azure)",border:"none",borderRadius:8,padding:"8px",cursor:"pointer"}}>➕ {TT("Ekle","Add")}</button><button onClick={()=>{setShowBulk(false);setBulkText("");}} style={{fontSize:12,fontWeight:700,color:"var(--faint)",background:"var(--panel)",border:"1px solid var(--line2)",borderRadius:8,padding:"8px 12px",cursor:"pointer"}}>{TT("İptal","Cancel")}</button></div></div>}
 </aside>
