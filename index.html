@@ -364,24 +364,24 @@ const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
 let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null;
 /* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
 const PERMS=[
- {key:"viewMarketing",code:"A1",group:"A · Marketing",tr:"Marketing görüntüle",en:"View Marketing"},
- {key:"editMarketing",code:"A2",group:"A · Marketing",tr:"Reklam aç/kapat",en:"Toggle ads"},
- {key:"deleteData",code:"A3",group:"A · Marketing",tr:"Veri sil",en:"Delete data"},
- {key:"viewFinance",code:"B1",group:"B · Finance",tr:"Finance görüntüle",en:"View Finance"},
- {key:"editFinance",code:"B2",group:"B · Finance",tr:"Ciro/gider düzenle",en:"Edit revenue/spend"},
- {key:"viewTrademark",code:"C1",group:"C · Trademark",tr:"Trademark görüntüle",en:"View Trademark"},
- {key:"editTrademark",code:"C2",group:"C · Trademark",tr:"Vaka ekle/düzenle",en:"Add/edit cases"},
- {key:"trademarkSendEmail",code:"C3",group:"C · Trademark",tr:"E-posta gönderebilir",en:"Can send email"},
- {key:"trademarkManage",code:"C4",group:"C · Trademark",tr:"Sayfayı yönetebilir",en:"Can manage page"},
- {key:"viewVisibility",code:"D1",group:"D · Görünürlük",tr:"Görünürlük görüntüle",en:"View Visibility"},
- {key:"editVisibility",code:"D2",group:"D · Görünürlük",tr:"Görünürlük düzenle",en:"Edit Visibility"},
- {key:"viewDashboard",code:"X1",group:"X · Shop Manager",tr:"Shop Manager görüntüle",en:"View Shop Manager"},
- {key:"viewIdentity",code:"Z1",group:"Z · Kimlik",tr:"Kimlik görüntüle",en:"View Identity"},
- {key:"editIdentity",code:"Z2",group:"Z · Kimlik",tr:"Kimlik düzenle",en:"Edit Identity"},
- {key:"manageStores",code:"G1",group:"Genel",tr:"Mağaza ekle/adlandır",en:"Add/rename stores"},
- {key:"connectGmail",code:"G2",group:"Genel",tr:"Gmail bağla/çek",en:"Connect/fetch Gmail"},
- {key:"manageTeam",code:"Y1",group:"Ekip",tr:"Ekip yönetimi",en:"Manage team"},
- {key:"sendMessages",code:"Y2",group:"Ekip",tr:"Mesaj gönder",en:"Send messages"},
+ {key:"viewMarketing",code:"1.1",group:"1 · Marketing",tr:"Marketing görüntüle",en:"View Marketing"},
+ {key:"editMarketing",code:"1.2",group:"1 · Marketing",tr:"Reklam aç/kapat",en:"Toggle ads"},
+ {key:"deleteData",code:"1.3",group:"1 · Marketing",tr:"Veri sil",en:"Delete data"},
+ {key:"viewFinance",code:"2.1",group:"2 · Finance",tr:"Finance görüntüle",en:"View Finance"},
+ {key:"editFinance",code:"2.2",group:"2 · Finance",tr:"Ciro/gider düzenle",en:"Edit revenue/spend"},
+ {key:"viewTrademark",code:"3.1",group:"3 · Trademark",tr:"Trademark görüntüle",en:"View Trademark"},
+ {key:"editTrademark",code:"3.2",group:"3 · Trademark",tr:"Vaka ekle/düzenle",en:"Add/edit cases"},
+ {key:"trademarkSendEmail",code:"3.3",group:"3 · Trademark",tr:"E-posta gönderebilir",en:"Can send email"},
+ {key:"trademarkManage",code:"3.4",group:"3 · Trademark",tr:"Sayfayı yönetebilir",en:"Can manage page"},
+ {key:"viewVisibility",code:"4.1",group:"4 · Görünürlük",tr:"Görünürlük görüntüle",en:"View Visibility"},
+ {key:"editVisibility",code:"4.2",group:"4 · Görünürlük",tr:"Görünürlük düzenle",en:"Edit Visibility"},
+ {key:"viewDashboard",code:"5.1",group:"5 · Shop Manager",tr:"Shop Manager görüntüle",en:"View Shop Manager"},
+ {key:"viewIdentity",code:"6.1",group:"6 · Kimlik",tr:"Kimlik görüntüle",en:"View Identity"},
+ {key:"editIdentity",code:"6.2",group:"6 · Kimlik",tr:"Kimlik düzenle",en:"Edit Identity"},
+ {key:"manageStores",code:"7.1",group:"7 · Genel",tr:"Mağaza ekle/adlandır",en:"Add/rename stores"},
+ {key:"connectGmail",code:"7.2",group:"7 · Genel",tr:"Gmail bağla/çek",en:"Connect/fetch Gmail"},
+ {key:"manageTeam",code:"8.1",group:"8 · Ekip",tr:"Ekip yönetimi",en:"Manage team"},
+ {key:"sendMessages",code:"8.2",group:"8 · Ekip",tr:"Mesaj gönder",en:"Send messages"},
 ];
 function defaultPerms(role){
  const set=v=>PERMS.reduce((o,p)=>{o[p.key]=v;return o},{});
@@ -1388,7 +1388,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM199 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM200 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
