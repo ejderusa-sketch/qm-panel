@@ -1388,7 +1388,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM202 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM203 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1424,7 +1424,7 @@ return(
 </aside>
 
 <main className="main">
-<div className="hero"><span className="mk">{tab==="profil"?TT("PROFİL","PROFILE"):tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"2 — FINANCE":tab==="trademark"?"3 — TRADEMARK":tab==="visibility"?TT("4 — GÖRÜNÜRLÜK","4 — VISIBILITY"):tab==="dashboard"?"5 — SHOP MANAGER":tab==="zidentity"?TT("6 — STORE KİMLİK","6 — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"1 — MARKETING"}</span>{["marketing","finance","trademark","visibility","zidentity"].includes(tab)&&<span style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:6,fontSize:13.5,fontWeight:800,color:"#fff",background:actColor,borderRadius:999,padding:"5px 15px",whiteSpace:"nowrap"}} title={TT("Aktif mağaza","Active store")}>🏪 {acctName||TT("Mağaza seç","Select store")}</span>}
+<div className="hero"><span className="mk">{tab==="profil"?TT("PROFİL","PROFILE"):tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"2 — FINANCE":tab==="trademark"?"3 — TRADEMARK":tab==="visibility"?TT("4 — GÖRÜNÜRLÜK","4 — VISIBILITY"):tab==="dashboard"?"5 — SHOP MANAGER":tab==="zidentity"?TT("6 — STORE KİMLİK","6 — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"1 — MARKETING"}</span>{["marketing","finance","trademark","visibility","zidentity"].includes(tab)&&<span style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:6,fontSize:13.5,fontWeight:800,color:"#fff",background:actColor,borderRadius:999,padding:"5px 15px",whiteSpace:"nowrap"}} title={TT("Aktif mağaza","Active store")}>🏪 {act?((/A1 INBOX/i.test(acctName)?"Z1":("QM"+(accounts.findIndex(a=>a.id===act)+1)))+" · "):""}{acctName||TT("Mağaza seç","Select store")}</span>}
 <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
 <button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")}>⚙ {TT("Ayarlar","Settings")}</button>
 <button className={"btn"+(tab==="profil"?" pri":"")} onClick={()=>setTab("profil")} title={TT("Profil","Profile")}>👤 {TT("Profil","Profile")}</button>
