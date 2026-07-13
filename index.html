@@ -392,7 +392,7 @@ function defaultPerms(role){
 function can(key){ if(currentRole==="admin"||currentPermissions===null)return true; return !!(currentPermissions&&currentPermissions[key]); }
 /* Basit iki dilli yardımcı: TT("Türkçe","English") */
 let uiLang="tr";
-function TT(a,b){return uiLang==="en"?b:a;}
+function TT(a,b,c){return uiLang==="ur"?(c!=null?c:b):(uiLang==="en"?b:a);}
 /* Hesap bootstrap: ilk giriş yapan Admin olur; davetli manager kendi hesabına bağlanır */
 async function bootstrap(){
   const u=(await sb.auth.getUser()).data.user;
@@ -979,7 +979,7 @@ function Overview({settings,accounts,setTab,setAct,onRead}){
 const [readMail,setReadMail]=useState(null);
 const cases=Array.isArray(settings.cases)?settings.cases:[];
 const cutoff=(()=>{const d=new Date();d.setMonth(d.getMonth()-1);return d.toISOString().slice(0,10);})();
-const storeName=(id)=>{const a=(accounts||[]).find(x=>x.id===id);if(!a)return"—";let nm=(a.name||a.email||"—").trim();if(/@/.test(nm))nm=nm.split("@")[0];nm=nm.replace(/^0*\d+\s+/,"").trim();return nm.toUpperCase()||"—";};
+const storeName=(id)=>{const _ix=(accounts||[]).findIndex(x=>x.id===id);const a=_ix>=0?accounts[_ix]:null;if(!a)return"—";let nm=(a.name||a.email||"—").trim();if(/@/.test(nm))nm=nm.split("@")[0];nm=nm.replace(/^0*\d+\s+/,"").trim();nm=nm.toUpperCase()||"—";return (_ix>=0&&!/A1 INBOX/i.test(a.name||"")?("QM"+(_ix+1)+" · "):"")+nm;};
 const isEtsy=c=>(!c.gmId)||/etsy\.com/i.test(c.gmail||"")||/etsy/i.test(c.company||"");
 const recent=cases.filter(c=>isEtsy(c)&&(c.date||"")>=cutoff);
 const tms=recent.filter(c=>(c.type||"trademark")!=="copyright"&&c.type!=="policy").sort((a,b)=>(b.date||"").localeCompare(a.date||""));
@@ -1406,8 +1406,8 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM226 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
-<div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM227 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
 <div className="sl">
@@ -1451,16 +1451,16 @@ return(
 <button className="btn" onClick={()=>sb.auth.signOut()}>{TT("Çıkış","Log out")}</button>
 </div></div>
 <div className="tabs">
-<button className={tab==="nova"?"on":""} onClick={()=>setTab("nova")}><b className="tl">A</b> NOVA AGENT</button>
-<button className={tab==="overview"?"on":""} onClick={()=>setTab("overview")}><b className="tl">0</b> DASHBOARD</button>
-{can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}><b className="tl">1</b> MARKETING</button>}
-{can("viewTrademark")&&<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}><b className="tl">2</b> TRADEMARK</button>}
-{can("viewFinance")&&<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}><b className="tl">3</b> FINANCE</button>}
-{can("viewVisibility")&&<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}><b className="tl">4</b> {TT("GÖRÜNÜRLÜK","VISIBILITY")}</button>}
-{can("viewDashboard")&&<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">5</b> SHOP MANAGER</button>}
-{can("viewIdentity")&&<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">6</b> {TT("KİMLİK","IDENTITY")}</button>}
-{can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">7</b> {TT("EKİP","TEAM")}</button>}
-<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}><b className="tl">8</b> {TT("AYARLAR","SETTINGS")}</button>
+<button className={tab==="nova"?"on":""} onClick={()=>setTab("nova")}><b className="tl">A</b> {TT("NOVA AGENT","NOVA AGENT","نووا ایجنٹ")}</button>
+<button className={tab==="overview"?"on":""} onClick={()=>setTab("overview")}><b className="tl">0</b> {TT("DASHBOARD","DASHBOARD","ڈ۳ش بورڈ")}</button>
+{can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}><b className="tl">1</b> {TT("MARKETING","MARKETING","مارکیٹنگ")}</button>}
+{can("viewTrademark")&&<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}><b className="tl">2</b> {TT("TRADEMARK","TRADEMARK","ٹریڈ مارک")}</button>}
+{can("viewFinance")&&<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}><b className="tl">3</b> {TT("FINANCE","FINANCE","فنانس")}</button>}
+{can("viewVisibility")&&<button className={tab==="visibility"?"on":""} onClick={()=>setTab("visibility")}><b className="tl">4</b> {TT("GÖRÜNÜRLÜK","VISIBILITY","مرئیت")}</button>}
+{can("viewDashboard")&&<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">5</b> {TT("SHOP MANAGER","SHOP MANAGER","شاپ مینیجر")}</button>}
+{can("viewIdentity")&&<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">6</b> {TT("KİMLİK","IDENTITY","شناخت")}</button>}
+{can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">7</b> {TT("EKİP","TEAM","ٹیم")}</button>}
+<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}><b className="tl">8</b> {TT("AYARLAR","SETTINGS","ترتیبات")}</button>
 </div>
 
 {tab==="ekip"&&<EkipPanel settings={settings} setSettings={setSettings}/>}
