@@ -1401,7 +1401,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM221 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM222 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1862,7 +1862,7 @@ function AuthGate(){
 const _jp=(()=>{try{const p=new URLSearchParams(location.search).get("join");if(!p)return null;return JSON.parse(atob(p));}catch(_){return null;}})();const _jv=!!(_jp&&_jp.exp&&_jp.exp>Date.now());const[mode,setMode]=useState(_jv?"signup":"login");const[email,setEmail]=useState("");const[pw,setPw]=useState("");
 const[busy,setBusy]=useState(false);const[err,setErr]=useState("");const[info,setInfo]=useState("");
 const submit=async e=>{e.preventDefault();setErr("");setInfo("");setBusy(true);
-try{if(mode==="signup"){const{error}=await sb.auth.signUp({email,password:pw});if(error)throw error;setInfo("Kayıt oluşturuldu. Şimdi giriş yap.");setMode("login");}
+try{if(mode==="signup"){const{error}=await sb.auth.signUp({email,password:pw});if(error)throw error;try{const _cur=await store.get("q:s",{});const _list=Array.isArray(_cur.mgrList)?_cur.mgrList:[];if(!_list.some(m=>(m.email||"").toLowerCase()===email.toLowerCase())){_list.push({id:"m"+Date.now().toString(36)+Math.floor(Math.random()*10000),no:"",name:"",email:email.toLowerCase(),approved:false,blocked:false,open:false,perms:{},allStores:false,stores:[]});await store.set("q:s",{..._cur,mgrList:_list});}}catch(_){}setInfo("Kayıt oluşturuldu — yönetici onayı bekleniyor.");setMode("login");}
 else{const{error}=await sb.auth.signInWithPassword({email,password:pw});if(error)throw error;}}
 catch(e2){setErr(e2.message||"Hata")}finally{setBusy(false)}};
 return(<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20,background:"linear-gradient(135deg,#eef3ff,#fdf1e9)"}}>
