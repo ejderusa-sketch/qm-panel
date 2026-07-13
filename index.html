@@ -437,6 +437,11 @@ async function _loadShared(){
 const store={
 async get(k,d){try{const row=await _loadShared();const col=COLMAP[k];if(!col)return d;const v=row[col];return v!=null?v:d}catch(e){return d}},
 async set(k,v){const col=COLMAP[k];if(!col)return null;try{_shared=_shared||{};_shared[col]=v;let res;if(currentAccountId){res=await sb.from("account_state").upsert({account_id:currentAccountId,[col]:v,updated_at:new Date().toISOString()},{onConflict:"account_id"});}else{res=await sb.from("shared_state").upsert({id:"main",[col]:v,updated_at:new Date().toISOString()},{onConflict:"id"});}return (res&&res.error)?res.error:null;}catch(e){return e}}};
+const OWNER_EMAIL="ejderusa@gmail.com";
+async function accessGet(){try{const{data,error}=await sb.from("shared_state").select("settings").eq("id","main").maybeSingle();if(error)return null;const s=(data&&data.settings)||{};return Array.isArray(s.accessList)?s.accessList:[];}catch(_){return null;}}
+async function accessSave(list){try{const{data}=await sb.from("shared_state").select("settings").eq("id","main").maybeSingle();const s=(data&&data.settings)||{};s.accessList=list;const{error}=await sb.from("shared_state").upsert({id:"main",settings:s,updated_at:new Date().toISOString()},{onConflict:"id"});return !error;}catch(_){return false;}}
+async function accessAddPending(email){const em=(email||"").toLowerCase();if(!em||em===OWNER_EMAIL)return;let list=await accessGet();if(list===null)list=[];if(!list.some(x=>(x.email||"").toLowerCase()===em)){list.push({email:em,status:"pending",ts:Date.now()});await accessSave(list);}}
+function AccessBanner(){const[list,setList]=useState([]);const load=async()=>{const l=await accessGet();if(Array.isArray(l))setList(l);};useEffect(()=>{if((currentUserEmail||"").toLowerCase()===OWNER_EMAIL){load();const t=setInterval(load,30000);return()=>clearInterval(t);}},[]);if((currentUserEmail||"").toLowerCase()!==OWNER_EMAIL)return null;const pend=list.filter(x=>x&&x.status==="pending");if(!pend.length)return null;const setStatus=async(em,st)=>{const nl=list.map(x=>(x.email||"").toLowerCase()===em.toLowerCase()?{...x,status:st}:x);setList(nl);await accessSave(nl);};return(<div style={{background:"var(--red)",color:"#fff",padding:"11px 16px",borderRadius:10,margin:"0 0 14px",display:"flex",flexDirection:"column",gap:8}}><div style={{fontWeight:800,fontSize:14}}>🔴 {pend.length} {TT("bekleyen erişim isteği — onayla / reddet","pending access request(s)")}</div>{pend.map(p=>(<div key={p.email} style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.14)",borderRadius:8,padding:"6px 10px"}}><span style={{flex:1,fontSize:12.5,fontWeight:700,fontFamily:"'JetBrains Mono'"}}>{p.email}</span><button onClick={()=>setStatus(p.email,"approved")} style={{fontSize:11.5,fontWeight:800,color:"var(--green)",background:"#fff",border:"none",borderRadius:6,padding:"5px 14px",cursor:"pointer"}}>✓ {TT("Onayla","Approve")}</button><button onClick={()=>setStatus(p.email,"blocked")} style={{fontSize:11.5,fontWeight:800,color:"#fff",background:"rgba(0,0,0,.28)",border:"1px solid #fff",borderRadius:6,padding:"5px 14px",cursor:"pointer"}}>⛔ {TT("Reddet","Block")}</button></div>))}</div>);}
 
 /* ===== Ekip (members) veri fonksiyonları ===== */
 async function listMembers(){if(!currentAccountId)return[];try{const{data}=await sb.from("members").select("*").eq("account_id",currentAccountId).order("created_at",{ascending:true});return data||[];}catch(e){return[];}}
@@ -1401,7 +1406,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM224 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM225 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1437,6 +1442,7 @@ return(
 </aside>
 
 <main className="main">
+<AccessBanner/>
 <div className="hero"><span className="mk">{tab==="profil"?TT("PROFİL","PROFILE"):tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"2 — FINANCE":tab==="trademark"?"3 — TRADEMARK":tab==="visibility"?TT("4 — GÖRÜNÜRLÜK","4 — VISIBILITY"):tab==="dashboard"?"5 — SHOP MANAGER":tab==="zidentity"?TT("6 — STORE KİMLİK","6 — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"1 — MARKETING"}</span>{["marketing","finance","trademark","visibility","zidentity"].includes(tab)&&<span style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:6,fontSize:13.5,fontWeight:800,color:"#fff",background:actColor,borderRadius:999,padding:"5px 15px",whiteSpace:"nowrap"}} title={TT("Aktif mağaza","Active store")}>🏪 {act?((/A1 INBOX/i.test(acctName)?"Z1":("QM"+(accounts.findIndex(a=>a.id===act)+1)))+" · "):""}{acctName||TT("Mağaza seç","Select store")}</span>}{(()=>{const _pend=(Array.isArray(settings.mgrList)?settings.mgrList:[]).filter(m=>m&&m.email&&!m.approved&&!m.blocked).length;return _pend>0?(<button onClick={()=>setTab("ayarlar")} title={TT("Bekleyen kayıt istekleri — 8.1 Yetkilendirme'de onayla","Pending register requests — approve in 8.1")} style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:7,fontSize:13,fontWeight:800,color:"#fff",background:"var(--red)",border:"none",borderRadius:999,padding:"6px 15px",cursor:"pointer",whiteSpace:"nowrap",boxShadow:"0 0 0 3px rgba(226,59,78,.2)"}}>🔴 {_pend} {TT("bekleyen istek","pending")}</button>):null;})()}
 <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
 <button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")}>⚙ {TT("Ayarlar","Settings")}</button>
@@ -1862,7 +1868,7 @@ function AuthGate(){
 const _jp=(()=>{try{const p=new URLSearchParams(location.search).get("join");if(!p)return null;return JSON.parse(atob(p));}catch(_){return null;}})();const _jv=!!(_jp&&_jp.exp&&_jp.exp>Date.now());const[mode,setMode]=useState(_jv?"signup":"login");const[email,setEmail]=useState("");const[pw,setPw]=useState("");
 const[busy,setBusy]=useState(false);const[err,setErr]=useState("");const[info,setInfo]=useState("");
 const submit=async e=>{e.preventDefault();setErr("");setInfo("");setBusy(true);
-try{if(mode==="signup"){const{error}=await sb.auth.signUp({email,password:pw});if(error)throw error;try{const _cur=await store.get("q:s",{});const _list=Array.isArray(_cur.mgrList)?_cur.mgrList:[];if(!_list.some(m=>(m.email||"").toLowerCase()===email.toLowerCase())){_list.push({id:"m"+Date.now().toString(36)+Math.floor(Math.random()*10000),no:"",name:"",email:email.toLowerCase(),approved:false,blocked:false,open:false,perms:{},allStores:false,stores:[]});await store.set("q:s",{..._cur,mgrList:_list});}}catch(_){}setInfo("Kayıt oluşturuldu — yönetici onayı bekleniyor.");setMode("login");}
+try{if(mode==="signup"){const{error}=await sb.auth.signUp({email,password:pw});if(error)throw error;try{await accessAddPending(email);}catch(_){}setInfo("Kayıt oluşturuldu — yönetici onayı bekleniyor.");setMode("login");}
 else{const{error}=await sb.auth.signInWithPassword({email,password:pw});if(error)throw error;}}
 catch(e2){setErr(e2.message||"Hata")}finally{setBusy(false)}};
 return(<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20,background:"linear-gradient(135deg,#eef3ff,#fdf1e9)"}}>
@@ -1881,11 +1887,16 @@ return(<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justify
 function Root(){
 const[session,setSession]=useState(undefined);
 const[ready,setReady]=useState(false);
-useEffect(()=>{sb.auth.getSession().then(({data})=>setSession(data.session));const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{currentAccountId=null;_shared=null;setReady(false);setSession(s)});return()=>sub.subscription.unsubscribe()},[]);
+const[gate,setGate]=useState("checking");
+useEffect(()=>{sb.auth.getSession().then(({data})=>setSession(data.session));const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{currentAccountId=null;_shared=null;setReady(false);setGate("checking");setSession(s)});return()=>sub.subscription.unsubscribe()},[]);
 useEffect(()=>{let ok=true;if(session){bootstrap().then(()=>{if(ok)setReady(true)}).catch(()=>{if(ok)setReady(true)});}return()=>{ok=false}},[session]);
+useEffect(()=>{let ok=true;if(session&&ready){(async()=>{const em=(currentUserEmail||"").toLowerCase();if(em===OWNER_EMAIL){if(ok)setGate("ok");return;}try{const list=await accessGet();if(list===null){if(ok)setGate("pending");return;}const me=list.find(x=>(x.email||"").toLowerCase()===em);if(me&&me.status==="approved"){if(ok)setGate("ok");}else if(me&&me.status==="blocked"){if(ok)setGate("blocked");}else{if(ok)setGate("pending");}}catch(_){if(ok)setGate("pending");}})();}return()=>{ok=false}},[session,ready]);
 if(session===undefined)return <div id="boot">Yükleniyor…</div>;
 if(!session)return <AuthGate/>;
 if(!ready)return <div id="boot">Hesap hazırlanıyor…</div>;
+if(gate==="checking")return <div id="boot">{TT("Yetki kontrol ediliyor…","Checking access…")}</div>;
+if(gate==="pending")return <div id="boot" style={{flexDirection:"column",gap:14,textAlign:"center",padding:24}}><div style={{fontSize:44}}>⏳</div><div style={{fontSize:18,fontWeight:800}}>{TT("Hesabınız yönetici onayı bekliyor","Waiting for admin approval")}</div><div style={{fontSize:13,color:"#667",maxWidth:380}}>{TT("Yönetici sizi onayladığında panele erişebilirsiniz.","You'll get access once the admin approves you.")}</div><button onClick={()=>sb.auth.signOut()} style={{fontSize:13,fontWeight:700,color:"#fff",background:"#e23b4e",border:"none",borderRadius:8,padding:"9px 18px",cursor:"pointer"}}>{TT("Çıkış","Log out")}</button></div>;
+if(gate==="blocked")return <div id="boot" style={{flexDirection:"column",gap:14,textAlign:"center",padding:24}}><div style={{fontSize:44}}>⛔</div><div style={{fontSize:18,fontWeight:800}}>{TT("Erişiminiz engellendi","Access blocked")}</div><button onClick={()=>sb.auth.signOut()} style={{fontSize:13,fontWeight:700,color:"#fff",background:"#e23b4e",border:"none",borderRadius:8,padding:"9px 18px",cursor:"pointer"}}>{TT("Çıkış","Log out")}</button></div>;
 return <App/>;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
