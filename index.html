@@ -1406,7 +1406,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM225 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM226 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="en"?"tr":"en"}))}>{lang==="tr"?"🇬🇧 EN":"🇹🇷 TR"}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1890,7 +1890,7 @@ const[ready,setReady]=useState(false);
 const[gate,setGate]=useState("checking");
 useEffect(()=>{sb.auth.getSession().then(({data})=>setSession(data.session));const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{currentAccountId=null;_shared=null;setReady(false);setGate("checking");setSession(s)});return()=>sub.subscription.unsubscribe()},[]);
 useEffect(()=>{let ok=true;if(session){bootstrap().then(()=>{if(ok)setReady(true)}).catch(()=>{if(ok)setReady(true)});}return()=>{ok=false}},[session]);
-useEffect(()=>{let ok=true;if(session&&ready){(async()=>{const em=(currentUserEmail||"").toLowerCase();if(em===OWNER_EMAIL){if(ok)setGate("ok");return;}try{const list=await accessGet();if(list===null){if(ok)setGate("pending");return;}const me=list.find(x=>(x.email||"").toLowerCase()===em);if(me&&me.status==="approved"){if(ok)setGate("ok");}else if(me&&me.status==="blocked"){if(ok)setGate("blocked");}else{if(ok)setGate("pending");}}catch(_){if(ok)setGate("pending");}})();}return()=>{ok=false}},[session,ready]);
+useEffect(()=>{let ok=true;if(session&&ready){(async()=>{const em=(currentUserEmail||"").toLowerCase();if(em===OWNER_EMAIL){if(ok)setGate("ok");return;}try{const list=await accessGet();if(list===null){if(ok)setGate("pending");return;}const me=list.find(x=>(x.email||"").toLowerCase()===em);if(me&&me.status==="approved"){if(ok)setGate("ok");}else if(me&&me.status==="blocked"){if(ok)setGate("blocked");}else{if(!me){try{await accessAddPending(em);}catch(_){}}if(ok)setGate("pending");}}catch(_){if(ok)setGate("pending");}})();}return()=>{ok=false}},[session,ready]);
 if(session===undefined)return <div id="boot">Yükleniyor…</div>;
 if(!session)return <AuthGate/>;
 if(!ready)return <div id="boot">Hesap hazırlanıyor…</div>;
