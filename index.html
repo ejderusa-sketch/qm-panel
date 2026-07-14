@@ -361,7 +361,7 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 const DEFAULT_GCID="507868834696-d7u4ruebp1b5jgjsqp15u1f7qvjq2u5u.apps.googleusercontent.com";
 const STORE_COLORS=["#ef6606","#1f7ae0","#0f9d63","#8b5cf6","#e11d48","#0891b2","#d97706","#db2777","#4f46e5","#16a34a","#0284c7","#dc2626","#7c3aed","#ca8a04","#059669"];
 const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
-let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null;
+let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null, currentStores="ALL";
 /* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
 const PERMS=[
  {key:"viewMarketing",code:"1.1",group:"1 · Marketing",tr:"Marketing görüntüle",en:"View Marketing"},
@@ -419,15 +419,19 @@ async function bootstrap(){
         }
       }catch(e){}
     }
-    currentAccountId=aid||ownerAcc||null; currentRole="admin"; currentPermissions=null;
+    currentAccountId=aid||ownerAcc||null; currentRole="admin"; currentPermissions=null; currentStores="ALL";
     /* pointer'ı owner'ın gerçek veri hesabına sabitle (managerlar buradan okuyacak) */
     if(currentAccountId&&currentAccountId!==ownerAcc){
       try{const{data:_p2}=await sb.from("shared_state").select("settings").eq("id","main").maybeSingle();const _s=(_p2&&_p2.settings)||{};_s.ownerAccountId=currentAccountId;await sb.from("shared_state").upsert({id:"main",settings:_s,updated_at:new Date().toISOString()},{onConflict:"id"});}catch(_e){}
     }
   }else{
-    /* owner değil: onaylanınca (gate zaten kontrol ediyor) owner'ın workspace'ine tam yetkiyle bağlan */
+    /* owner değil: onaylanınca owner'ın workspace'ine bağlan; modül+mağaza yetkileri 8.1 mgrList slotundan gelir */
     try{await sb.from("members").update({user_id:u.id}).is("user_id",null).eq("email",email);}catch(e){}
-    currentAccountId=ownerAcc||null; currentRole="admin"; currentPermissions=null;
+    currentAccountId=ownerAcc||null; currentRole="user";
+    let _slot=null;
+    try{if(ownerAcc){const{data:_as}=await sb.from("account_state").select("settings").eq("account_id",ownerAcc).maybeSingle();const _mg=(_as&&_as.settings&&Array.isArray(_as.settings.mgrList))?_as.settings.mgrList:[];_slot=_mg.find(m=>((m&&m.email)||"").toLowerCase()===email)||null;}}catch(_e){}
+    currentPermissions=(_slot&&_slot.perms&&typeof _slot.perms==="object")?_slot.perms:{};
+    currentStores=(_slot&&_slot.allStores)?"ALL":((_slot&&Array.isArray(_slot.stores))?_slot.stores.slice():[]);
   }
   _shared=null;
   return currentAccountId;
@@ -1419,12 +1423,12 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM240 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM241 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
 <div className="sl">
-{accounts.map((a,i)=>{
+{accounts.filter(_a=>currentRole==="admin"||currentStores==="ALL"||(Array.isArray(currentStores)&&currentStores.includes(_a.id))).map((a,i)=>{
 const on=a.id===act;
 const col=STORE_COLORS[i%STORE_COLORS.length];
 const st=acctStats[a.id]||{count:0,close:0};
@@ -1458,14 +1462,14 @@ return(
 <AccessBanner/>
 <div className="hero"><span className="mk">{tab==="profil"?TT("PROFİL","PROFILE"):tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"2 — FINANCE":tab==="trademark"?"3 — TRADEMARK":tab==="visibility"?TT("4 — GÖRÜNÜRLÜK","4 — VISIBILITY"):tab==="dashboard"?"5 — SHOP MANAGER":tab==="zidentity"?TT("6 — STORE KİMLİK","6 — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"1 — MARKETING"}</span>{["marketing","finance","trademark","visibility","zidentity"].includes(tab)&&<span style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:6,fontSize:13.5,fontWeight:800,color:"#fff",background:actColor,borderRadius:999,padding:"5px 15px",whiteSpace:"nowrap"}} title={TT("Aktif mağaza","Active store")}>🏪 {act?((/A1 INBOX/i.test(acctName)?"Z1":("QM"+(accounts.findIndex(a=>a.id===act)+1)))+" · "):""}{acctName||TT("Mağaza seç","Select store")}</span>}{(()=>{const _pend=(Array.isArray(settings.mgrList)?settings.mgrList:[]).filter(m=>m&&m.email&&!m.approved&&!m.blocked).length;return _pend>0?(<button onClick={()=>setTab("ayarlar")} title={TT("Bekleyen kayıt istekleri — 8.1 Yetkilendirme'de onayla","Pending register requests — approve in 8.1")} style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:7,fontSize:13,fontWeight:800,color:"#fff",background:"var(--red)",border:"none",borderRadius:999,padding:"6px 15px",cursor:"pointer",whiteSpace:"nowrap",boxShadow:"0 0 0 3px rgba(226,59,78,.2)"}}>🔴 {_pend} {TT("bekleyen istek","pending")}</button>):null;})()}
 <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
-<button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")}>⚙ {TT("Ayarlar","Settings")}</button>
+<button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")} style={{display:currentRole==="admin"?"":"none"}}>⚙ {TT("Ayarlar","Settings")}</button>
 <button className={"btn"+(tab==="profil"?" pri":"")} onClick={()=>setTab("profil")} title={TT("Profil","Profile")}>👤 {TT("Profil","Profile")}</button>
 <select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
 <button className="btn" onClick={()=>sb.auth.signOut()}>{TT("Çıkış","Log out")}</button>
 </div></div>
 <div className="tabs">
-<button className={tab==="nova"?"on":""} onClick={()=>setTab("nova")}><b className="tl">A</b> {TT("NOVA AGENT","NOVA AGENT","نووا ایجنٹ")}</button>
-<button className={tab==="overview"?"on":""} onClick={()=>setTab("overview")}><b className="tl">0</b> {TT("DASHBOARD","DASHBOARD","ڈ۳ش بورڈ")}</button>
+<button className={tab==="nova"?"on":""} onClick={()=>setTab("nova")} style={{display:currentRole==="admin"?"":"none"}}><b className="tl">A</b> {TT("NOVA AGENT","NOVA AGENT","نووا ایجنٹ")}</button>
+<button className={tab==="overview"?"on":""} onClick={()=>setTab("overview")} style={{display:currentRole==="admin"?"":"none"}}><b className="tl">0</b> {TT("DASHBOARD","DASHBOARD","ڈ۳ش بورڈ")}</button>
 {can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}><b className="tl">1</b> {TT("MARKETING","MARKETING","مارکیٹنگ")}</button>}
 {can("viewTrademark")&&<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}><b className="tl">2</b> {TT("TRADEMARK","TRADEMARK","ٹریڈ مارک")}</button>}
 {can("viewFinance")&&<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}><b className="tl">3</b> {TT("FINANCE","FINANCE","فنانس")}</button>}
@@ -1473,16 +1477,16 @@ return(
 {can("viewDashboard")&&<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">5</b> {TT("SHOP MANAGER","SHOP MANAGER","شاپ مینیجر")}</button>}
 {can("viewIdentity")&&<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">6</b> {TT("KİMLİK","IDENTITY","شناخت")}</button>}
 {can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">7</b> {TT("EKİP","TEAM","ٹیم")}</button>}
-<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")}><b className="tl">8</b> {TT("AYARLAR","SETTINGS","ترتیبات")}</button>
+<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")} style={{display:currentRole==="admin"?"":"none"}}><b className="tl">8</b> {TT("AYARLAR","SETTINGS","ترتیبات")}</button>
 </div>
 
-{tab==="ekip"&&<EkipPanel settings={settings} setSettings={setSettings}/>}
-{tab==="finance"&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
-{tab==="nova"&&<NovaAgent accounts={accounts} onInbox={fetchInbox} onRead={readStoreMail} onMarkRead={markRead} seen={settings.novaRead||[]} onSeen={(id)=>setSettings(s=>({...s,novaRead:[...new Set([...(s.novaRead||[]),String(id)])]}))} important={settings.novaImportant||[]} onImportant={(it)=>setSettings(s=>({...s,novaImportant:[...(s.novaImportant||[]).filter(x=>x.id!==it.id),it]}))} onUnimportant={(id)=>setSettings(s=>({...s,novaImportant:(s.novaImportant||[]).filter(x=>String(x.id)!==String(id))}))} userEmail={currentUserEmail} onConnect={connectInbox} blocked={settings.novaBlocked||[]} onBlock={(em)=>setSettings(s=>({...s,novaBlocked:[...new Set([...(s.novaBlocked||[]),em])]}))}/>}
-{tab==="overview"&&<Overview settings={settings} accounts={accounts} setTab={setTab} setAct={setAct} onRead={readStoreMail}/>}
-{tab==="trademark"&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts} act={act} setAct={setAct} onFetch={fetchStoreTrademark} onSend={sendStoreMail} onRead={readStoreMail}/>}
-{tab==="visibility"&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
-{tab==="dashboard"&&<div style={{padding:"8px 0 40px"}}>
+{tab==="ekip"&&can("manageTeam")&&<EkipPanel settings={settings} setSettings={setSettings}/>}
+{tab==="finance"&&can("viewFinance")&&<FinanceTab dm={dm} act={act} accounts={accounts} settings={settings} setSettings={setSettings}/>}
+{tab==="nova"&&currentRole==="admin"&&<NovaAgent accounts={accounts} onInbox={fetchInbox} onRead={readStoreMail} onMarkRead={markRead} seen={settings.novaRead||[]} onSeen={(id)=>setSettings(s=>({...s,novaRead:[...new Set([...(s.novaRead||[]),String(id)])]}))} important={settings.novaImportant||[]} onImportant={(it)=>setSettings(s=>({...s,novaImportant:[...(s.novaImportant||[]).filter(x=>x.id!==it.id),it]}))} onUnimportant={(id)=>setSettings(s=>({...s,novaImportant:(s.novaImportant||[]).filter(x=>String(x.id)!==String(id))}))} userEmail={currentUserEmail} onConnect={connectInbox} blocked={settings.novaBlocked||[]} onBlock={(em)=>setSettings(s=>({...s,novaBlocked:[...new Set([...(s.novaBlocked||[]),em])]}))}/>}
+{tab==="overview"&&currentRole==="admin"&&<Overview settings={settings} accounts={accounts} setTab={setTab} setAct={setAct} onRead={readStoreMail}/>}
+{tab==="trademark"&&can("viewTrademark")&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts} act={act} setAct={setAct} onFetch={fetchStoreTrademark} onSend={sendStoreMail} onRead={readStoreMail}/>}
+{tab==="visibility"&&can("viewVisibility")&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
+{tab==="dashboard"&&can("viewDashboard")&&<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
 <div className="rh"><span style={{fontSize:16}}>✅ 5 — {TT("SHOP MANAGER · Bugün","SHOP MANAGER · Today")}</span><span className="store" style={{marginLeft:"auto"}}>{(accounts.find(a=>a.id===act)||{}).name||"—"}</span></div>
 <div style={{fontSize:13.5,color:"var(--muted)",lineHeight:1.6}}>{directive}</div></div>
@@ -1494,12 +1498,12 @@ return(
 {budget.moves.length>0&&<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--green)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>{TT("Bütçe önerisi","Budget suggestion")}</span></div>
 <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>{budget.moves.map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>➕ {m.to}</span><b style={{color:"var(--green)"}}>{money(m.amt,settings.cur)}</b><span style={{color:"var(--faint)",fontFamily:"'JetBrains Mono'",fontSize:12}}>ROAS {m.roas.toFixed(1)}×</span></div>)}</div></div>}
 </div>}
-{tab==="zidentity"&&<ZKimlik accounts={accounts} act={act} setAccounts={setAccounts}/>}
-{tab==="ayarlar"&&<SettingsPanel settings={settings} setSettings={setSettings} accounts={accounts} setAccounts={setAccounts} readStoreLegal={readStoreLegal}/>}
+{tab==="zidentity"&&can("viewIdentity")&&<ZKimlik accounts={accounts} act={act} setAccounts={setAccounts}/>}
+{tab==="ayarlar"&&currentRole==="admin"&&<SettingsPanel settings={settings} setSettings={setSettings} accounts={accounts} setAccounts={setAccounts} readStoreLegal={readStoreLegal}/>}
 {tab==="profil"&&<ProfilePanel/>}
 
 {/* ===== MARKETING TAB ===== */}
-{tab==="marketing"&&(<>
+{tab==="marketing"&&can("viewMarketing")&&(<>
 <input id="csvInput" type="file" accept=".csv,text/csv" style={{display:"none"}} onChange={e=>handleCSV(e.target.files&&e.target.files[0])}/>
 <input ref={fRef} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handleImage(e.target.files&&e.target.files[0])}/>
 <div style={{display:"flex",alignItems:"center",gap:10,margin:"2px 0 12px",flexWrap:"wrap"}}>
