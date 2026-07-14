@@ -1286,7 +1286,7 @@ catch(e){setGmErr("Çekilemedi: "+(e.message||"hata"))}finally{setGmLoad(false)}
 
 /* QM19: mağaza başına Gmail bağlantısı */
 const GMAIL_FN=SB_URL+"/functions/v1/gmail";const gmailFn=async(action,storeId,extra)=>{try{const{data:{session}}=await sb.auth.getSession();const jwt=session&&session.access_token;const r=await fetch(GMAIL_FN,{method:"POST",headers:{"Content-Type":"application/json","apikey":SB_KEY,"Authorization":"Bearer "+(jwt||SB_KEY)},body:JSON.stringify({action,storeId,...(extra||{})})});return await r.json();}catch(e){return{error:String(e)};}};const getToken=async(acc)=>{const c=gmStoreTok.current[acc.id];if(c&&c.t&&c.exp&&c.exp>Date.now()+60000)return c.t;const r=await gmailFn("token",acc.id);if(r&&r.access_token){gmStoreTok.current[acc.id]={t:r.access_token,exp:Date.now()+((r.expires_in||3500)*1000)};return r.access_token;}return null;};
-const connectStore=(acc,andFetch,after)=>{const cid=((acc&&acc.gcid)||settings.googleClientId||DEFAULT_GCID||"").trim();
+const connectStore=(acc,andFetch,after)=>{const cid=(DEFAULT_GCID||(acc&&acc.gcid)||settings.googleClientId||"").trim();
 if(!cid){setToast(TT("Google Client ID bulunamadı.","Google Client ID not found."));setShowSet(true);return;}
 if(!window.google||!window.google.accounts){setToast(TT("Google kütüphanesi yüklenemedi.","Google library not loaded."));return;}
 try{const cc=window.google.accounts.oauth2.initCodeClient({client_id:cid,scope:"https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.modify",ux_mode:"popup",prompt:"consent",hint:((acc&&acc.email)||"").trim(),callback:async resp=>{
