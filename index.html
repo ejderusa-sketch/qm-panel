@@ -674,6 +674,7 @@ const[prof,setProf]=useState(null);
 const[acc,setAcc]=useState(null);
 const[saved,setSaved]=useState("");
 const[newRule,setNewRule]=useState("");const[legalSid,setLegalSid]=useState("");
+useEffect(()=>{if((currentUserEmail||"").toLowerCase()!==OWNER_EMAIL)return;let _alive=true;const _sync=async()=>{try{const list=await accessGet();if(!Array.isArray(list)||!_alive)return;const ems=list.filter(x=>x&&x.email&&x.status!=="blocked").map(x=>(x.email||"").toLowerCase());if(!ems.length)return;setSettings(s=>{const cur=Array.isArray(s.mgrList)?s.mgrList:[];const have=new Set(cur.map(m=>((m&&m.email)||"").toLowerCase()));const add=[];ems.forEach((em,ix)=>{if(!have.has(em)){const _st=(list.find(x=>(x.email||"").toLowerCase()===em)||{}).status;add.push({id:"m"+Date.now().toString(36)+Math.floor(Math.random()*100000)+ix,no:"",name:((em.split("@")[0]||"").replace(/[._\-]/g," ").trim().toUpperCase()||em.split("@")[0]),email:em,approved:_st==="approved",blocked:false,open:false,perms:{},allStores:false,stores:[]});}});if(!add.length)return s;return{...s,mgrList:[...cur,...add]};});}catch(_e){}};_sync();const _t=setInterval(_sync,20000);return()=>{_alive=false;clearInterval(_t);};},[]);
 const accts=Array.isArray(accounts)?accounts:[];
 const houseRules=Array.isArray(settings.houseRules)?settings.houseRules:[];
 const upStore=(id,k,v)=>setAccounts&&setAccounts(x=>x.map(s=>s.id===id?{...s,[k]:v}:s));
@@ -1423,7 +1424,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM241 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM242 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
