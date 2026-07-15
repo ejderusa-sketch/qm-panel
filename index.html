@@ -382,6 +382,7 @@ const PERMS=[
  {key:"manageStores",code:"7.1",group:"7 · Genel",tr:"Mağaza ekle/adlandır",en:"Add/rename stores"},
  {key:"connectGmail",code:"7.2",group:"7 · Genel",tr:"Gmail bağla/çek",en:"Connect/fetch Gmail"},
  {key:"manageTeam",code:"8.1",group:"8 · Ekip",tr:"Ekip yönetimi",en:"Manage team"},
+ {key:"viewSettings",code:"9.1",group:"9 · Ayarlar",tr:"Ayarlar görüntüle",en:"View Settings"},
  {key:"sendMessages",code:"8.2",group:"8 · Ekip",tr:"Mesaj gönder",en:"Send messages"},
 ];
 function defaultPerms(role){
@@ -1426,7 +1427,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM290 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM291 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1465,7 +1466,7 @@ return(
 <AccessBanner/>
 <div className="hero"><span className="mk">{tab==="profil"?TT("PROFİL","PROFILE"):tab==="ayarlar"?TT("AYARLAR","SETTINGS"):tab==="finance"?"2 — FINANCE":tab==="trademark"?"3 — TRADEMARK":tab==="visibility"?TT("4 — GÖRÜNÜRLÜK","4 — VISIBILITY"):tab==="dashboard"?"5 — SHOP MANAGER":tab==="zidentity"?TT("6 — STORE KİMLİK","6 — STORE IDENTITY"):tab==="ekip"?TT("EKİP YÖNETİMİ","TEAM MANAGEMENT"):"1 — MARKETING"}</span>{["marketing","finance","trademark","visibility","zidentity"].includes(tab)&&<span style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:6,fontSize:13.5,fontWeight:800,color:"#fff",background:actColor,borderRadius:999,padding:"5px 15px",whiteSpace:"nowrap"}} title={TT("Aktif mağaza","Active store")}>🏪 {act?((/A1 INBOX/i.test(acctName)?"Z1":("QM"+(accounts.findIndex(a=>a.id===act)+1)))+" · "):""}{acctName||TT("Mağaza seç","Select store")}</span>}{(()=>{const _pend=(Array.isArray(settings.mgrList)?settings.mgrList:[]).filter(m=>m&&m.email&&!m.approved&&!m.blocked).length;return _pend>0?(<button onClick={()=>setTab("ayarlar")} title={TT("Bekleyen kayıt istekleri — 8.1 Yetkilendirme'de onayla","Pending register requests — approve in 8.1")} style={{marginLeft:12,display:"inline-flex",alignItems:"center",gap:7,fontSize:13,fontWeight:800,color:"#fff",background:"var(--red)",border:"none",borderRadius:999,padding:"6px 15px",cursor:"pointer",whiteSpace:"nowrap",boxShadow:"0 0 0 3px rgba(226,59,78,.2)"}}>🔴 {_pend} {TT("bekleyen istek","pending")}</button>):null;})()}
 <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
-<button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")} style={{display:currentRole==="admin"?"":"none"}}>⚙ {TT("Ayarlar","Settings")}</button>
+<button className={"btn"+(tab==="ayarlar"?" pri":"")} onClick={()=>setTab("ayarlar")} title={TT("Ayarlar","Settings")} style={{display:(currentRole==="admin"||can("viewSettings"))?"":"none"}}>⚙ {TT("Ayarlar","Settings")}</button>
 <button className={"btn"+(tab==="profil"?" pri":"")} onClick={()=>setTab("profil")} title={TT("Profil","Profile")}>👤 {TT("Profil","Profile")}</button>
 <select className="cur-sel" value={settings.cur} onChange={e=>setSettings(s=>({...s,cur:e.target.value}))}><option value="₺">₺ TRY</option><option value="$">$ USD</option><option value="€">€ EUR</option></select>
 <button className="btn" onClick={()=>sb.auth.signOut()}>{TT("Çıkış","Log out")}</button>
@@ -1480,7 +1481,7 @@ return(
 {can("viewDashboard")&&<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">5</b> {TT("SHOP MANAGER","SHOP MANAGER","شاپ مینیجر")}</button>}
 {can("viewIdentity")&&<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">6</b> {TT("KİMLİK","IDENTITY","شناخت")}</button>}
 {can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">7</b> {TT("EKİP","TEAM","ٹیم")}</button>}
-<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")} style={{display:currentRole==="admin"?"":"none"}}><b className="tl">8</b> {TT("AYARLAR","SETTINGS","ترتیبات")}</button>
+<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")} style={{display:(currentRole==="admin"||can("viewSettings"))?"":"none"}}><b className="tl">8</b> {TT("AYARLAR","SETTINGS","ترتیبات")}</button>
 </div>
 
 {tab==="ekip"&&can("manageTeam")&&<EkipPanel settings={settings} setSettings={setSettings}/>}
@@ -1502,7 +1503,7 @@ return(
 <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>{budget.moves.map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 13px",border:"1px solid var(--line2)",borderRadius:10,background:"var(--bg2)",fontSize:13.5}}><span style={{flex:1}}>➕ {m.to}</span><b style={{color:"var(--green)"}}>{money(m.amt,settings.cur)}</b><span style={{color:"var(--faint)",fontFamily:"'JetBrains Mono'",fontSize:12}}>ROAS {m.roas.toFixed(1)}×</span></div>)}</div></div>}
 </div>}
 {tab==="zidentity"&&can("viewIdentity")&&<ZKimlik accounts={accounts} act={act} setAccounts={setAccounts}/>}
-{tab==="ayarlar"&&currentRole==="admin"&&<SettingsPanel settings={settings} setSettings={setSettings} accounts={accounts} setAccounts={setAccounts} readStoreLegal={readStoreLegal}/>}
+{tab==="ayarlar"&&(currentRole==="admin"||can("viewSettings"))&&<SettingsPanel settings={settings} setSettings={setSettings} accounts={accounts} setAccounts={setAccounts} readStoreLegal={readStoreLegal}/>}
 {tab==="profil"&&<ProfilePanel/>}
 
 {/* ===== MARKETING TAB ===== */}
