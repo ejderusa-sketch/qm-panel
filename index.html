@@ -387,6 +387,7 @@ const PERMS=[
 ];
 function defaultPerms(role){
  const set=v=>PERMS.reduce((o,p)=>{o[p.key]=v;return o},{});
+ if(role==="owner")return set(true);
  if(role==="admin")return set(true);
  if(role==="user"){const o=set(true);o.deleteData=false;o.manageTeam=false;return o;}
  const o=set(true);o.deleteData=false;o.editFinance=false;o.manageTeam=false;return o;
@@ -809,7 +810,7 @@ await load();setBusy(false);};
 const del=async(id)=>{if(!window.confirm(TT("Bu üyeyi çıkar?","Remove this member?")))return;await removeMember(id);load();};
 const chRole=async(id,rl)=>{await updateMemberRole(id,rl);load();};
 const isAdmin=currentRole==="admin";
-const roleOpts=<React.Fragment><option value="shop_manager">{TT("Mağaza Müdürü","Shop Manager")}</option><option value="user">{TT("Kullanıcı","User")}</option><option value="admin">{TT("Yönetici","Admin")}</option></React.Fragment>;
+const roleOpts=<React.Fragment><option value="owner">Owner</option><option value="shop_manager">{TT("Mağaza Müdürü","Shop Manager")}</option><option value="user">{TT("Kullanıcı","User")}</option><option value="admin">{TT("Yönetici","Admin")}</option></React.Fragment>;
 return(<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>{TT("Ekip yönetimi. Admin, e-postayla Mağaza Müdürü veya Kullanıcı davet eder; davet edilen kişi o e-postayla giriş yapınca senin hesabına katılır ve aynı verileri görür.","Team management. An admin invites a Shop Manager or User by email; the invited person joins your account when they sign in with that email and sees the same data.")} {!isAdmin&&<span style={{color:"var(--red)"}}> {TT("(Yalnızca Admin üye ekleyip çıkarabilir.)","(Only an Admin can add or remove members.)")}</span>}</div>{can("manageTeam")&&<div className="rules"><div className="rh"><span style={{width:3,height:15,background:"var(--azure)",borderRadius:2,display:"inline-block"}}/><span style={{fontSize:15}}>📥 {TT("İçeri Alma — Bekleyen İstekler","Let In — Pending Requests")}</span></div><div style={{fontSize:12,color:"var(--muted)",margin:"2px 0 8px"}}>{TT("Kayıt linkiyle başvuran kişileri buradan onayla (içeri al). Bunun için 'Ekip yönetimi' izni yeter; admin olmak gerekmez.","Approve people who applied via the register link. Needs 'Manage team' permission; admin not required.")}</div><AccessQueue onLetIn={async(em)=>{const _e=(em||"").toLowerCase();setSettings(s=>{const L=s.mgrList||[];if(L.some(m=>(m.email||"").toLowerCase()===_e))return s;return{...s,mgrList:[...L,{id:"m"+Date.now().toString(36)+Math.floor(Math.random()*10000),no:"",name:((_e.split("@")[0]||"").replace(/[._\-]/g," ").replace(/\s+/g," ").trim().toUpperCase()||_e.split("@")[0]),email:_e,approved:true,blocked:false,open:false,perms:{},allStores:false,stores:[]}]};});try{const _L=(await accessGet())||[];const _nl=_L.some(x=>(x.email||'').toLowerCase()===_e)?_L.map(x=>(x.email||'').toLowerCase()===_e?{...x,status:'approved'}:x):[..._L,{email:_e,status:'approved',ts:Date.now()}];await accessSave(_nl);try{await addMember(_e,'user');}catch(_a){}}catch(_b){}}}/></div>}
 {isAdmin&&<div className="rules">
@@ -1428,7 +1429,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM297 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM298 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
