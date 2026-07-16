@@ -358,7 +358,7 @@ return{label:"Veri az",key:"advLow",color:"var(--faint)",strong:false,rank:5};
 const SB_URL="https://pepvzsffeyvzhxvlliex.supabase.co";
 const SB_KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
 const sb=supabase.createClient(SB_URL,SB_KEY);
-const DEFAULT_GCID="507868834696-d7u4ruebp1b5jgjsqp15u1f7qvjq2u5u.apps.googleusercontent.com";
+const DEFAULT_GCID="507868834696-m1gnrlcu7ba620knq4ck1cj58fs5qu97.apps.googleusercontent.com";
 const STORE_COLORS=["#ef6606","#1f7ae0","#0f9d63","#8b5cf6","#e11d48","#0891b2","#d97706","#db2777","#4f46e5","#16a34a","#0284c7","#dc2626","#7c3aed","#ca8a04","#059669"];
 const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
 let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null, currentStores="ALL";
@@ -1430,7 +1430,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM301 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM302 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
