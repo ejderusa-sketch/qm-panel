@@ -1075,6 +1075,58 @@ return(<div style={{padding:"8px 0 40px"}}>
 {ta(TT("Upload Gap (fırsat vs. mevcut)","Upload Gap (opportunity vs. current)"),"gap","...")}
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
 </div></div>);}
+
+function EtsyDataPanel(){
+var e=React.createElement;
+var FN="https://pepvzsffeyvzhxvlliex.supabase.co/functions/v1/etsy";
+var KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
+var sS=React.useState([]),stores=sS[0],setStores=sS[1];
+var sL=React.useState(""),sel=sL[0],setSel=sL[1];
+var sB=React.useState(false),busy=sB[0],setBusy=sB[1];
+var sE=React.useState(""),err=sE[0],setErr=sE[1];
+var s2=React.useState(null),shop=s2[0],setShop=s2[1];
+var s3=React.useState(null),rec=s3[0],setRec=s3[1];
+var s4=React.useState(null),lst=s4[0],setLst=s4[1];
+function call(b){return fetch(FN,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+KEY},body:JSON.stringify(b)}).then(function(r){return r.json();});}
+function proxy(uid,path,query){return call({action:"proxy",etsy_user_id:uid,path:path,query:query});}
+React.useEffect(function(){
+ call({action:"list"}).then(function(r){
+  var arr=(r&&r.stores)||[];
+  if(!arr.length){setErr("Bağlı mağaza yok. Önce Etsy'ye bağlan.");return;}
+  return Promise.all(arr.map(function(s){
+   return proxy(s.etsy_user_id,"/v3/application/users/"+s.etsy_user_id+"/shops").then(function(sh){
+    var shp=sh&&sh.data&&(sh.data.shop_id?sh.data:(sh.data.results&&sh.data.results[0]));
+    return {etsy_user_id:s.etsy_user_id,shop_id:shp&&shp.shop_id,shop_name:(shp&&shp.shop_name)||("#"+s.etsy_user_id),_shop:shp};
+   }).catch(function(){return {etsy_user_id:s.etsy_user_id,shop_name:"#"+s.etsy_user_id};});
+  })).then(function(list){setStores(list);setSel(list[0].etsy_user_id);});
+ }).catch(function(ex){setErr(String(ex&&ex.message||ex));});
+},[]);
+function loadSel(uid,list){
+ var arr=list||stores;var st=arr.filter(function(x){return x.etsy_user_id===uid;})[0];
+ if(!st){return;}
+ setShop(st._shop||null);setRec(null);setLst(null);
+ if(!st.shop_id){setErr("Bu hesapta mağaza bulunamadı.");return;}
+ setBusy(true);setErr("");
+ Promise.all([proxy(uid,"/v3/application/shops/"+st.shop_id+"/receipts",{limit:25}),proxy(uid,"/v3/application/shops/"+st.shop_id+"/listings/active",{limit:24})]).then(function(a){setRec(a[0].data);setLst(a[1].data);}).catch(function(ex){setErr(String(ex&&ex.message||ex));}).then(function(){setBusy(false);});
+}
+React.useEffect(function(){if(sel){loadSel(sel);}},[sel,stores]);
+function money(m){return m?((m.amount/m.divisor).toFixed(2)+" "+m.currency_code):"";}
+function card(label,val){return e("div",{key:label,style:{background:"var(--panel2)",border:"1px solid var(--line)",borderRadius:12,padding:"14px 16px",minWidth:120}},e("div",{style:{fontSize:12,color:"var(--muted)"}},label),e("div",{style:{fontSize:22,fontWeight:800,marginTop:4}},val));}
+var rows=(rec&&rec.results)||[];
+var items=(lst&&lst.results)||[];
+var th=function(t){return e("th",{key:t,style:{textAlign:"left",padding:"8px 10px",borderBottom:"1px solid var(--line)",color:"var(--muted)",whiteSpace:"nowrap"}},t);};
+var td=function(v,k){return e("td",{key:k,style:{padding:"8px 10px",borderBottom:"1px solid var(--line)"}},v);};
+return e("div",{style:{padding:"8px 0 40px"}},
+ e("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:16,flexWrap:"wrap"}},e("span",{style:{fontSize:18,fontWeight:800}},"🛍️ Z ETSY"),e("select",{value:sel,onChange:function(ev){setSel(ev.target.value);},style:{padding:"8px 10px",borderRadius:8,border:"1px solid var(--line)",background:"var(--panel2)",fontWeight:700}},stores.length?stores.map(function(s){return e("option",{key:s.etsy_user_id,value:s.etsy_user_id},s.shop_name+" (#"+s.etsy_user_id+")");}):e("option",{value:""},"Yükleniyor…")),e("button",{onClick:function(){loadSel(sel);},disabled:busy||!sel,style:{marginLeft:"auto",padding:"8px 16px",borderRadius:8,border:"1px solid var(--line)",background:"var(--panel2)",cursor:"pointer",fontWeight:700}},busy?"Yükleniyor…":"🔄 Yenile")),
+ err?e("div",{style:{color:"#e23b4e",marginBottom:12}},"Hata: "+err):null,
+ shop?e("div",{style:{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}},card("Mağaza",shop.shop_name),card("Toplam satış",shop.transaction_sold_count!=null?shop.transaction_sold_count:"—"),card("Aktif ilan",shop.listing_active_count!=null?shop.listing_active_count:items.length),card("Sipariş",(rec&&rec.count)!=null?rec.count:rows.length),card("Takipçi",shop.num_favorers!=null?shop.num_favorers:"—")):null,
+ e("h3",{style:{margin:"10px 0"}},"Son siparişler"),
+ e("div",{style:{overflowX:"auto"}},e("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:13}},e("thead",null,e("tr",null,["Sipariş","Alıcı","Tutar","Durum","Tarih"].map(th))),e("tbody",null,rows.map(function(r,i){return e("tr",{key:i},td("#"+r.receipt_id,"a"),td(r.name||r.buyer_email||"—","b"),td(money(r.grandtotal||r.total_price),"c"),td(r.status||(r.is_shipped?"shipped":"—"),"d"),td(r.created_timestamp?new Date(r.created_timestamp*1000).toLocaleDateString("tr-TR"):"—","e"));})))),
+ e("h3",{style:{margin:"20px 0 10px"}},"Aktif ilanlar"),
+ e("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))",gap:12}},items.map(function(it,i){return e("div",{key:i,style:{border:"1px solid var(--line)",borderRadius:10,padding:10,fontSize:12}},e("div",{style:{fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},it.title||("#"+it.listing_id)),e("div",{style:{color:"var(--muted)",marginTop:4}},money(it.price)),e("div",{style:{color:"var(--muted)",marginTop:2}},"Stok: "+(it.quantity!=null?it.quantity:"—")));}))
+);
+}
+
 function App(){
 const ALL_STORES=[];
 const DEMO_IDS=new Set(["a0","a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13","a14","a15"]);
@@ -1469,6 +1521,7 @@ return(
 <main className="main">
 <AccessBanner/>
 <div className="tabs">
+<button className={tab==="zetsy"?"on":""} onClick={()=>setTab("zetsy")}><b className="tl">★</b> Z ETSY</button>
 <button className={tab==="nova"?"on":""} onClick={()=>setTab("nova")} style={{display:currentRole==="admin"?"":"none"}}><b className="tl">A</b> {TT("NOVA AGENT","NOVA AGENT","نووا ایجنٹ")}</button>
 <button className={tab==="overview"?"on":""} onClick={()=>setTab("overview")} style={{display:can("viewOverview")?"":"none"}}><b className="tl">0</b> {TT("DASHBOARD","DASHBOARD","ڈ۳ش بورڈ")}</button>
 {can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}><b className="tl">1</b> {TT("MARKETING","MARKETING","مارکیٹنگ")}</button>}
@@ -1479,7 +1532,7 @@ return(
 {can("viewIdentity")&&<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">6</b> {TT("KİMLİK","IDENTITY","شناخت")}</button>}
 {can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">7</b> {TT("EKİP","TEAM","ٹیم")}</button>}
 <button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")} style={{display:(currentRole==="admin"||can("viewSettings"))?"":"none"}}><b className="tl">8</b> {TT("AYARLAR","SETTINGS","ترتیبات")}</button>
-<button className={tab==="etsy"?"on":""} onClick={()=>setTab("etsy")}><b className="tl">9</b> ETSY</button>
+<button className={tab==="etsy"?"on":""} onClick={()=>setTab("etsy")}><b className="tl">9</b> ETSY TOOLS</button>
 </div>
 
 {tab==="ekip"&&can("manageTeam")&&<EkipPanel settings={settings} setSettings={setSettings}/>}
@@ -1488,6 +1541,7 @@ return(
 {tab==="overview"&&can("viewOverview")&&<Overview settings={settings} setSettings={setSettings} accounts={accounts} setTab={setTab} setAct={setAct} onRead={readStoreMail} onReadThread={readStoreThread}/>}
 {tab==="trademark"&&can("viewTrademark")&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts} act={act} setAct={setAct} onFetch={fetchStoreTrademark} onSend={sendStoreMail} onRead={readStoreMail} onReadThread={readStoreThread}/>}
 {tab==="visibility"&&can("viewVisibility")&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
+{tab==="zetsy"&&<EtsyDataPanel/>}
 {tab==="dashboard"&&can("viewDashboard")&&<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
 <div className="rh"><span style={{fontSize:16}}>✅ 5 — {TT("SHOP MANAGER · Bugün","SHOP MANAGER · Today")}</span><span className="store" style={{marginLeft:"auto"}}>{(accounts.find(a=>a.id===act)||{}).name||"—"}</span></div>
