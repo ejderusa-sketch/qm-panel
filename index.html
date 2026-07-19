@@ -84,8 +84,8 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 .ctag.g{background:var(--green-s);color:var(--green);border-color:rgba(15,157,99,.25)}
 
 /* rules */
-.rules{border:1px solid var(--line);border-radius:13px;padding:14px 16px;margin-bottom:18px;background:var(--panel)}
-.rh{font-family:'Space Grotesk';font-size:13px;font-weight:600;display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.rules{border:2px solid var(--line2);border-radius:13px;padding:14px 16px;margin-bottom:18px;background:var(--panel)}
+.rh{font-family:'Space Grotesk';font-size:15px;font-weight:800;color:#111;display:flex;align-items:center;gap:9px;margin-bottom:8px}
 .fbul{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--muted);line-height:1.45}
 .fbul>span:first-child{font-size:10px;flex-shrink:0;line-height:1.6}
 .rules-grid{display:grid;grid-template-columns:1fr;gap:10px}
@@ -1430,7 +1430,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM330 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM331 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1535,7 +1535,7 @@ return(
 {PERIODS.map(([k,tr,en])=><option key={k} value={k}>{TT(tr,en)}</option>)}
 </select>
 
-{(()=>{const _n=new Date();const _cm=_n.getFullYear()+"-"+String(_n.getMonth()+1).padStart(2,"0");const _on=period===_cm;return <button onClick={()=>{setPeriod(_cm);const _a=accounts.find(x=>x.id===act);if(_a&&_a.gmailConnected&&(dm[act+"|"+_cm]||[]).length===0)fetchStoreCSV(_a);}} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(_on?"var(--azure)":"var(--line2)"),background:_on?"var(--azure)":"var(--panel)",color:_on?"#fff":"var(--ink)"}}>{TT("Bu Ay","This Month")}</button>;})()}{[["l1m",TT("Son 1 Ay","Last 1 Mo")],["l2m",TT("Son 2 Ay","Last 2 Mo")],["l3m",TT("Son 3 Ay","Last 3 Mo")]].map(([k,lb])=><button key={k} onClick={()=>{setPeriod(k);const _a=accounts.find(x=>x.id===act);if(_a&&_a.gmailConnected&&aggRows(rangeMonths(k)).length===0)fetchStoreCSV(_a);}} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(period===k?"var(--azure)":"var(--line2)"),background:period===k?"var(--azure)":"var(--panel)",color:period===k?"#fff":"var(--ink)"}}>{lb}</button>)}
+{(()=>{const _n=new Date();const _cm=_n.getFullYear()+"-"+String(_n.getMonth()+1).padStart(2,"0");const _on=period===_cm;return <button onClick={()=>{setPeriod(_cm);const _a=accounts.find(x=>x.id===act);if(_a&&_a.gmailConnected&&(dm[act+"|"+_cm]||[]).length===0)fetchStoreCSV(_a);}} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(_on?"var(--azure)":"var(--line2)"),background:_on?"var(--azure)":"var(--panel)",color:_on?"#fff":"var(--ink)"}}>{TT("Bu Ay","This Month")}</button>;})()}{(()=>{const _mn=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];const _now=new Date();const _o=[];for(let _i=11;_i>=0;_i--){const _d=new Date(_now.getFullYear(),_now.getMonth()-_i,1);const _k=_d.getFullYear()+"-"+String(_d.getMonth()+1).padStart(2,"0");_o.push(<button key={_k} onClick={()=>{setPeriod(_k);const _a=accounts.find(x=>x.id===act);if(_a&&_a.gmailConnected&&(dm[act+"|"+_k]||[]).length===0)fetchStoreCSV(_a);}} style={{fontSize:12,fontWeight:700,padding:"6px 10px",borderRadius:8,cursor:"pointer",border:"1px solid "+(period===_k?"var(--azure)":"var(--line2)"),background:period===_k?"var(--azure)":"var(--panel)",color:period===_k?"#fff":"var(--ink)"}}>{_mn[_d.getMonth()]+" "+String(_d.getFullYear()).slice(2)}</button>);}return _o;})()}
 
 </div>
 <div style={{display:"flex",gap:6,marginBottom:12}}>
