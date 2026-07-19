@@ -1075,6 +1075,43 @@ return(<div style={{padding:"8px 0 40px"}}>
 {ta(TT("Upload Gap (fırsat vs. mevcut)","Upload Gap (opportunity vs. current)"),"gap","...")}
 <div style={{fontSize:12,color:"var(--faint)",marginTop:10}}>{TT("Değişiklikler otomatik kaydedilir (buluta).","Changes are saved automatically (to the cloud).")}</div>
 </div></div>);}
+function EtsyApiDataPanel(){
+var e=React.createElement;
+var FN="https://pepvzsffeyvzhxvlliex.supabase.co/functions/v1/etsy";
+var KEY="sb_publishable_y9y0jhTqXFogfD_9Wc1viA_Wu-J0Q_-";
+var CONNECT="https://ejderusa-sketch.github.io/qm-etsy/index.html";
+var sS=React.useState([]),stores=sS[0],setStores=sS[1];
+var sL=React.useState(""),sel=sL[0],setSel=sL[1];
+var sB=React.useState(false),busy=sB[0],setBusy=sB[1];
+var sE=React.useState(""),err=sE[0],setErr=sE[1];
+var s2=React.useState(null),shop=s2[0],setShop=s2[1];
+var s3=React.useState(null),rec=s3[0],setRec=s3[1];
+var s4=React.useState(null),lst=s4[0],setLst=s4[1];
+function call(b){return fetch(FN,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+KEY},body:JSON.stringify(b)}).then(function(r){return r.json();});}
+function proxy(uid,path,query){return call({action:"proxy",etsy_user_id:uid,path:path,query:query});}
+React.useEffect(function(){call({action:"list"}).then(function(r){var arr=(r&&r.stores)||[];if(!arr.length){setErr("Bağlı mağaza yok. + Bağla ile başla.");return;}return Promise.all(arr.map(function(s){return proxy(s.etsy_user_id,"/v3/application/users/"+s.etsy_user_id+"/shops").then(function(sh){var shp=sh&&sh.data&&(sh.data.shop_id?sh.data:(sh.data.results&&sh.data.results[0]));return {etsy_user_id:s.etsy_user_id,shop_id:shp&&shp.shop_id,shop_name:(shp&&shp.shop_name)||("#"+s.etsy_user_id),_shop:shp};}).catch(function(){return {etsy_user_id:s.etsy_user_id,shop_name:"#"+s.etsy_user_id};});})).then(function(list){setStores(list);setSel(list[0].etsy_user_id);});}).catch(function(ex){setErr(String(ex&&ex.message||ex));});},[]);
+function loadSel(uid,list){var arr=list||stores;var st=arr.filter(function(x){return x.etsy_user_id===uid;})[0];if(!st){return;}setShop(st._shop||null);setRec(null);setLst(null);if(!st.shop_id){setErr("Bu hesapta mağaza bulunamadı.");return;}setBusy(true);setErr("");Promise.all([proxy(uid,"/v3/application/shops/"+st.shop_id+"/receipts",{limit:50}),proxy(uid,"/v3/application/shops/"+st.shop_id+"/listings/active",{limit:24})]).then(function(a){setRec(a[0].data);setLst(a[1].data);}).catch(function(ex){setErr(String(ex&&ex.message||ex));}).then(function(){setBusy(false);});}
+React.useEffect(function(){if(sel){loadSel(sel);}},[sel,stores]);
+function money(m){return m?((m.amount/m.divisor).toFixed(2)+" "+m.currency_code):"—";}
+function varOf(t,names){var vs=(t&&t.variations)||[];for(var i=0;i<vs.length;i++){var n=(vs[i].formatted_name||"").toLowerCase();for(var j=0;j<names.length;j++){if(n.indexOf(names[j])>=0)return vs[i].formatted_value||"";}}return "";}
+function card(label,val){return e("div",{key:label,style:{background:"var(--panel2)",border:"1px solid var(--line)",borderRadius:12,padding:"14px 16px",minWidth:120}},e("div",{style:{fontSize:12,color:"var(--muted)"}},label),e("div",{style:{fontSize:22,fontWeight:800,marginTop:4}},val));}
+var items=(lst&&lst.results)||[];
+var lines=[];
+((rec&&rec.results)||[]).forEach(function(r){var sh0=(r.shipments&&r.shipments[0])||{};var txs=(r.transactions&&r.transactions.length)?r.transactions:[{}];txs.forEach(function(t){lines.push(["#"+r.receipt_id,(r.created_timestamp?new Date(r.created_timestamp*1000).toLocaleDateString("tr-TR"):"—"),(r.status||"—"),(r.name||"—"),(r.country_iso||"—"),(r.state||"—"),(r.city||"—"),(r.zip||"—"),([r.first_line,r.second_line].filter(Boolean).join(" ")||"—"),(t.sku||"—"),(t.title||"—"),(varOf(t,["size","style","beden"])||"—"),(varOf(t,["color","renk"])||"—"),(varOf(t,["personal","kişisel"])||"—"),(t.quantity!=null?t.quantity:"—"),money(t.price),money(r.subtotal),money(r.total_shipping_cost),money(r.total_tax_cost),money(r.discount_amt),money(r.grandtotal||r.total_price),(r.payment_method||"—"),(r.is_shipped?"Evet":"Hayır"),(r.is_paid?"Evet":"Hayır"),(sh0.carrier_name||"—"),(sh0.tracking_code||"—"),(r.message_from_buyer||"—"),(r.is_gift?"Evet":"Hayır")]);});});
+var cols=["Sipariş","Tarih","Durum","Alıcı","Ülke","Eyalet","Şehir","Posta Kodu","Adres","SKU","Ürün","Beden","Renk","Kişiselleştirme","Adet","Birim Fiyat","Ara Toplam","Kargo Ücreti","Vergi","İndirim","Genel Toplam","Ödeme","Kargolandı","Ödendi","Kargo Firması","Takip No","Alıcı Mesajı","Hediye"];
+var wmax={8:220,10:240,26:260};
+var th=function(t){return e("th",{key:t,style:{textAlign:"left",padding:"8px 10px",borderBottom:"2px solid var(--line)",color:"var(--muted)",whiteSpace:"nowrap",position:"sticky",top:0,background:"var(--panel,#fff)"}},t);};
+return e("div",{style:{padding:"8px 0 40px"}},
+ e("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:16,flexWrap:"wrap"}},e("span",{style:{fontSize:18,fontWeight:800}},"2 · ETSY API"),e("select",{value:sel,onChange:function(ev){setSel(ev.target.value);},style:{padding:"8px 10px",borderRadius:8,border:"1px solid var(--line)",background:"var(--panel2)",fontWeight:700}},stores.length?stores.map(function(s){return e("option",{key:s.etsy_user_id,value:s.etsy_user_id},s.shop_name+" (#"+s.etsy_user_id+")");}):e("option",{value:""},"Yükleniyor…")),e("button",{onClick:function(){window.open(CONNECT,"_blank");},style:{padding:"8px 16px",borderRadius:8,border:"2px solid var(--orange,#e2731b)",background:"var(--orange,#e2731b)",color:"#fff",cursor:"pointer",fontWeight:700}},"+ Bağla"),e("button",{onClick:function(){loadSel(sel);},disabled:busy||!sel,style:{marginLeft:"auto",padding:"8px 16px",borderRadius:8,border:"1px solid var(--line)",background:"var(--panel2)",cursor:"pointer",fontWeight:700}},busy?"Yükleniyor…":"🔄 Yenile")),
+ err?e("div",{style:{color:"#e23b4e",marginBottom:12}},"Hata: "+err):null,
+ shop?e("div",{style:{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}},card("Mağaza",shop.shop_name),card("Toplam satış",shop.transaction_sold_count!=null?shop.transaction_sold_count:"—"),card("Aktif ilan",shop.listing_active_count!=null?shop.listing_active_count:items.length),card("Sipariş",(rec&&rec.count)!=null?rec.count:lines.length),card("Takipçi",shop.num_favorers!=null?shop.num_favorers:"—")):null,
+ e("div",{style:{display:"flex",alignItems:"center",gap:8,margin:"18px 0 10px"}},e("span",{style:{width:3,height:15,background:"var(--orange,#e2731b)",borderRadius:2,display:"inline-block"}}),e("span",{style:{fontSize:15,fontWeight:800}},"2.1 · SON SİPARİŞLER ("+lines.length+" satır)")),
+ e("div",{style:{overflowX:"auto",border:"1px solid var(--line)",borderRadius:10}},e("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:12.5}},e("thead",null,e("tr",null,cols.map(th))),e("tbody",null,lines.map(function(row,i){return e("tr",{key:i},row.map(function(v,ci){return e("td",{key:ci,style:{padding:"8px 10px",borderBottom:"1px solid var(--line)",whiteSpace:"nowrap",maxWidth:(wmax[ci]||"none"),overflow:"hidden",textOverflow:"ellipsis"},title:(typeof v==="string"?v:"")},v);}));})))),
+ e("div",{style:{display:"flex",alignItems:"center",gap:8,margin:"22px 0 10px"}},e("span",{style:{width:3,height:15,background:"var(--orange,#e2731b)",borderRadius:2,display:"inline-block"}}),e("span",{style:{fontSize:15,fontWeight:800}},"2.2 · AKTİF İLANLAR")),
+ e("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))",gap:12}},items.map(function(it,i){return e("div",{key:i,style:{border:"1px solid var(--line)",borderRadius:10,padding:10,fontSize:12}},e("div",{style:{fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},it.title||("#"+it.listing_id)),e("div",{style:{color:"var(--muted)",marginTop:4}},money(it.price)),e("div",{style:{color:"var(--muted)",marginTop:2}},"SKU: "+((it.skus&&it.skus[0])||"—")),e("div",{style:{color:"var(--muted)",marginTop:2}},"Stok: "+(it.quantity!=null?it.quantity:"—")));}))
+);
+}
+
 function App(){
 const ALL_STORES=[];
 const DEMO_IDS=new Set(["a0","a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13","a14","a15"]);
@@ -1478,6 +1515,7 @@ return(
 <button className={tab==="nova"?"on":""} onClick={()=>setTab("nova")} style={{display:currentRole==="admin"?"":"none"}}><b className="tl">A</b> {TT("NOVA AGENT","NOVA AGENT","نووا ایجنٹ")}</button>
 <button className={tab==="overview"?"on":""} onClick={()=>setTab("overview")} style={{display:can("viewOverview")?"":"none"}}><b className="tl">0</b> {TT("DASHBOARD","DASHBOARD","ڈ۳ش بورڈ")}</button>
 {can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}><b className="tl">1</b> {TT("MARKETING","MARKETING","مارکیٹنگ")}</button>}
+{<button className={tab==="etsyapi"?"on":""} onClick={()=>setTab("etsyapi")}><b className="tl">2</b> ETSY API</button>}
 {can("viewFinance")&&<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}><b className="tl">3</b> {TT("FINANCE","FINANCE","فنانس")}</button>}
 {can("viewVisibility")&&<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}><b className="tl">4</b> {TT("TRADEMARK","TRADEMARK","ٹریڈ مارک")}</button>}
 {can("viewDashboard")&&<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">5</b> {TT("SHOP MANAGER","SHOP MANAGER","شاپ مینیجر")}</button>}
@@ -1493,6 +1531,7 @@ return(
 {tab==="overview"&&can("viewOverview")&&<Overview settings={settings} setSettings={setSettings} accounts={accounts} setTab={setTab} setAct={setAct} onRead={readStoreMail} onReadThread={readStoreThread}/>}
 {tab==="trademark"&&can("viewTrademark")&&<CTrademark settings={settings} setSettings={setSettings} accounts={accounts} act={act} setAct={setAct} onFetch={fetchStoreTrademark} onSend={sendStoreMail} onRead={readStoreMail} onReadThread={readStoreThread}/>}
 {tab==="visibility"&&can("viewVisibility")&&<DGorunurluk accounts={accounts} act={act} setAccounts={setAccounts}/>}
+{tab==="etsyapi"&&<EtsyApiDataPanel/>}
 {tab==="dashboard"&&can("viewDashboard")&&<div style={{padding:"8px 0 40px"}}>
 <div className="rules" style={{background:"var(--panel2)"}}>
 <div className="rh"><span style={{fontSize:16}}>5 — {TT("SHOP MANAGER · Bugün","SHOP MANAGER · Today")}</span><span className="store" style={{marginLeft:"auto"}}>{(accounts.find(a=>a.id===act)||{}).name||"—"}</span></div>
