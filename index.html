@@ -1470,7 +1470,7 @@ t.wasted=evals.filter(x=>x.e.verdict==="KAPAT").reduce((s,x)=>s+Math.max(x.e.spe
 t.net=t.rev-t.spend;t.roas=t.spend?t.rev/t.spend:0;t.acos=t.rev?t.spend/t.rev:0;t.ctr=t.imp?t.clk/t.imp:0;return t},[evals]);
 const budget=useMemo(()=>{const ls=evals.filter(x=>x.e.verdict==="KAPAT");const ws=evals.filter(x=>x.e.verdict==="BÜYÜT").sort((a,b)=>b.e.roas-a.e.roas);
 const freed=ls.reduce((s,x)=>s+x.e.spend,0);const moves=[];
-if(freed>0&&ws.length){const tr=ws.reduce(((s,x)=>s+x.e.roas,0);ws.slice(0,4).forEach(w=>{const sh=tr?(w.e.roas/tr):1/ws.length;moves.push({to:w.row.name||"Listing",amt:freed*sh,roas:w.e.roas})})}
+if(freed>0&&ws.length){const tr=ws.reduce((s,x)=>s+x.e.roas,0);ws.slice(0,4).forEach(w=>{const sh=tr?(w.e.roas/tr):1/ws.length;moves.push({to:w.row.name||"Listing",amt:freed*sh,roas:w.e.roas})})}
 return{freed,moves,losers:ls.length}},[evals]);
 const directive=useMemo(()=>{if(!evals.length)return"Ekran görüntüsünü yükle ya da raporu yapıştır.";const p=[];
 if(totals.close)p.push(`${totals.close} listing kapat`);if(totals.grow)p.push(`${totals.grow} listing büyüt`);if(totals.watch)p.push(`${totals.watch} listing izle`);
