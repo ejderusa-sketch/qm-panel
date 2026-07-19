@@ -1122,9 +1122,9 @@ const hiRef=useRef();
 const gmStoreTok=useRef({});
 
 const key=`${act}|${period}`;
-const rangeMonths=(p)=>{const now=new Date();const y=now.getFullYear(),m=now.getMonth();const out=[];if(p==="l1m"){out.push(y+"-"+String(m+1).padStart(2,"0"));}else if(p==="l2m"){for(let i=0;i<2;i++){const d=new Date(y,m-i,1);out.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"));}}else if(p==="l3m"){for(let i=0;i<3;i++){const d=new Date(y,m-i,1);out.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"));}}else if(p==="ytd"){for(let mm=0;mm<=m;mm++){out.push(y+"-"+String(mm+1).padStart(2,"0"));}}return out;};
+const rangeMonths=(p)=>{const now=new Date();const y=now.getFullYear(),m=now.getMonth();const out=[];const _mm=String(p).match(/^l(\d+)m$/);if(_mm){const _cnt=+_mm[1];for(let i=0;i<_cnt;i++){const d=new Date(y,m-i,1);out.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"));}}else if(p==="ytd"){for(let mo=0;mo<=m;mo++){out.push(y+"-"+String(mo+1).padStart(2,"0"));}}return out;};
 const aggRows=(months)=>{const mp={};for(const mo of months){const arr=dm[act+"|"+mo]||[];for(const r of arr){const k=(r.name||"Listing").trim().toLowerCase();if(!mp[k])mp[k]={id:"agg-"+k,name:r.name||"Listing",ads:r.ads||"on",months:"",_i:0,_c:0,_s:0,_o:0,_r:0};mp[k]._i+=toNum(r.impressions);mp[k]._c+=toNum(r.clicks);mp[k]._s+=toNum(r.spend);mp[k]._o+=toNum(r.orders);mp[k]._r+=toNum(r.revenue);}}return Object.values(mp).map(o=>({id:o.id,name:o.name,ads:o.ads,months:"",impressions:String(o._i),clicks:String(o._c),spend:String(o._s),orders:String(o._o),revenue:String(o._r)}));};
-const rows=/^(l1m|l2m|l3m|ytd)$/.test(period)?aggRows(rangeMonths(period)):(dm[key]||[]);
+const rows=/^(l\d+m|ytd)$/.test(period)?aggRows(rangeMonths(period)):(dm[key]||[]);
 const vkey=`V::${act}|${date}`;
 const vrows=dm[vkey]||[];
 
@@ -1430,7 +1430,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM332 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM333 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -1535,7 +1535,7 @@ return(
 {PERIODS.map(([k,tr,en])=><option key={k} value={k}>{TT(tr,en)}</option>)}
 </select>
 
-{(()=>{const _n=new Date();const _cm=_n.getFullYear()+"-"+String(_n.getMonth()+1).padStart(2,"0");const _on=period===_cm;return <button onClick={()=>{setPeriod(_cm);const _a=accounts.find(x=>x.id===act);if(_a&&_a.gmailConnected&&(dm[act+"|"+_cm]||[]).length===0)fetchStoreCSV(_a);}} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(_on?"var(--azure)":"var(--line2)"),background:_on?"var(--azure)":"var(--panel)",color:_on?"#fff":"var(--ink)"}}>{TT("Bu Ay","This Month")}</button>;})()}{(()=>{const _mn=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];const _now=new Date();const _o=[];for(let _i=11;_i>=0;_i--){const _d=new Date(_now.getFullYear(),_now.getMonth()-_i,1);const _k=_d.getFullYear()+"-"+String(_d.getMonth()+1).padStart(2,"0");_o.push(<button key={_k} onClick={()=>{setPeriod(_k);const _a=accounts.find(x=>x.id===act);if(_a&&_a.gmailConnected&&(dm[act+"|"+_k]||[]).length===0)fetchStoreCSV(_a);}} style={{fontSize:12,fontWeight:700,padding:"6px 10px",borderRadius:8,cursor:"pointer",border:"1px solid "+(period===_k?"var(--azure)":"var(--line2)"),background:period===_k?"var(--azure)":"var(--panel)",color:period===_k?"#fff":"var(--ink)"}}>{_mn[_d.getMonth()]+" "+String(_d.getFullYear()).slice(2)}</button>);}return _o;})()}
+{[1,2,3,4,5,6].map(_c=>{const _k="l"+_c+"m";const _on=period===_k;return <button key={_k} onClick={()=>{setPeriod(_k);const _a=accounts.find(x=>x.id===act);if(_a&&_a.gmailConnected&&aggRows(rangeMonths(_k)).length===0)fetchStoreCSV(_a);}} style={{fontSize:12,fontWeight:700,padding:"6px 11px",borderRadius:8,cursor:"pointer",border:"1px solid "+(_on?"var(--azure)":"var(--line2)"),background:_on?"var(--azure)":"var(--panel)",color:_on?"#fff":"var(--ink)"}}>{TT("Son "+_c+" Ay","Last "+_c+" Mo")}</button>;})}
 
 </div>
 <div style={{display:"flex",gap:6,marginBottom:12}}>
