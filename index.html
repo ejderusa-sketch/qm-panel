@@ -1277,8 +1277,8 @@ hiRef.current=f=>handleImage(f);
 useEffect(()=>{const h=e=>{const it=e.clipboardData&&e.clipboardData.items;if(!it)return;for(const i of it){if(i.type&&i.type.indexOf("image")===0){const f=i.getAsFile();if(f){e.preventDefault();hiRef.current(f);break}}}};window.addEventListener("paste",h);return()=>window.removeEventListener("paste",h)},[]);
 
 const applyPaste=()=>{const p=parseReport(pt);if(!p.length){flash("Okunamadı.");return}setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);setPt("");setShowPaste(false);flash(`${p.length} listing eklendi.`)};
-const handleCSV=async(file,targetPeriod,targetAct,requireNames)=>{if(!file)return false;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
-try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} → ${tp}${dmo?"":" ⚠ tarih yok"}`);return true}
+const handleCSV=async(file,targetPeriod,targetAct,requireNames,replace)=>{if(!file)return false;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
+try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;const aid=targetAct||act,tp=dmo||targetPeriod||period,kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{if(replace){added=p.length;return {...m,[kk]:p};}const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} → ${tp}${dmo?"":" ⚠ tarih yok"}`);return true}
 catch(err){setImgErr("CSV hatası: "+(err&&err.message||"bilinmeyen"))}
 finally{const el=document.getElementById("csvInput");if(el)el.value=""}};
 
@@ -1336,7 +1336,7 @@ if(!tok){setToast(TT("Yeniden bağlanılıyor…","Reconnecting…"));connectSto
 setAct(acc.id);
 setToast(TT("Gmail'den çekiliyor…","Fetching from Gmail…"));
 try{const base="https://www.googleapis.com/gmail/v1/users/me/messages";
-const list=await gGet(tok,base+"?q="+encodeURIComponent("has:attachment newer_than:760d in:anywhere")+"&maxResults=30");
+const list=await gGet(tok,base+"?q="+encodeURIComponent("has:attachment filename:csv newer_than:760d in:anywhere")+"&maxResults=30");
 const msgs=list.messages||[];if(!msgs.length){setToast(TT("Son 1 yılda ekli e-posta bulunamadı.","No email with attachments in the last year."));return;}
 const ak=(settings.apiKey||"").trim();const inC=typeof window!=="undefined"&&window.storage;
 const sysP="Sen veri cikarma asistanisin. Etsy Ads raporu gorselindeki HER listing satirini oku. Yalnizca JSON dizisi dondur - markdown yok. Her oge: {\"name\":\"metin\",\"impressions\":sayi,\"clicks\":sayi,\"spend\":sayi,\"orders\":sayi,\"revenue\":sayi}. Sutun sirasi: Views·Clicks·%·Orders·Revenue·Spend·ROAS. Revenue ile Spend karistirma. % ve ROAS yok say. $ TL kaldir. Bos=0. Toplam satirini dahil etme.";
@@ -1351,9 +1351,9 @@ for(let mi=0;mi<msgs.length;mi++){const m=msgs[mi];const d=await gGet(tok,base+"
 const parts={csv:[],img:[]};
 const collect=(pl)=>{if(!pl)return;if(pl.filename&&pl.body&&pl.body.attachmentId){if(/\.csv$/i.test(pl.filename))parts.csv.push(pl);else if(/^image\//.test(pl.mimeType||"")||/\.(png|jpe?g|gif|webp)$/i.test(pl.filename))parts.img.push(pl);}if(pl.parts)pl.parts.forEach(collect);};
 collect(d.payload);
-if(!parts.csv.length&&!parts.img.length)continue;
-for(const cp of parts.csv){const at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);const b64=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(b64)));}catch(_){txt=atob(b64);}const file=new File([txt],"gmail.csv",{type:"text/csv"});const ok=await handleCSV(file,period,acc.id,true);if(ok)imported++;}
-if(mi===0){for(const ip of parts.img){try{setToast(TT("Görsel okunuyor…","Reading image…"));const at=await gGet(tok,base+"/"+m.id+"/attachments/"+ip.body.attachmentId);const b64u=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");const rows=await imgToRows(b64u,ip.mimeType);const added=addRows(period,rows);if(added)imported++;}catch(_){}}}
+if(!parts.csv.length)continue;
+for(const cp of parts.csv){const at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);const b64=(at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(b64)));}catch(_){txt=atob(b64);}const file=new File([txt],"gmail.csv",{type:"text/csv"});const ok=await handleCSV(file,period,acc.id,true,true);if(ok)imported++;}
+break;
 }
 if(imported)setToast(TT(imported+" rapor içeri alındı (her biri ayına).",imported+" reports imported (each to its month)."));
 else setToast(TT("Uygun rapor bulunamadı.","No suitable report found."));}
@@ -1431,7 +1431,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM323 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM324 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)"}}>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
