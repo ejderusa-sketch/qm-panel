@@ -1455,8 +1455,7 @@ const mktS=storeCfgOf(act);
 const setMktS=(updater)=>setSettings(gs=>{const eff={...gs,...((gs.storeCfg&&gs.storeCfg[act])||{})};const ne=typeof updater==="function"?updater(eff):{...eff,...updater};const slice={};for(const k of MKT_KEYS)if(k in ne)slice[k]=ne[k];return {...gs,storeCfg:{...(gs.storeCfg||{}),[act]:{...((gs.storeCfg&&gs.storeCfg[act])||{}),...slice}}};});
 const evals=useMemo(()=>rows.map(r=>({row:r,e:evaluate(r,mktS)})),[rows,mktS]);
 /* QM7: ShipStation tarzı filtre/arama/seçim */
-const baseEvals=evals.filter(x=>x.e.imp||x.LI
- e.spend);
+const baseEvals=evals.filter(x=>x.e.imp||x.e.spend);
 const verdictCounts=useMemo(()=>{const c={all:0,"BÜYÜT":0,"İZLE":0,"DÜZELT":0,"KAPAT":0,"VERİ AZ":0};for(const x of baseEvals){c.all++;if(c[x.e.verdict]!=null)c[x.e.verdict]++;}return c;},[rows,settings]);
 const shownEvals=baseEvals.filter(x=>(mktFilter==="all"||x.e.verdict===mktFilter)).filter(x=>{const q=mktSearch.trim().toLowerCase();return!q||(x.row.name||"").toLowerCase().includes(q);}).map(x=>({...x,a:advise(x.e)})).sort((p,q)=>{if(sortCol){const g=x=>sortCol==="name"?(x.row.name||"").toLowerCase():sortCol==="action"?(x.e.verdict==="KAPAT"?0:x.e.verdict==="BÜYÜT"?2:1):(toNum(x.e[sortCol])||0);const pv=g(p),qv=g(q);const c=pv<qv?-1:pv>qv?1:0;return sortDir==="desc"?-c:c;}return p.a.rank-q.a.rank||q.e.roas-p.e.roas;});
 const toggleSel=id=>setSel(s=>{const n=new Set(s);n.has(id)?n.delete(id):n.add(id);return n;});
