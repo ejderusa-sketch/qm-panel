@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM377 · 21 Tem 2026 · TUMU listesi tarayiciya kaydediliyor — sayfa yenilense de duruyor, tarama sadece yenileri ekliyor
      QM376 · 21 Tem 2026 · TUMU listesi artik birikiyor — onceki taramalar silinmiyor, yeniler uste ekleniyor; guncelleme sirasinda liste acik kaliyor
      QM375 · 21 Tem 2026 · NOVA AGENT acilista dogrudan TUMU sekmesinde basliyor
      QM374 · 21 Tem 2026 · NOVA AGENT altindaki "Sirket Kurma" kutusu kaldirildi
@@ -1002,6 +1003,11 @@ const T=["Dear "+rep+",\n\nI'm reaching out about the listing that was recently 
 let novaCache=null;
 let novaCacheX={};
 let novaCacheAll=null;
+/* TUMU listesi tarayicida saklanir — sayfa yenilenince kaybolmasin */
+const NOVA_ALL_LS="qm:nova:all";
+const NOVA_ALL_MAX=800;
+function novaAllLoad(){if(novaCacheAll)return novaCacheAll;try{const r=localStorage.getItem(NOVA_ALL_LS);const p=r?JSON.parse(r):null;if(Array.isArray(p)){novaCacheAll=p;return p;}}catch(_){}return null;}
+function novaAllSave(list){try{novaCacheAll=list;localStorage.setItem(NOVA_ALL_LS,JSON.stringify((list||[]).slice(0,NOVA_ALL_MAX)));}catch(_){}}
 /* Ek gelen kutulari — yeni bir e-posta eklemek icin bu listeye bir satir yaz */
 const EXTRA_INBOXES=[
  {key:"a3",email:"novainnc@gmail.com"},
@@ -1011,8 +1017,8 @@ let novaDatesCache=[];
 function NovaAgent({accounts,onInbox,onRead,onMarkRead,onSeen,seen,userEmail,onConnect,blocked,onBlock,important,onImportant,onUnimportant}){
 const[sid,setSid]=useState("");const[items,setItems]=useState(novaCache);const[loading,setLoading]=useState(false);const[readMail,setReadMail]=useState(null);const[view,setView]=useState("all");const[dates,setDates]=useState(novaDatesCache);const[newDate,setNewDate]=useState("");const[newLabel,setNewLabel]=useState("");const[xItems,setXItems]=useState(novaCacheX);const[xLoad,setXLoad]=useState({});const[xErr,setXErr]=useState({});const[days,setDays]=useState(3);
 const xDef=EXTRA_INBOXES.find(e=>e.key===view)||null;const isX=!!xDef;
-const[allItems,setAllItems]=useState(novaCacheAll);const[allLoad,setAllLoad]=useState(false);const isAll=view==="all";
-useEffect(()=>{if(allItems!==null)novaCacheAll=allItems;},[allItems]);
+const[allItems,setAllItems]=useState(novaAllLoad);const[allLoad,setAllLoad]=useState(false);const isAll=view==="all";
+useEffect(()=>{if(allItems!==null)novaAllSave(allItems);},[allItems]);
 const SRC_COLORS={A1:"var(--azure)",A3:"var(--green)",A4:"var(--amber)",A5:"var(--red)",A6:"#8b5cf6",A7:"#0891b2"};
 const accts=Array.isArray(accounts)?accounts:[];
 const inboxAcc=accts.find(a=>(a.email||"").toLowerCase()===(userEmail||"").toLowerCase())||null;
@@ -1508,7 +1514,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM376 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM377 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)",display:"inline-flex",alignItems:"center",gap:6}}><span style={{display:"inline-block",width:15,height:15,borderRadius:"50%",flex:"none",border:"1.5px solid #fff",background:syncing?"#22c55e":"#e23b4e",boxShadow:"0 0 10px "+(syncing?"#22c55e":"#e23b4e"),animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
