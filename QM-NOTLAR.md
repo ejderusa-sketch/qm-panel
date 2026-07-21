@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM386 | 21 Tem 2026 | **Her satıra 🚫 Engelle butonu** eklendi (row fonksiyonu — tüm bölümlerde: Acil/Önemli, Diğer, Reklam...). Basınca onay ister, gönderici `novaBlocked`'a eklenir, o mailler hem TÜMÜ hem aktif listeden kalkar ve sonraki taramalarda gelmez (`_bl` filtresi). Engeli Ayarlar'dan geri açabilirsin |
 | QM385 | 21 Tem 2026 | Hero başlığı yanındaki aktif mağaza etiketi (Marketing/Finance/Trademark/Görünürlük/Kimlik): dış kısım **beyaz zemin + siyah yazı** (eskiden mavi/beyaz), numara yuvarlağı beyaz/kırmızı kaldı |
 | QM384 | 21 Tem 2026 | **Okundu / Önemli durumu sekmeler arası senkron.** Eskiden TÜMÜ'deki mailin id'sinde `A1:` öneki vardı, tek sekmede yoktu → eşleşmiyordu. Artık seen/important için **ortak ham Gmail message id** (`_gid`) kullanılıyor. TÜMÜ'de okunan mail A1/A3/A4'te de okundu; ⭐ Önemli de senkron |
 | QM383 | 21 Tem 2026 | Birikim + kalıcılık **A1, A3, A4** sekmelerine de uygulandı. Her kutu ayrı localStorage anahtarında (`qm:nova:a1`, `qm:nova:x`). Hepsi ilk açılışta bir kez tarıyor, sonra 3 dk'de bir sessiz yeniliyor; sekme/sayfa değişince liste duruyor, yeniler üste ekleniyor |
