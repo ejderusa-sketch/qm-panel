@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM381 | 21 Tem 2026 | TÜMÜ sekmesindeki sayaç artık **okunmamış (ekranda görünen)** e-posta sayısını gösteriyor, birikmiş toplamı değil. `allItems.length` yerine `_visA.length` |
 | QM380 | 21 Tem 2026 | **Sıfırlanma hatası düzeltildi.** `scanAll` bağlı kutu bulamayınca listeyi `[]` yapıp siliyordu; sekme değiştirip dönünce token'lar bir an geç yüklendiği için liste boşalıyordu. Artık boşaltmıyor, kayıtlı listeyi koruyor. Tarama sadece en az bir kutu bağlıyken çalışıyor (`_liveCount`) |
 | QM379 | 21 Tem 2026 | Kaynak rozetleri kaynağa göre renklendirildi (`SRC_TEXT`): ejderusa/A1 **siyah**, novainnc/A3 **kırmızı**, ejderug/A4 **mavi**. Hem satır rozetleri hem üst künye |
 | QM378 | 21 Tem 2026 | **Otomatik sürüm takibi.** Açık paneller `version.txt`'yi 2 dakikada bir kontrol ediyor; yeni sürüm çıkınca alta mavi "🔄 Yeni sürüm — Yenile" şeridi düşüyor. Dünyadaki tüm shop manager'lar push'tan sonra en geç 2 dk içinde uyarı alıp güncelleyebiliyor. `version.txt` her sürümde push edilmeli |
