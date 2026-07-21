@@ -45,16 +45,41 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 
 - **A1** — kullanıcının kendi gelen kutusu (`userEmail` ile eşleşen hesap)
 - **A2** — ⭐ ile işaretlenen önemli e-postalar (ortak havuz)
-- **A3** — `novainnc@gmail.com` gelen kutusu (mağaza listesindeki 50 numaralı kayıt)
+- **A3, A4, …** — `EXTRA_INBOXES` listesindeki ek gelen kutuları
 
-Her gelen kutusu kendi state'ini tutar: A1 → `items`, A3 → `items3`.
-Aktif hesap `curAcc`, aktif liste güncelleyici `curSet` ile seçilir.
+### Yeni e-posta kutusu eklemek
+
+`EXTRA_INBOXES` dizisine tek satır ekle, başka hiçbir yere dokunma:
+
+```js
+const EXTRA_INBOXES=[
+ {key:"a3",email:"novainnc@gmail.com"},
+ {key:"a4",email:"ejderug@gmail.com"},
+ {key:"a5",email:"yeni@gmail.com"}   // <— böyle
+];
+```
+
+Sekme düğmesi, tarama, teşhis mesajları ve tablolar kendiliğinden oluşur.
+Şart: o e-posta mağaza listesinde kayıtlı ve Gmail'e bağlı olmalı.
+
+A1 kendi state'ini tutar (`items`); ek kutular ortak bir sözlükte tutulur (`xItems`, anahtar = `key`).
+Aktif hesap `curAcc`, aktif liste güncelleyici `curSet` ile seçilir. `findAcc(email)` esnek eşleştirme yapar.
 Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 ## SÜRÜM GEÇMİŞİ
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM376 | 21 Tem 2026 | TÜMÜ listesi artık **birikiyor**. Önceki taramalar silinmiyor, yeni gelenler üste ekleniyor (id ile tekrar kontrolü). Liste `novaCacheAll`'da tutuluyor, sekme değiştirip dönünce duruyor. Güncelleme sırasında liste ekranda kalıyor, üstte "arka planda güncelleniyor" notu çıkıyor |
+| QM375 | 21 Tem 2026 | NOVA AGENT açılışta doğrudan **TÜMÜ** sekmesinde başlıyor |
+| QM374 | 21 Tem 2026 | NOVA AGENT altındaki "Şirket Kurma" kutusu kaldırıldı |
+| QM373 | 21 Tem 2026 | TÜMÜ listesindeki kaynak rozeti yeniden tasarlandı: içi boş (beyaz), **kırmızı çerceve + kırmızı yazı**, büyütüldü ve içine **tam e-posta adresi** yazılıyor (A1/A3 kısaltması yerine). Üstteki "BAĞLI GELEN KUTULARI" künyesi de aynı stile getirildi |
+| QM372 | 21 Tem 2026 | **★ TÜMÜ sekmesi.** Bağlı tüm gelen kutuları (A1 + EXTRA_INBOXES) tek taramada çekilip tarihe göre birleşik listede gösteriliyor. Her satırın solunda renkli kaynak rozeti (A1/A3/A4) + hesap adı. Üstte "BAĞLI GELEN KUTULARI" künyesi. Oku/Okundu/Cevapla işlemleri satırın kendi hesabına gidiyor (`_accId`, `_gid`, `_srcEmail`) |
+| QM371 | 21 Tem 2026 | QM370'teki koruma çalışmıyordu — uyarı `#root` içine yazılıyor, sonra React render edip üstüne yazıyordu. `document.open()/write()/close()` ile tüm belge değiştirilerek React'in hiç yüklenmemesi sağlandı |
+| QM370 | 21 Tem 2026 | **`file://` koruması.** Panel yerel dosyadan açılırsa çalışmayı reddedip "Canlı panele git" butonu olan bir uyarı gösteriyor. Sebep: Google OAuth `file://` adreslerini kabul etmiyor, "Access blocked / invalid_request" hatası veriyordu |
+| QM369 | 21 Tem 2026 | Sol mağaza listesindeki e-posta satırlarına **A1 / A3 / A4 rozetleri** eklendi — hangi e-postanın NOVA AGENT'ta sekmesi olduğu tek bakışta görünüyor. Rozet `EXTRA_INBOXES` listesinden otomatik üretiliyor |
+| QM368 | 21 Tem 2026 | Ek gelen kutuları tek tek yazılmak yerine **`EXTRA_INBOXES` listesine** taşındı. **A4 = ejderug@gmail.com** eklendi. Yeni e-posta eklemek artık listeye tek satır yazmak demek — state, tarama, teşhis, tablolar hepsi otomatik geliyor |
+| QM367 | 21 Tem 2026 | **Erişim hatası düzeltildi:** `accessAddPending` erişim listesini okuyamadığında boş sanıp üzerine yazıyordu — onaylanmış herkes siliniyordu. Artık okuyamazsa hiçbir şey yazmıyor. Ayrıca kişi `members` tablosunda kayıtlıysa girişte doğrudan içeri alınıyor, onay kuyruğuna düşmüyor. Onay verildiğinde `addMember` de çağrılıyor. Erişim ✕ ile kaldırılınca `members` kaydı da siliniyor (yoksa yetki kapatılamıyordu). Önbellek kapatma meta etiketleri eklendi (`?v=` gerekmesin diye) |
 | QM366 | 21 Tem 2026 | Tarama aralığı seçilebilir yapıldı — tarama butonunun yanına **3g / 7g / 30g** düğmeleri; `fetchInbox(acc, days)` parametreli hâle getirildi (30 günde `maxResults` 200'e çıkıyor) |
 | QM365 | 21 Tem 2026 | A3 boş gelince sebebini yazan teşhis kutusu eklendi; hesap eşleştirme esnetildi (tam eşleşme → kullanıcı adı → içinde geçen) |
 | QM364 | 21 Tem 2026 | NOVA AGENT'a **A3** sekmesi eklendi — `novainnc@gmail.com` gelen kutusu, A1 ile birebir aynı tablo yapısı |
