@@ -70,6 +70,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM377 | 21 Tem 2026 | TÜMÜ listesi **tarayıcıya kaydediliyor** (`localStorage`, anahtar `qm:nova:all`, en yeni 800 kayıt). Sayfa yenilense veya tarayıcı kapatılıp açılsa da liste duruyor; tarama sadece yeni gelenleri ekliyor |
 | QM376 | 21 Tem 2026 | TÜMÜ listesi artık **birikiyor**. Önceki taramalar silinmiyor, yeni gelenler üste ekleniyor (id ile tekrar kontrolü). Liste `novaCacheAll`'da tutuluyor, sekme değiştirip dönünce duruyor. Güncelleme sırasında liste ekranda kalıyor, üstte "arka planda güncelleniyor" notu çıkıyor |
 | QM375 | 21 Tem 2026 | NOVA AGENT açılışta doğrudan **TÜMÜ** sekmesinde başlıyor |
 | QM374 | 21 Tem 2026 | NOVA AGENT altındaki "Şirket Kurma" kutusu kaldırıldı |
