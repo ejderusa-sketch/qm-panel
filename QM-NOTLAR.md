@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM379 | 21 Tem 2026 | Kaynak rozetleri kaynağa göre renklendirildi (`SRC_TEXT`): ejderusa/A1 **siyah**, novainnc/A3 **kırmızı**, ejderug/A4 **mavi**. Hem satır rozetleri hem üst künye |
 | QM378 | 21 Tem 2026 | **Otomatik sürüm takibi.** Açık paneller `version.txt`'yi 2 dakikada bir kontrol ediyor; yeni sürüm çıkınca alta mavi "🔄 Yeni sürüm — Yenile" şeridi düşüyor. Dünyadaki tüm shop manager'lar push'tan sonra en geç 2 dk içinde uyarı alıp güncelleyebiliyor. `version.txt` her sürümde push edilmeli |
 | QM377 | 21 Tem 2026 | TÜMÜ listesi **tarayıcıya kaydediliyor** (`localStorage`, anahtar `qm:nova:all`, en yeni 800 kayıt). Sayfa yenilense veya tarayıcı kapatılıp açılsa da liste duruyor; tarama sadece yeni gelenleri ekliyor |
 | QM376 | 21 Tem 2026 | TÜMÜ listesi artık **birikiyor**. Önceki taramalar silinmiyor, yeni gelenler üste ekleniyor (id ile tekrar kontrolü). Liste `novaCacheAll`'da tutuluyor, sekme değiştirip dönünce duruyor. Güncelleme sırasında liste ekranda kalıyor, üstte "arka planda güncelleniyor" notu çıkıyor |
