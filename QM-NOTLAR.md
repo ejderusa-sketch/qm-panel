@@ -16,10 +16,16 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 
 ## SÜRÜM KURALI
 
-- Sürüm numarası dosyada **iki yerde**: en üstteki HTML yorumu ve alt bilgideki `QM3xx ☁️` rozeti.
-- Her değişiklikte numara **+1** artar (QM364 → QM365 → QM366...).
-- Aynı anda en üstteki yorum bloğuna tek satır özet eklenir.
-- Bu dosyanın "SÜRÜM GEÇMİŞİ" bölümü de güncellenir.
+Her değişiklikte numara **+1** artar (QM377 → QM378...). Numara **DÖRT yerde** güncellenmeli:
+
+1. En üstteki HTML yorum bloğu (yeni satır eklenir)
+2. Alt bilgideki `QM3xx ☁️` rozeti
+3. Sürüm-takip scriptindeki `var CURRENT=3xx;`
+4. `version.txt` dosyasının içi (sadece sayı, örn. `378`)
+
+Ayrıca bu dosyanın "SÜRÜM GEÇMİŞİ" tablosuna satır eklenir.
+
+**Neden version.txt önemli:** Açık duran paneller her 2 dakikada bir `version.txt`'yi kontrol eder. İçindeki sayı `CURRENT`'tan büyükse "Yeni sürüm — Yenile" şeridi çıkar. Yani version.txt push edilmezse dünyadaki manager'lar güncelleme uyarısı almaz.
 
 ## İŞ AKIŞI
 
@@ -70,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM378 | 21 Tem 2026 | **Otomatik sürüm takibi.** Açık paneller `version.txt`'yi 2 dakikada bir kontrol ediyor; yeni sürüm çıkınca alta mavi "🔄 Yeni sürüm — Yenile" şeridi düşüyor. Dünyadaki tüm shop manager'lar push'tan sonra en geç 2 dk içinde uyarı alıp güncelleyebiliyor. `version.txt` her sürümde push edilmeli |
 | QM377 | 21 Tem 2026 | TÜMÜ listesi **tarayıcıya kaydediliyor** (`localStorage`, anahtar `qm:nova:all`, en yeni 800 kayıt). Sayfa yenilense veya tarayıcı kapatılıp açılsa da liste duruyor; tarama sadece yeni gelenleri ekliyor |
 | QM376 | 21 Tem 2026 | TÜMÜ listesi artık **birikiyor**. Önceki taramalar silinmiyor, yeni gelenler üste ekleniyor (id ile tekrar kontrolü). Liste `novaCacheAll`'da tutuluyor, sekme değiştirip dönünce duruyor. Güncelleme sırasında liste ekranda kalıyor, üstte "arka planda güncelleniyor" notu çıkıyor |
 | QM375 | 21 Tem 2026 | NOVA AGENT açılışta doğrudan **TÜMÜ** sekmesinde başlıyor |

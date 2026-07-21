@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM378 · 21 Tem 2026 · Otomatik surum takibi — yeni yayin cikinca acik panellere "Yenile" serdi (version.txt + 2dk kontrol)
      QM377 · 21 Tem 2026 · TUMU listesi tarayiciya kaydediliyor — sayfa yenilense de duruyor, tarama sadece yenileri ekliyor
      QM376 · 21 Tem 2026 · TUMU listesi artik birikiyor — onceki taramalar silinmiyor, yeniler uste ekleniyor; guncelleme sirasinda liste acik kaliyor
      QM375 · 21 Tem 2026 · NOVA AGENT acilista dogrudan TUMU sekmesinde basliyor
@@ -1514,7 +1515,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM377 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM378 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)",display:"inline-flex",alignItems:"center",gap:6}}><span style={{display:"inline-block",width:15,height:15,borderRadius:"50%",flex:"none",border:"1.5px solid #fff",background:syncing?"#22c55e":"#e23b4e",boxShadow:"0 0 10px "+(syncing?"#22c55e":"#e23b4e"),animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -2031,6 +2032,34 @@ if(gate==="blocked")return <div id="boot" style={{flexDirection:"column",gap:14,
 return <App/>;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
+</script>
+<script>
+/* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
+(function(){
+  if(location.protocol==="file:")return;
+  var CURRENT=378; /* bu sayi her surumde artar */
+  var banner=null;
+  function showBanner(nv){
+    if(banner)return;
+    banner=document.createElement("div");
+    banner.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#1f7ae0;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Arial;font-size:14.5px;font-weight:700;padding:13px 18px;display:flex;align-items:center;justify-content:center;gap:16px;box-shadow:0 -2px 14px rgba(0,0,0,.18)";
+    banner.innerHTML='<span>\u{1F504} Yeni sürüm yayınlandı (QM'+nv+') — güncellemek için yenile</span>';
+    var b=document.createElement("button");
+    b.textContent="Yenile";
+    b.style.cssText="background:#fff;color:#1f7ae0;border:none;border-radius:8px;padding:8px 20px;font-weight:800;font-size:14px;cursor:pointer";
+    b.onclick=function(){location.reload(true);};
+    banner.appendChild(b);
+    document.body.appendChild(banner);
+  }
+  function check(){
+    fetch("version.txt?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():null;}).then(function(t){
+      if(!t)return;var nv=parseInt(String(t).replace(/[^0-9]/g,""),10);
+      if(nv&&nv>CURRENT)showBanner(nv);
+    }).catch(function(){});
+  }
+  setTimeout(check,8000);
+  setInterval(check,120000); /* her 2 dakikada bir bak */
+})();
 </script>
 </body>
 </html>
