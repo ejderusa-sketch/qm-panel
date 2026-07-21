@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM383 · 21 Tem 2026 · Ayni birikim/kalicilik A1-A3-A4 sekmelerine de uygulandi — hepsi tarayiciya kaydediliyor, ilk acilis + 3dk sessiz yenile
      QM382 · 21 Tem 2026 · TUMU her giriste yeniden taramiyor — sadece ilk acilista tarar, sonra 3dkde bir arka planda sessiz yeniler
      QM381 · 21 Tem 2026 · TUMU sayaci artik okunmamis (ekranda gorunen) sayisini gosteriyor, birikmis toplami degil
      QM380 · 21 Tem 2026 · TUMU sifirlanma hatasi duzeltildi — token gec yuklenince liste bosalmiyor, birikim korunuyor
@@ -1013,6 +1014,14 @@ const NOVA_ALL_LS="qm:nova:all";
 const NOVA_ALL_MAX=800;
 function novaAllLoad(){if(novaCacheAll)return novaCacheAll;try{const r=localStorage.getItem(NOVA_ALL_LS);const p=r?JSON.parse(r):null;if(Array.isArray(p)){novaCacheAll=p;return p;}}catch(_){}return null;}
 function novaAllSave(list){try{novaCacheAll=list;localStorage.setItem(NOVA_ALL_LS,JSON.stringify((list||[]).slice(0,NOVA_ALL_MAX)));}catch(_){}}
+/* A1 gelen kutusu kalici */
+const NOVA_A1_LS="qm:nova:a1";
+function novaA1Load(){if(novaCache)return novaCache;try{const r=localStorage.getItem(NOVA_A1_LS);const p=r?JSON.parse(r):null;if(Array.isArray(p)){novaCache=p;return p;}}catch(_){}return null;}
+function novaA1Save(list){try{novaCache=list;localStorage.setItem(NOVA_A1_LS,JSON.stringify((list||[]).slice(0,NOVA_ALL_MAX)));}catch(_){}}
+/* Ek kutular (A3, A4...) kalici — sozluk halinde */
+const NOVA_X_LS="qm:nova:x";
+function novaXLoad(){try{const r=localStorage.getItem(NOVA_X_LS);const p=r?JSON.parse(r):null;if(p&&typeof p==="object"){novaCacheX=p;return p;}}catch(_){}return novaCacheX||{};}
+function novaXSave(obj){try{novaCacheX=obj;const trimmed={};Object.keys(obj||{}).forEach(k=>{trimmed[k]=Array.isArray(obj[k])?obj[k].slice(0,NOVA_ALL_MAX):obj[k];});localStorage.setItem(NOVA_X_LS,JSON.stringify(trimmed));}catch(_){}}
 /* Ek gelen kutulari — yeni bir e-posta eklemek icin bu listeye bir satir yaz */
 const EXTRA_INBOXES=[
  {key:"a3",email:"novainnc@gmail.com"},
@@ -1020,7 +1029,7 @@ const EXTRA_INBOXES=[
 ];
 let novaDatesCache=[];
 function NovaAgent({accounts,onInbox,onRead,onMarkRead,onSeen,seen,userEmail,onConnect,blocked,onBlock,important,onImportant,onUnimportant}){
-const[sid,setSid]=useState("");const[items,setItems]=useState(novaCache);const[loading,setLoading]=useState(false);const[readMail,setReadMail]=useState(null);const[view,setView]=useState("all");const[dates,setDates]=useState(novaDatesCache);const[newDate,setNewDate]=useState("");const[newLabel,setNewLabel]=useState("");const[xItems,setXItems]=useState(novaCacheX);const[xLoad,setXLoad]=useState({});const[xErr,setXErr]=useState({});const[days,setDays]=useState(3);
+const[sid,setSid]=useState("");const[items,setItems]=useState(novaA1Load);const[loading,setLoading]=useState(false);const[readMail,setReadMail]=useState(null);const[view,setView]=useState("all");const[dates,setDates]=useState(novaDatesCache);const[newDate,setNewDate]=useState("");const[newLabel,setNewLabel]=useState("");const[xItems,setXItems]=useState(novaXLoad);const[xLoad,setXLoad]=useState({});const[xErr,setXErr]=useState({});const[days,setDays]=useState(3);
 const xDef=EXTRA_INBOXES.find(e=>e.key===view)||null;const isX=!!xDef;
 const[allItems,setAllItems]=useState(novaAllLoad);const[allLoad,setAllLoad]=useState(false);const isAll=view==="all";
 useEffect(()=>{if(allItems!==null)novaAllSave(allItems);},[allItems]);
@@ -1029,15 +1038,17 @@ const SRC_TEXT={A1:"#000000",A3:"var(--red)",A4:"var(--azure)",A5:"#8b5cf6",A6:"
 const accts=Array.isArray(accounts)?accounts:[];
 const inboxAcc=accts.find(a=>(a.email||"").toLowerCase()===(userEmail||"").toLowerCase())||null;
 const scan=async(_d)=>{if(!inboxAcc)return;setLoading(true);const r=await onInbox(inboxAcc,_d||days);setLoading(false);if(r&&r.ok){setItems(prev=>{const ex=Array.isArray(prev)?prev:[];const seen=new Set(ex.map(i=>String(i.id)));const fresh=(r.items||[]).filter(i=>!seen.has(String(i.id)));return [...fresh,...ex];});}else if(items===null){setItems([]);}};
-useEffect(()=>{if(inboxAcc&&inboxAcc.gmailConnected){scan();const _id=setInterval(()=>{scan();},180000);return()=>clearInterval(_id);}},[inboxAcc&&inboxAcc.id,inboxAcc&&inboxAcc.gmailConnected]);
-useEffect(()=>{if(items!==null)novaCache=items;},[items]);
+useEffect(()=>{if(inboxAcc&&inboxAcc.gmailConnected){if(items===null)scan();const _id=setInterval(()=>{scan();},180000);return()=>clearInterval(_id);}},[inboxAcc&&inboxAcc.id,inboxAcc&&inboxAcc.gmailConnected]);
+useEffect(()=>{if(items!==null)novaA1Save(items);},[items]);
 const _nrm=s=>String(s||"").trim().toLowerCase();
 const findAcc=(em)=>{const t=_nrm(em);const u=t.split("@")[0];return accts.find(a=>_nrm(a.email)===t)||accts.find(a=>_nrm(a.email).split("@")[0]===u)||accts.find(a=>_nrm(a.email).indexOf(u)!==-1||_nrm(a.name).indexOf(u)!==-1)||null;};
 const xAcc=xDef?findAcc(xDef.email):null;
 const xList=(xDef&&Array.isArray(xItems[xDef.key]))?xItems[xDef.key]:null;
 const scanX=async(key,em,_d)=>{const acc=findAcc(em);if(!acc){setXErr(p=>({...p,[key]:"nofound"}));return;}setXLoad(p=>({...p,[key]:true}));setXErr(p=>({...p,[key]:""}));const r=await onInbox(acc,_d||days);setXLoad(p=>({...p,[key]:false}));if(r&&r.ok){setXErr(p=>({...p,[key]:""}));setXItems(p=>{const ex=Array.isArray(p[key])?p[key]:[];const sn=new Set(ex.map(i=>String(i.id)));const fresh=(r.items||[]).filter(i=>!sn.has(String(i.id)));return {...p,[key]:[...fresh,...ex]};});}else{setXErr(p=>({...p,[key]:(r&&r.error)||"unknown"}));setXItems(p=>(Array.isArray(p[key])?p:{...p,[key]:[]}));}};
 useEffect(()=>{if(isX&&xAcc&&xAcc.gmailConnected&&xList===null)scanX(xDef.key,xDef.email);},[view,xAcc&&xAcc.id,xAcc&&xAcc.gmailConnected]);
-useEffect(()=>{novaCacheX=xItems;},[xItems]);
+/* Ek kutular — acikken 3dk'de bir sessiz yenile */
+useEffect(()=>{if(!isX||!xAcc||!xAcc.gmailConnected)return;const t=setInterval(()=>{scanX(xDef.key,xDef.email);},180000);return()=>clearInterval(t);},[isX,xAcc&&xAcc.id,xAcc&&xAcc.gmailConnected]);
+useEffect(()=>{novaXSave(xItems);},[xItems]);
 /* Bagli tum gelen kutulari — A1 + EXTRA_INBOXES */
 const allSources=[{key:"A1",email:(inboxAcc&&inboxAcc.email)||userEmail||"",acc:inboxAcc}].concat(EXTRA_INBOXES.map(e=>({key:e.key.toUpperCase(),email:e.email,acc:findAcc(e.email)}))).filter(s=>s.acc&&s.acc.email);
 const scanAll=async(_d)=>{const live=allSources.filter(s=>s.acc&&s.acc.gmailConnected);if(!live.length){setAllItems(prev=>Array.isArray(prev)?prev:[]);return;}setAllLoad(true);const out=[];
@@ -1524,7 +1535,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM382 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM383 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)",display:"inline-flex",alignItems:"center",gap:6}}><span style={{display:"inline-block",width:15,height:15,borderRadius:"50%",flex:"none",border:"1.5px solid #fff",background:syncing?"#22c55e":"#e23b4e",boxShadow:"0 0 10px "+(syncing?"#22c55e":"#e23b4e"),animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -2046,7 +2057,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=382; /* bu sayi her surumde artar */
+  var CURRENT=383; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
