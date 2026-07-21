@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM382 · 21 Tem 2026 · TUMU her giriste yeniden taramiyor — sadece ilk acilista tarar, sonra 3dkde bir arka planda sessiz yeniler
      QM381 · 21 Tem 2026 · TUMU sayaci artik okunmamis (ekranda gorunen) sayisini gosteriyor, birikmis toplami degil
      QM380 · 21 Tem 2026 · TUMU sifirlanma hatasi duzeltildi — token gec yuklenince liste bosalmiyor, birikim korunuyor
      QM379 · 21 Tem 2026 · Kaynak rozetleri renklendirildi — ejderusa siyah, novainnc kirmizi, ejderug mavi
@@ -1045,7 +1046,10 @@ setAllLoad(false);
 /* Eskiler kalsin — yeni gelenler uste eklensin, tekrarlar atlansin */
 setAllItems(prev=>{const ex=Array.isArray(prev)?prev:[];const seen=new Set(ex.map(i=>String(i.id)));const fresh=out.filter(i=>!seen.has(String(i.id)));const all=[...fresh,...ex];all.sort((a,b)=>{const da=new Date(a.date||0).getTime()||0,db=new Date(b.date||0).getTime()||0;return db-da;});return all;});};
 const _liveCount=allSources.filter(s=>s.acc&&s.acc.gmailConnected).length;
-useEffect(()=>{if(isAll&&_liveCount>0)scanAll();},[view,_liveCount]);
+/* Sadece ilk kez (liste hic yoksa) tara; sonra her girişte yeniden indirme */
+useEffect(()=>{if(isAll&&_liveCount>0&&allItems===null)scanAll();},[view,_liveCount]);
+/* Arka planda sessiz yenileme — TUMU acikken her 3 dakikada bir yenileri ekler */
+useEffect(()=>{if(!isAll||_liveCount<1)return;const t=setInterval(()=>{scanAll();},180000);return()=>clearInterval(t);},[isAll,_liveCount]);
 const _imp=Array.isArray(important)?important:[];const _impIds=_imp.map(x=>String(x.id));const _bl=(blocked||[]).map(b=>String(b).toLowerCase());const _sn=(seen||[]).map(String);const _vis=(items||[]).filter(x=>!_bl.includes(String(x.fromEmail||"").toLowerCase())&&!_sn.includes(String(x.id))&&!_impIds.includes(String(x.id)));const _isSchool=x=>/wylieisd\.net|harmonytx\.org|parentsquare\.com|skyward|family access/i.test(String(x.fromEmail||"")+" "+String(x.from||"")+" "+String(x.subject||""));const school=_vis.filter(_isSchool);const urgent=_vis.filter(x=>x.cat==="urgent"&&!_isSchool(x));const ads=_vis.filter(x=>x.cat==="ad"&&!_isSchool(x));const others=_vis.filter(x=>x.cat==="other"&&!_isSchool(x));const _vis3=(xList||[]).filter(x=>!_bl.includes(String(x.fromEmail||"").toLowerCase())&&!_sn.includes(String(x.id))&&!_impIds.includes(String(x.id)));const school3=_vis3.filter(_isSchool);const urgent3=_vis3.filter(x=>x.cat==="urgent"&&!_isSchool(x));const ads3=_vis3.filter(x=>x.cat==="ad"&&!_isSchool(x));const others3=_vis3.filter(x=>x.cat==="other"&&!_isSchool(x));const _visA=(allItems||[]).filter(x=>!_bl.includes(String(x.fromEmail||"").toLowerCase())&&!_sn.includes(String(x.id))&&!_impIds.includes(String(x.id)));const schoolA=_visA.filter(_isSchool);const urgentA=_visA.filter(x=>x.cat==="urgent"&&!_isSchool(x));const adsA=_visA.filter(x=>x.cat==="ad"&&!_isSchool(x));const othersA=_visA.filter(x=>x.cat==="other"&&!_isSchool(x));
 const curAcc=isX?xAcc:inboxAcc;const setXCur=(v)=>{if(!xDef)return;setXItems(p=>{const cur=Array.isArray(p[xDef.key])?p[xDef.key]:[];return {...p,[xDef.key]:(typeof v==="function"?v(cur):v)};});};const curSet=isX?setXCur:setItems;
 const compose=(x)=>{const em=(x&&x._srcEmail)||(curAcc&&curAcc.email);return (em?"https://mail.google.com/mail/?authuser="+encodeURIComponent(em)+"&":"https://mail.google.com/mail/?")+"view=cm&fs=1&to="+encodeURIComponent(x.fromEmail||"")+"&su="+encodeURIComponent("Re: "+(x.subject||""));};
@@ -1520,7 +1524,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM381 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM382 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)",display:"inline-flex",alignItems:"center",gap:6}}><span style={{display:"inline-block",width:15,height:15,borderRadius:"50%",flex:"none",border:"1.5px solid #fff",background:syncing?"#22c55e":"#e23b4e",boxShadow:"0 0 10px "+(syncing?"#22c55e":"#e23b4e"),animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -2042,7 +2046,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=381; /* bu sayi her surumde artar */
+  var CURRENT=382; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
