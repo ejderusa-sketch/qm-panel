@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM387 · 21 Tem 2026 · CSV yuklenince panel otomatik o aya ve o magazaya geciyor — veri bosmus gibi gorunmuyor
      QM386 · 21 Tem 2026 · Her satira Engelle butonu — gonderici engellenince listeden kalkar ve bir daha taramaya girmez (onayli)
      QM385 · 21 Tem 2026 · Hero magaza etiketi beyaz zemin + siyah yazi (numara yuvarlagi beyaz/kirmizi)
      QM384 · 21 Tem 2026 · Okundu/Onemli durumu sekmeler arasi senkron — TUMUde okununca kendi sekmesinde de okundu (ortak Gmail ID)
@@ -1385,7 +1386,7 @@ useEffect(()=>{const h=e=>{const it=e.clipboardData&&e.clipboardData.items;if(!i
 
 const applyPaste=()=>{const p=parseReport(pt);if(!p.length){flash("Okunamadı.");return}setRows(rs=>[...rs.filter(r=>r.name||r.impressions||r.spend),...p]);setPt("");setShowPaste(false);flash(`${p.length} listing eklendi.`)};
 const handleCSV=async(file,targetPeriod,targetAct,requireNames,replace,forceMonth)=>{if(!file)return false;if(!/\.csv$/i.test(file.name||"")&&!/csv/i.test(file.type||"")){setImgErr("CSV dosyası seç (.csv).");return}setImgErr("");
-try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;const aid=targetAct||act,tp=((forceMonth&&/^\d{4}-\d{2}$/.test(forceMonth))?forceMonth:(dmo||targetPeriod||period)),kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{if(replace){added=p.length;return {...m,[kk]:p};}const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});flash(`${added} → ${tp}${dmo?"":" ⚠ tarih yok"}`);return true}
+try{const text=await file.text();const p=parseCSV(text);if(!p.length)throw new Error("CSV okunamadı — Etsy'den 'Download data / CSV' ile indir, sütun başlıkları olmalı.");const dmo=detectMonth(text);const named=p.filter(r=>r.name&&r.name!=="Listing").length;if(requireNames&&!named)return false;const aid=targetAct||act,tp=((forceMonth&&/^\d{4}-\d{2}$/.test(forceMonth))?forceMonth:(dmo||targetPeriod||period)),kk=aid+"|"+tp;const sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");let added=0;setDm(m=>{if(replace){added=p.length;return {...m,[kk]:p};}const ex=(m[kk]||[]).filter(r=>r.name||r.impressions||r.spend);const seen=new Set(ex.map(sig));const out=[...ex];for(const r of p){const sg=sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);added++;}}return {...m,[kk]:out};});if(/^\d{4}-\d{2}$/.test(tp)){try{setPeriod(tp);}catch(_){}}if(aid&&aid!==act){try{setAct(aid);}catch(_){}}flash(`${added} → ${tp}${dmo?"":" ⚠ tarih yok"} — ${TT("bu aya geçildi","switched to this month")}`);return true}
 catch(err){setImgErr("CSV hatası: "+(err&&err.message||"bilinmeyen"))}
 finally{const el=document.getElementById("csvInput");if(el)el.value=""}};
 
@@ -1538,7 +1539,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM386 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM387 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)",display:"inline-flex",alignItems:"center",gap:6}}><span style={{display:"inline-block",width:15,height:15,borderRadius:"50%",flex:"none",border:"1.5px solid #fff",background:syncing?"#22c55e":"#e23b4e",boxShadow:"0 0 10px "+(syncing?"#22c55e":"#e23b4e"),animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -2060,7 +2061,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=386; /* bu sayi her surumde artar */
+  var CURRENT=387; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
