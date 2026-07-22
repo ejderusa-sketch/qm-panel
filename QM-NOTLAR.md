@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM395 | 21 Tem 2026 | **1.2 Görünürlük grubu.** 1.4/1.5 üst satırdan kaldırılıp 1.2 butonuna toplandı; basınca 1.2.1 Görünürlük (viz) ve 1.2.2 Görünürlük Listing (vizl) açılıyor. Grup butonları ortak `_grpBtn` yardımcısıyla üretiliyor (1.1 ve 1.2). mSub anahtarları değişmedi |
 | QM394 | 21 Tem 2026 | 1.1.1/1.1.2 alt sekmeleri varsayılan **gizli**. Üst satıra **1.1 Reklam Payı** butonu (▸/▾) eklendi; basınca alt satır açılıp 1.1.1 seçiliyor, tekrar/başka sekmeye basınca kapanıyor. `_grpOn = mSub==="a3"||"spl"` |
 | QM393 | 21 Tem 2026 | Marketing alt sekmeleri arası boşluk artırıldı (üst satır gap 16, alt satır 14) |
 | QM392 | 21 Tem 2026 | Alt sekmeler yeniden adlandırıldı: 1.1.1 **Reklam Yüzdeliği**, 1.1.2 **Listing Reklam Yüzdeliği**. Küçültüldü (font 11, dar padding) ki 1.1'in altına sağa kaymadan sığsın; aktifken koyu mavi yerine **hafif mavi** (`#dbe9fb`). Ayrıca **Son N Ay** butonlarının yanında "Toplanan: aylar · kaçında veri var" göstergesi (butonların çalıştığını görmek için) |
