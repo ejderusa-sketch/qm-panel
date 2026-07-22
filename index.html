@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM390 · 21 Tem 2026 · CSV parse duzeltildi — ustteki "Month:" bilgi satiri baslik saniliyordu, hepsi sifir geliyordu; gercek baslik satiri otomatik bulunuyor
      QM389 · 21 Tem 2026 · Marketing alt sekmeleri Trademark gibi mavi cerceveli/yuvarlak, numara yuvarlagi kirmizi
      QM388 · 21 Tem 2026 · CSV ay tespiti tamamen yeniden yazildi — TR/EN ay adlari, sayisal (2026-07), tarih araligi hepsi basliktan okunuyor; email cekme de ayni tespiti kullaniyor
      QM387 · 21 Tem 2026 · CSV yuklenince panel otomatik o aya ve o magazaya geciyor — veri bosmus gibi gorunmuyor
@@ -381,7 +382,18 @@ function detectMonth(text){
 function parseCSV(text){
 const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
 if(lines.length<2)return[];
-const hdr=parseCSVLine(lines[0]).map(h=>h.trim().toLowerCase());
+/* Gercek baslik satirini bul — ustte "Month: ..." gibi bilgi satirlari olabilir.
+   Baslik = icinde en az bir isim sutunu (listing/title/item) VE bir sayi sutunu (view/click/spend/order/revenue) gecen satir. */
+let _hi=0;
+for(let i=0;i<Math.min(lines.length,15);i++){
+ const cells=parseCSVLine(lines[i]).map(h=>h.trim().toLowerCase());
+ const hasName=cells.some(h=>/listing|title|item|product|^name$/.test(h));
+ const hasNum=cells.some(h=>/view|impression|click|spend|cost|order|revenue|sales/.test(h));
+ if(hasName&&hasNum){_hi=i;break;}
+ /* isim yoksa ama en az 2 sayi sutunu varsa yine baslik say */
+ if(cells.filter(h=>/view|impression|click|spend|cost|order|revenue|sales/.test(h)).length>=2){_hi=i;break;}
+}
+const hdr=parseCSVLine(lines[_hi]).map(h=>h.trim().toLowerCase());
 const find=(re,ex)=>hdr.findIndex(h=>re.test(h)&&(!ex||!ex.test(h)));
 const iName=find(/listing|title|item|product|name/);
 const iImp=find(/view|impression/);
@@ -389,13 +401,13 @@ const iClk=find(/click/,/rate|ctr|%/);
 const iRev=find(/revenue|sales|order value|order amount|order total/);
 const iOrd=find(/order/,/value|amount|revenue|total/);
 const iSpend=find(/spend|cost|budget/);
-let iN2=iName;if(iN2<0){const used=new Set([iImp,iClk,iRev,iOrd,iSpend]);const sample=parseCSVLine(lines[1]||"");const isDate=v=>/\b(19|20)\d{2}\b/.test(v)||/^\s*\d{1,2}[\/.\- ]/.test(v)||/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık)/i.test(v);for(let i=0;i<hdr.length;i++){if(used.has(i))continue;const v=(sample[i]||"").trim();if(v&&v.length>=4&&/[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}/.test(v)&&!isDate(v)){iN2=i;break;}}}
+let iN2=iName;if(iN2<0){const used=new Set([iImp,iClk,iRev,iOrd,iSpend]);const sample=parseCSVLine(lines[_hi+1]||"");const isDate=v=>/\b(19|20)\d{2}\b/.test(v)||/^\s*\d{1,2}[\/.\- ]/.test(v)||/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık)/i.test(v);for(let i=0;i<hdr.length;i++){if(used.has(i))continue;const v=(sample[i]||"").trim();if(v&&v.length>=4&&/[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}/.test(v)&&!isDate(v)){iN2=i;break;}}}
 const out=[];
-for(let r=1;r<lines.length;r++){
+for(let r=_hi+1;r<lines.length;r++){
 const c=parseCSVLine(lines[r]);if(!c.length)continue;
 const g=i=>i>=0&&i<c.length?c[i]:"";
 const name=String(g(iN2)||"").trim();
-if(/^(total|grand total|sum|toplam)/i.test(name))continue;
+if(/^(total|grand total|sum|toplam|month|ay|tarih|date|period|dönem)\s*:?/i.test(name))continue;
 const o={id:Math.random().toString(36).slice(2),name:name||"Listing",impressions:String(toNum(g(iImp))),clicks:String(toNum(g(iClk))),spend:String(toNum(g(iSpend))),orders:String(toNum(g(iOrd))),revenue:String(toNum(g(iRev)))};
 if(o.name==="Listing"&&!toNum(o.impressions)&&!toNum(o.spend)&&!toNum(o.revenue))continue;
 out.push(o)}
@@ -1574,7 +1586,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM389 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM390 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)",display:"inline-flex",alignItems:"center",gap:6}}><span style={{display:"inline-block",width:15,height:15,borderRadius:"50%",flex:"none",border:"1.5px solid #fff",background:syncing?"#22c55e":"#e23b4e",boxShadow:"0 0 10px "+(syncing?"#22c55e":"#e23b4e"),animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -2096,7 +2108,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=389; /* bu sayi her surumde artar */
+  var CURRENT=390; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
