@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM389 | 21 Tem 2026 | Marketing alt sekmeleri (1.0–1.7) Trademark stiline getirildi: mavi 2.5px çerçeve, yuvarlak (999), pasifte mavi yazı-beyaz zemin, aktifte mavi dolgu; numara yuvarlağı kırmızı |
 | QM388 | 21 Tem 2026 | **CSV ay tespiti tamamen yeniden yazıldı** (`detectMonth` + `_monthFrom`). Eskiden yalnız "Jul 1, 2026 - Jul 31, 2026" tam aralığını tanıyordu; başlıkta sadece "Temmuz 2026" / "July 2026" / "2026-07" yazıyorsa "tarih yok" diyordu. Artık TR+EN ay adları (tam/kısa), sayısal biçimler, tarih aralığı — hepsi tanınıyor, önce başlık (ilk 6 satır) taranıyor. E-postadan çekme (`fetchStoreCSV`) de aynı `detectMonth`'u fallback kullanıyor. Tüm hesaplar/e-postalar/gelecek CSV'ler için geçerli. 11 biçim test edildi, hepsi doğru |
 | QM387 | 21 Tem 2026 | **CSV "okumuyor" sorunu.** Aslında veri kaybolmuyordu — her CSV bir aya kaydediliyor, tablo seçili ayı gösteriyor; CSV farklı aya gidince boş görünüyordu (örn. veri Ocak'ta, ekran Temmuz'da). Artık `handleCSV` başarılı içe aktarımdan sonra **otomatik o aya (`setPeriod`) ve o mağazaya (`setAct`) geçiyor**, veri hemen görünüyor |
 | QM386 | 21 Tem 2026 | **Her satıra 🚫 Engelle butonu** eklendi (row fonksiyonu — tüm bölümlerde: Acil/Önemli, Diğer, Reklam...). Basınca onay ister, gönderici `novaBlocked`'a eklenir, o mailler hem TÜMÜ hem aktif listeden kalkar ve sonraki taramalarda gelmez (`_bl` filtresi). Engeli Ayarlar'dan geri açabilirsin |
