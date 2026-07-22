@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM396 | 21 Tem 2026 | Görünürlük Dağılımı (1.2.1) görünümünün tepesine, Reklam Yüzdeliği'ndeki gibi **Embroidery / Diğer** iki kartı eklendi (görüntülenme bazında %). Embroidery kategorisi `CATS` içinden bulunuyor |
 | QM395 | 21 Tem 2026 | **1.2 Görünürlük grubu.** 1.4/1.5 üst satırdan kaldırılıp 1.2 butonuna toplandı; basınca 1.2.1 Görünürlük (viz) ve 1.2.2 Görünürlük Listing (vizl) açılıyor. Grup butonları ortak `_grpBtn` yardımcısıyla üretiliyor (1.1 ve 1.2). mSub anahtarları değişmedi |
 | QM394 | 21 Tem 2026 | 1.1.1/1.1.2 alt sekmeleri varsayılan **gizli**. Üst satıra **1.1 Reklam Payı** butonu (▸/▾) eklendi; basınca alt satır açılıp 1.1.1 seçiliyor, tekrar/başka sekmeye basınca kapanıyor. `_grpOn = mSub==="a3"||"spl"` |
 | QM393 | 21 Tem 2026 | Marketing alt sekmeleri arası boşluk artırıldı (üst satır gap 16, alt satır 14) |
