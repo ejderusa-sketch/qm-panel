@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM406 | 21 Tem 2026 | Parantezde **yalnız shopName** (dükkan adı) gösteriliyor. legalEntity/fullName fallback'i kaldırıldı — artık şirket adı (LLC) yazmıyor; dükkan adı yoksa kırmızı "(eksik)" |
 | QM405 | 21 Tem 2026 | Legal okuma (`readStoreLegal`) artık **gerçek Etsy dükkan adını** (`shopName`) da çekiyor — legal ekranının sol alt köşesindeki "Sales channels · Etsy · <ad>" (örn. newcustomtee). Mağaza düğmelerinde parantezde önce shopName, yoksa legalEntity/fullName; **hiç yoksa kırmızı "(eksik)"**. Legal formuna "Shop name" alanı eklendi. Mevcut kayıtlarda görünmesi için o mağazada tekrar "📷 E-postadan oku" gerekir |
 | QM404 | 21 Tem 2026 | Legal & Tax mağaza düğmelerinde manuel ismin yanına gerçek isim parantez içinde küçük gösterilmeye başlandı (QM405 ile shopName eklendi) |
 | QM403 | 21 Tem 2026 | CSV Yap artık **net onay** soruyor: görüntüleri işlemeden önce "MAĞAZA: X · AY: Y — doğru mu?" diye gösteriyor. Mağaza seçili değilse uyarıyor; üstte aralık (Son N Ay) seçiliyse hangi aya ait olduğunu soruyor. `handleImage(file, targetMonth)` parametreli hâle geldi (doğru `act\|YYYY-MM` anahtarına yazıyor), işlem sonrası o aya geçiyor |
