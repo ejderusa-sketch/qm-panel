@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM393 | 21 Tem 2026 | Marketing alt sekmeleri arası boşluk artırıldı (üst satır gap 16, alt satır 14) |
 | QM392 | 21 Tem 2026 | Alt sekmeler yeniden adlandırıldı: 1.1.1 **Reklam Yüzdeliği**, 1.1.2 **Listing Reklam Yüzdeliği**. Küçültüldü (font 11, dar padding) ki 1.1'in altına sağa kaymadan sığsın; aktifken koyu mavi yerine **hafif mavi** (`#dbe9fb`). Ayrıca **Son N Ay** butonlarının yanında "Toplanan: aylar · kaçında veri var" göstergesi (butonların çalıştığını görmek için) |
 | QM391 | 21 Tem 2026 | Marketing alt sekmeleri iki satıra bölündü: üst satır 1.0 Etsy Reklamlar · 1.4 · 1.5 · 1.6 · 1.7. Alt satır girintili (↳): Dağılım analizleri yeniden numaralandı — **1.1.1 Dağılım**, **1.1.2 Dağılım Listing** (eski 1.2/1.3). mSub anahtarları a3/spl aynı |
 | QM390 | 21 Tem 2026 | **ASIL CSV sorunu bulundu.** Etsy CSV'sinin ilk satırında "Month: Haziran 2026" gibi bir bilgi satırı var; `parseCSV` ilk satırı sütun başlığı sanıyor, Views/Clicks/Spend'i bulamıyor → **tüm rakamlar 0** geliyordu, "Month:" listing gibi görünüyordu. Artık ilk 15 satır içinden **gerçek başlık satırı** (listing + view/click/spend geçen) otomatik bulunuyor; preamble ve Total/Month/Date satırları eleniyor. Gerçek Etsy formatıyla test edildi: 6714 view, 90.07 spend vb. doğru okundu |
