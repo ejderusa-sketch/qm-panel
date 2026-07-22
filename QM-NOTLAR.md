@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM400 | 21 Tem 2026 | **Senkron butonu artık HER ŞEYİ günceller.** Eskiden yalnız Marketing (CSV) + Trademark çekiyordu; artık NOVA gelen kutularını (A1/A3/A4/TÜMÜ) da tazeliyor. `syncAll` bir `syncTick` sayacını artırıyor, `NovaAgent` bu prop'u izleyip scan/scanX/scanAll çağırıyor. Tek basış = tüm mağazalar, tüm veri, tüm e-postalar |
 | QM399 | 21 Tem 2026 | 1.2 ile 1.3 grupları yer değiştirdi: **1.2 CTR**, **1.3 Görünürlük** (alt numaralar da: CTR 1.2.1/1.2.2, Görünürlük 1.3.1/1.3.2). Yeni **1.4 ROAS** grubu eklendi: 1.4.1 ROAS (kategori, gelir÷harcama, yüksek üstte) ve 1.4.2 ROAS Listing (listing bazında, ROAS≥1 yeşil, <1 kırmızı bar) |
 | QM398 | 21 Tem 2026 | CTR görünümlerinde (1.3.1 ve 1.3.2) karışık "tıklama/görüntülenme" kesirleri (959/37.090 gibi) kaldırıldı; sadece sade yüzde kaldı (1 ondalık) |
 | QM397 | 21 Tem 2026 | **1.3 CTR grubu.** 1.6/1.7 üst satırdan kaldırılıp 1.3 butonuna toplandı; basınca 1.3.1 CTR (ctr) ve 1.3.2 CTR Listing (ctrl) açılıyor. Marketing alt sekmeleri artık üç grup: 1.1 Reklam Payı · 1.2 Görünürlük · 1.3 CTR |
