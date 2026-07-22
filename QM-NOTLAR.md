@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM388 | 21 Tem 2026 | **CSV ay tespiti tamamen yeniden yazıldı** (`detectMonth` + `_monthFrom`). Eskiden yalnız "Jul 1, 2026 - Jul 31, 2026" tam aralığını tanıyordu; başlıkta sadece "Temmuz 2026" / "July 2026" / "2026-07" yazıyorsa "tarih yok" diyordu. Artık TR+EN ay adları (tam/kısa), sayısal biçimler, tarih aralığı — hepsi tanınıyor, önce başlık (ilk 6 satır) taranıyor. E-postadan çekme (`fetchStoreCSV`) de aynı `detectMonth`'u fallback kullanıyor. Tüm hesaplar/e-postalar/gelecek CSV'ler için geçerli. 11 biçim test edildi, hepsi doğru |
 | QM387 | 21 Tem 2026 | **CSV "okumuyor" sorunu.** Aslında veri kaybolmuyordu — her CSV bir aya kaydediliyor, tablo seçili ayı gösteriyor; CSV farklı aya gidince boş görünüyordu (örn. veri Ocak'ta, ekran Temmuz'da). Artık `handleCSV` başarılı içe aktarımdan sonra **otomatik o aya (`setPeriod`) ve o mağazaya (`setAct`) geçiyor**, veri hemen görünüyor |
 | QM386 | 21 Tem 2026 | **Her satıra 🚫 Engelle butonu** eklendi (row fonksiyonu — tüm bölümlerde: Acil/Önemli, Diğer, Reklam...). Basınca onay ister, gönderici `novaBlocked`'a eklenir, o mailler hem TÜMÜ hem aktif listeden kalkar ve sonraki taramalarda gelmez (`_bl` filtresi). Engeli Ayarlar'dan geri açabilirsin |
 | QM385 | 21 Tem 2026 | Hero başlığı yanındaki aktif mağaza etiketi (Marketing/Finance/Trademark/Görünürlük/Kimlik): dış kısım **beyaz zemin + siyah yazı** (eskiden mavi/beyaz), numara yuvarlağı beyaz/kırmızı kaldı |

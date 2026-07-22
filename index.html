@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM388 · 21 Tem 2026 · CSV ay tespiti tamamen yeniden yazildi — TR/EN ay adlari, sayisal (2026-07), tarih araligi hepsi basliktan okunuyor; email cekme de ayni tespiti kullaniyor
      QM387 · 21 Tem 2026 · CSV yuklenince panel otomatik o aya ve o magazaya geciyor — veri bosmus gibi gorunmuyor
      QM386 · 21 Tem 2026 · Her satira Engelle butonu — gonderici engellenince listeden kalkar ve bir daha taramaya girmez (onayli)
      QM385 · 21 Tem 2026 · Hero magaza etiketi beyaz zemin + siyah yazi (numara yuvarlagi beyaz/kirmizi)
@@ -334,15 +335,48 @@ if(isMetrics&&pend){rows.push({id:Math.random().toString(36).slice(2),name:pend,
 if(a.length>=18&&/[a-zA-ZğüşıöçĞÜŞİÖÇ]{4,}/.test(a)&&!bad.test(a)&&c.slice(1).every(x=>!(x||"").trim()))pend=a;
 }
 return rows;}
+/* Ay adlarini (TR + EN, tam + kisa) numaraya cevir */
+const MONTH_MAP={
+ "ocak":1,"subat":2,"şubat":2,"mart":3,"nisan":4,"mayis":5,"mayıs":5,"haziran":6,"temmuz":7,"agustos":8,"ağustos":8,"eylul":9,"eylül":9,"ekim":10,"kasim":11,"kasım":11,"aralik":12,"aralık":12,
+ "january":1,"february":2,"march":3,"april":4,"may":5,"june":6,"july":7,"august":8,"september":9,"october":10,"november":11,"december":12,
+ "jan":1,"feb":2,"mar":3,"apr":4,"jun":6,"jul":7,"aug":8,"sep":9,"sept":9,"oct":10,"nov":11,"dec":12
+};
+function _monthFrom(txt){
+ if(!txt)return null;const cy=new Date().getFullYear();
+ const t=String(txt).toLowerCase();
+ /* 1) 2026-07 / 2026_07 / 2026/07 / 2026.07 */
+ let m=t.match(/(20\d\d)[-_./ ]?(0[1-9]|1[0-2])(?![0-9])/);
+ if(m)return m[1]+"-"+m[2];
+ /* 2) 07-2026 / 07/2026 */
+ m=t.match(/(?<![0-9])(0[1-9]|1[0-2])[-_./](20\d\d)/);
+ if(m)return m[2]+"-"+m[1];
+ /* 3) ay adi + yil  (Temmuz 2026 / July 2026 / July, 2026) */
+ const names=Object.keys(MONTH_MAP).sort((a,b)=>b.length-a.length).join("|");
+ let re=new RegExp("("+names+")[a-zçğıöşü]*[ ,._-]{0,4}(20\\d\\d)","i");
+ m=t.match(re);if(m){const n=MONTH_MAP[m[1].toLowerCase()];if(n)return m[2]+"-"+String(n).padStart(2,"0");}
+ /* 4) yil + ay adi  (2026 Temmuz) */
+ re=new RegExp("(20\\d\\d)[ ,._-]{0,4}("+names+")[a-zçğıöşü]*","i");
+ m=t.match(re);if(m){const n=MONTH_MAP[m[2].toLowerCase()];if(n)return m[1]+"-"+String(n).padStart(2,"0");}
+ /* 5) sadece ay adi (yil yoksa bu yil) */
+ re=new RegExp("(?:^|[^a-zçğıöşü])("+names+")(?![a-zçğıöşü])","i");
+ m=t.match(re);if(m){const n=MONTH_MAP[m[1].toLowerCase()];if(n)return cy+"-"+String(n).padStart(2,"0");}
+ return null;
+}
 function detectMonth(text){
-const M={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-const cy=new Date().getFullYear();
-let best=null,bestY=cy,partial=null,partialY=cy;
-const re=/([A-Za-z]{3})[a-z]*\s+(\d{1,2})(?:,?\s*(\d{4}))?\s*[-–—]\s*([A-Za-z]{3})[a-z]*\s+(\d{1,2})(?:,?\s*(\d{4}))?/g;let m;
-while((m=re.exec(text))){const a=M[m[1].toLowerCase()],b=M[m[4].toLowerCase()],d1=+m[2],d2=+m[5];if(a==null||b==null)continue;const yr=(+m[6])||(+m[3])||cy;if(a===b){if(d1<=2&&d2>=27){best=a;bestY=yr;}else if(partial==null){partial=a;partialY=yr;}}}
-if(best!=null)return bestY+"-"+String(best+1).padStart(2,"0");
-if(partial!=null)return partialY+"-"+String(partial+1).padStart(2,"0");
-return null;}
+ if(!text)return null;
+ /* Once BASLIK (ilk satirlar) — ay genelde orada yazar */
+ const head=String(text).split(/\r?\n/).slice(0,6).join(" ");
+ const fromHead=_monthFrom(head);if(fromHead)return fromHead;
+ /* Sonra tam tarih araligi (Jul 1, 2026 - Jul 31, 2026) */
+ const M2={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+ const cy=new Date().getFullYear();let best=null,bestY=cy,partial=null,partialY=cy;
+ const re=/([A-Za-z]{3})[a-z]*\s+(\d{1,2})(?:,?\s*(\d{4}))?\s*[-–—]\s*([A-Za-z]{3})[a-z]*\s+(\d{1,2})(?:,?\s*(\d{4}))?/g;let m;
+ while((m=re.exec(text))){const a=M2[m[1].toLowerCase()],b=M2[m[4].toLowerCase()],d1=+m[2],d2=+m[5];if(a==null||b==null)continue;const yr=(+m[6])||(+m[3])||cy;if(a===b){if(d1<=2&&d2>=27){best=a;bestY=yr;}else if(partial==null){partial=a;partialY=yr;}}}
+ if(best!=null)return bestY+"-"+String(best+1).padStart(2,"0");
+ if(partial!=null)return partialY+"-"+String(partial+1).padStart(2,"0");
+ /* Son care: tum metinde herhangi bir ay ifadesi */
+ return _monthFrom(String(text).slice(0,2000));
+}
 function parseCSV(text){
 const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
 if(lines.length<2)return[];
@@ -1461,7 +1495,7 @@ const parts={csv:[],img:[]};
 const collect=(pl)=>{if(!pl)return;if(pl.filename&&pl.body&&pl.body.attachmentId){if(/\.csv$/i.test(pl.filename))parts.csv.push(pl);else if(/^image\//.test(pl.mimeType||"")||/\.(png|jpe?g|gif|webp)$/i.test(pl.filename))parts.img.push(pl);}if(pl.parts)pl.parts.forEach(collect);};
 collect(d.payload);
 if(!parts.csv.length)continue;
-for(const cp of parts.csv){const _at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);const _b=(_at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(_b)));}catch(_){txt=atob(_b);}const _fn=String(cp.filename||"").toLowerCase();const _MN={ocak:"01",subat:"02",mart:"03",nisan:"04",mayis:"05",haziran:"06",temmuz:"07",agustos:"08",eylul:"09",ekim:"10",kasim:"11",aralik:"12",january:"01",february:"02",march:"03",april:"04",june:"06",july:"07",august:"08",september:"09",october:"10",november:"11",december:"12",may:"05"};let _mth="";const _ym=_fn.match(/(20\d\d)[-_ ]?(0[1-9]|1[0-2])/);if(_ym)_mth=_ym[1]+"-"+_ym[2];if(!_mth){for(const _k in _MN){if(_fn.indexOf(_k)>-1){_mth=((_fn.match(/20\d\d/)||["2026"])[0])+"-"+_MN[_k];break;}}}if(!_mth){const _cc={};(txt.match(/20\d\d-(0[1-9]|1[0-2])/g)||[]).forEach(x=>{_cc[x]=(_cc[x]||0)+1;});const _bm=Object.keys(_cc).sort((a,b)=>_cc[b]-_cc[a])[0];if(_bm)_mth=_bm;}if(!_mth)continue;if(doneM.has(_mth))continue;const file=new File([txt],cp.filename||"gmail.csv",{type:"text/csv"});const ok=await handleCSV(file,period,acc.id,true,true,_mth);if(ok){imported++;doneM.add(_mth);}}
+for(const cp of parts.csv){const _at=await gGet(tok,base+"/"+m.id+"/attachments/"+cp.body.attachmentId);const _b=(_at.data||"").replace(/-/g,"+").replace(/_/g,"/");let txt="";try{txt=decodeURIComponent(escape(atob(_b)));}catch(_){txt=atob(_b);}const _fn=String(cp.filename||"").toLowerCase();const _MN={ocak:"01",subat:"02",mart:"03",nisan:"04",mayis:"05",haziran:"06",temmuz:"07",agustos:"08",eylul:"09",ekim:"10",kasim:"11",aralik:"12",january:"01",february:"02",march:"03",april:"04",june:"06",july:"07",august:"08",september:"09",october:"10",november:"11",december:"12",may:"05"};let _mth="";const _ym=_fn.match(/(20\d\d)[-_ ]?(0[1-9]|1[0-2])/);if(_ym)_mth=_ym[1]+"-"+_ym[2];if(!_mth){for(const _k in _MN){if(_fn.indexOf(_k)>-1){_mth=((_fn.match(/20\d\d/)||["2026"])[0])+"-"+_MN[_k];break;}}}if(!_mth){const _dm=detectMonth(txt);if(_dm)_mth=_dm;}if(!_mth){const _cc={};(txt.match(/20\d\d-(0[1-9]|1[0-2])/g)||[]).forEach(x=>{_cc[x]=(_cc[x]||0)+1;});const _bm=Object.keys(_cc).sort((a,b)=>_cc[b]-_cc[a])[0];if(_bm)_mth=_bm;}if(!_mth)continue;if(doneM.has(_mth))continue;const file=new File([txt],cp.filename||"gmail.csv",{type:"text/csv"});const ok=await handleCSV(file,period,acc.id,true,true,_mth);if(ok){imported++;doneM.add(_mth);}}
 }
 if(imported)setToast(TT(imported+" rapor içeri alındı (her biri ayına).",imported+" reports imported (each to its month)."));
 else setToast(TT("Uygun rapor bulunamadı.","No suitable report found."));}
@@ -1539,7 +1573,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM387 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM388 ☁️</b> · A·B·C·D {TT("modülleri","modules")}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{background:"var(--azure)",color:"#fff",borderColor:"var(--azure)",display:"inline-flex",alignItems:"center",gap:6}}><span style={{display:"inline-block",width:15,height:15,borderRadius:"50%",flex:"none",border:"1.5px solid #fff",background:syncing?"#22c55e":"#e23b4e",boxShadow:"0 0 10px "+(syncing?"#22c55e":"#e23b4e"),animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button></div>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
@@ -2061,7 +2095,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=387; /* bu sayi her surumde artar */
+  var CURRENT=388; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
