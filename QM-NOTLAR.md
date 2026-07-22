@@ -76,6 +76,8 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM405 | 21 Tem 2026 | Legal okuma (`readStoreLegal`) artık **gerçek Etsy dükkan adını** (`shopName`) da çekiyor — legal ekranının sol alt köşesindeki "Sales channels · Etsy · <ad>" (örn. newcustomtee). Mağaza düğmelerinde parantezde önce shopName, yoksa legalEntity/fullName; **hiç yoksa kırmızı "(eksik)"**. Legal formuna "Shop name" alanı eklendi. Mevcut kayıtlarda görünmesi için o mağazada tekrar "📷 E-postadan oku" gerekir |
+| QM404 | 21 Tem 2026 | Legal & Tax mağaza düğmelerinde manuel ismin yanına gerçek isim parantez içinde küçük gösterilmeye başlandı (QM405 ile shopName eklendi) |
 | QM403 | 21 Tem 2026 | CSV Yap artık **net onay** soruyor: görüntüleri işlemeden önce "MAĞAZA: X · AY: Y — doğru mu?" diye gösteriyor. Mağaza seçili değilse uyarıyor; üstte aralık (Son N Ay) seçiliyse hangi aya ait olduğunu soruyor. `handleImage(file, targetMonth)` parametreli hâle geldi (doğru `act\|YYYY-MM` anahtarına yazıyor), işlem sonrası o aya geçiyor |
 | QM402 | 21 Tem 2026 | Senkron ve CSV Yap butonları **beyaz zemin + kırmızı yazı** yapıldı (içi kırmızı değil); "A·B·C·D modülleri" yazısı kaldırıldı; butonlar küçültülüp `flexWrap` ile sığacak hâle getirildi (kenardan taşmıyor) |
 | QM401 | 21 Tem 2026 | Senkron butonu **kırmızı zemin + beyaz kalın yazı** yapıldı, yanına aynı görünümde **📷 CSV Yap** butonu eklendi. Ekran görüntülerini (çoklu seçilebilir) mevcut `handleImage` motoruyla yapay zekâya okutup **CSV satırlarına** çeviriyor (aktif mağaza + seçili ay). Motor: API anahtarı varsa Claude (isabetli), yoksa cihazda OCR. Doğrudan taze görüntü verildiği için e-posta ekindeki sıkıştırılmış görüntülerden daha iyi sonuç. Gizli input `#shotInput` |
