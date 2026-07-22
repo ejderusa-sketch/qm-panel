@@ -120,7 +120,7 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 
 /* hero & tabs */
 .hero{display:flex;align-items:flex-end;gap:14px;margin:20px 0 2px;flex-wrap:wrap}
-.mk{font-family:'Space Grotesk';font-size:26px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:linear-gradient(90deg,var(--orange),var(--amber) 60%,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+.mk{font-family:'Space Grotesk';font-size:19px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--red);background:#fff;border:2px solid var(--red);border-radius:12px;padding:6px 16px;display:inline-block}
 .store{font-family:'JetBrains Mono';font-size:12.5px;color:var(--azure);border:1px solid var(--line2);background:rgba(31,122,224,.08);padding:5px 12px;border-radius:999px}
 @keyframes qmpulse{0%,100%{opacity:1}50%{opacity:.3}}
 .tabs{display:flex;gap:8px;margin:14px 0 4px;border-bottom:1px solid var(--line);overflow-x:auto;flex-wrap:nowrap}
@@ -1604,7 +1604,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM406 ☁️</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM407 ☁️</b></div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"⏳":"📷"} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast("📷 "+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -2139,7 +2139,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=406; /* bu sayi her surumde artar */
+  var CURRENT=407; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
