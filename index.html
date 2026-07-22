@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM403 · 21 Tem 2026 · CSV Yap onay soruyor (MAGAZA + AY net gosterilir), aralik seciliyse ay sorar, dogru aya yazip o aya geciyor
      QM402 · 21 Tem 2026 · Senkron/CSV Yap butonlari beyaz zemin kirmizi yazi; A·B·C·D modulleri yazisi kaldirildi; butonlar sigacak sekilde (wrap)
      QM401 · 21 Tem 2026 · Senkron kirmizi/beyaz/bold yapildi, yanina CSV Yap butonu — ekran goruntulerini yapay zeka ile CSVye cevirir (secili magaza+ay)
      QM400 · 21 Tem 2026 · Senkron butonu artik gelen kutularini da (A1/A3/A4/TUMU) tazeliyor — Marketing+Trademark+Email hepsi tek basista
@@ -1413,9 +1414,11 @@ const applyBulk=()=>{const lines=bulkText.split(/\r?\n/).map(l=>l.trim()).filter
 const renAcct=id=>{const c=accounts.find(a=>a.id===id);const n=prompt(TT("Mağaza adı:","Store name:"),(c&&c.name)||"");if(n)setAccounts(a=>a.map(x=>x.id===id?{...x,name:n}:x))};
 
 /* image handling */
-const handleImage=async(file)=>{
+const handleImage=async(file,targetMonth)=>{
 if(!file)return;if(!/^image\//.test(file.type)){setImgErr("Görsel dosya seç (png/jpg).");return}
 setImgErr("");setImgBusy(true);setImgMsg("Görüntü okunuyor…");
+const _wk=(targetMonth&&/^\d{4}-\d{2}$/.test(targetMonth))?(act+"|"+targetMonth):key;
+const setRows=(fn)=>setDm(m=>({...m,[_wk]:typeof fn==="function"?fn(m[_wk]||[]):fn}));
 try{
 const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=()=>rej(new Error("Dosya okunamadı"));r.readAsDataURL(file)});
 const sys="Sen veri çıkarma asistanısın. Etsy Ads raporu ekran görüntüsündeki HER listing satırını oku. Yalnızca JSON dizisi döndür — markdown yok. "+
@@ -1600,9 +1603,9 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM402 ☁️</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM403 ☁️</b></div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"⏳":"📷"} {TT("CSV Yap","Make CSV")}</button></div></div>
-<input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f);_ok++;}catch(_x){}}if(_el)_el.value="";setToast("📷 "+_ok+"/"+_fs.length+" "+TT("görüntü CSV'ye çevrildi → ","screenshots → CSV → ")+(acctName||TT("mağaza","store"))+" · "+period);}}/>
+<input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast("📷 "+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
 <div className="sh">📦 {lang==="tr"?"MAĞAZALAR":"STORES"}</div>
 <div className="sl">
@@ -2135,7 +2138,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=402; /* bu sayi her surumde artar */
+  var CURRENT=403; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;

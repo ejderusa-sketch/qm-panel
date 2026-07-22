@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM403 | 21 Tem 2026 | CSV Yap artık **net onay** soruyor: görüntüleri işlemeden önce "MAĞAZA: X · AY: Y — doğru mu?" diye gösteriyor. Mağaza seçili değilse uyarıyor; üstte aralık (Son N Ay) seçiliyse hangi aya ait olduğunu soruyor. `handleImage(file, targetMonth)` parametreli hâle geldi (doğru `act\|YYYY-MM` anahtarına yazıyor), işlem sonrası o aya geçiyor |
 | QM402 | 21 Tem 2026 | Senkron ve CSV Yap butonları **beyaz zemin + kırmızı yazı** yapıldı (içi kırmızı değil); "A·B·C·D modülleri" yazısı kaldırıldı; butonlar küçültülüp `flexWrap` ile sığacak hâle getirildi (kenardan taşmıyor) |
 | QM401 | 21 Tem 2026 | Senkron butonu **kırmızı zemin + beyaz kalın yazı** yapıldı, yanına aynı görünümde **📷 CSV Yap** butonu eklendi. Ekran görüntülerini (çoklu seçilebilir) mevcut `handleImage` motoruyla yapay zekâya okutup **CSV satırlarına** çeviriyor (aktif mağaza + seçili ay). Motor: API anahtarı varsa Claude (isabetli), yoksa cihazda OCR. Doğrudan taze görüntü verildiği için e-posta ekindeki sıkıştırılmış görüntülerden daha iyi sonuç. Gizli input `#shotInput` |
 | QM400 | 21 Tem 2026 | **Senkron butonu artık HER ŞEYİ günceller.** Eskiden yalnız Marketing (CSV) + Trademark çekiyordu; artık NOVA gelen kutularını (A1/A3/A4/TÜMÜ) da tazeliyor. `syncAll` bir `syncTick` sayacını artırıyor, `NovaAgent` bu prop'u izleyip scan/scanX/scanAll çağırıyor. Tek basış = tüm mağazalar, tüm veri, tüm e-postalar |
