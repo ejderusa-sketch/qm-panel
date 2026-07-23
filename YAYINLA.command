@@ -39,7 +39,7 @@ echo "Surum: $SURUM"
 echo "Gonderiliyor..."
 echo ""
 
-git add index.html QM-NOTLAR.md 2>/dev/null
+git add -A 2>/dev/null
 
 if git diff --cached --quiet; then
   echo "ℹ️  Yeni degisiklik yok — bekleyen gonderim kontrol ediliyor..."
