@@ -117,6 +117,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM425 | 22 Tem 2026 | 2A ShipStation ikiye bölündü: **2A.1 Mağazalar** (ShipStation store listesi — kaç tane varsa, Mağaza Adı/Marketplace/Store ID/Aktif) + **2A.2 Siparişler** (müşteri/adres/email tablosu). `ssView` toggle, `ssFetchStores` (`action:"stores"`). Orders bloğu temiz yeniden yazıldı |
 | QM424 | 22 Tem 2026 | **2A ShipStation entegrasyonu (ön yüz).** Sipariş tablosu: Sipariş # · Tarih · Müşteri · **E-posta** · **Adres** · Durum. Durum filtresi (awaiting/shipped/on_hold/cancelled) + "ShipStation'dan Çek" butonu. `ssFn` → `SB_URL/functions/v1/shipstation`. **Arka uç:** `supabase/functions/shipstation/index.ts` (ShipStation V1 proxy, Basic auth, CORS). Kurulum: `supabase functions deploy shipstation` + `supabase secrets set SS_API_KEY / SS_API_SECRET`. Kurulmadan tablo boş/uyarı gösterir |
 | QM423 | 22 Tem 2026 | **ALT BAŞLIK STANDARDI** MD'ye kalıcı yazıldı (mavi hap + kırmızı numara rozeti — Trademark 4.x referans). ROAS başlığındaki "1A" düz metinden **kırmızı numara rozetine** çevrildi. Bundan sonra tüm yeni alt başlık/sekmeler bu formatta |
 | QM422 | 22 Tem 2026 | 1A MARKETING ROAS özet kartı (Views/Clicks/Orders/Revenue/Spend/ROAS) **veri olmasa da her zaman görünüyor** — standart tablo bu. Boşken 0 gösterir; altında veri varsa günlük tablo, yoksa CSV çek/yükle ipucu |
