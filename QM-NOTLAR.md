@@ -55,6 +55,12 @@ Bundan sonra farklı CSV'ler de gelecek. Bu yüzden "diğer her şey → LISTING
 
 Yani: **beyaz/mavi hap + içinde kırmızı numara rozeti**. Section header'lar (`.rules > .rh`) da numara taşıyorsa aynı kırmızı rozet kullanılır. Marketing (1.0–1.4) ve Trademark (4.1–4.4) bu standarttadır; **yeni her şey de öyle olacak.**
 
+**HİYERARŞİK / AÇILIR ALT SEKME KURALI (ZORUNLU — HER YERDE):**
+Bir üst sekmeye/alt sekmeye basınca **kendi alt sekmeleri (bir alt kademe) açılır/görünür.** Yani sekmeler ağaç gibi kademelidir ve her tıklama bir sonraki kademeyi gösterir:
+- 0 DASHBOARD → basınca 01/02/03 açılır → 02'ye basınca 02.1/02.2/02.3 açılır.
+- 1 CSV → basınca 1.1 LISTING MARKETING / 1.2 MARKETING ROAS açılır → 1.1'e basınca kendi iç pill'leri (Etsy Reklamlar, Reklam Payı, CTR, Görünürlük, ROAS) açılır.
+Bu davranış **istisnasız her sekmeye** uygulanır. Yeni bir üst sekme eklerken alt sekmeleri de bu açılır mantıkla (parent seçili → children render) kur. Numara rozetleri kademeye göre gider (0 → 01 → 02.1 gibi).
+
 ## DİL / ÇEVİRİ KURALI (ZORUNLU)
 
 **Dil değişince A'dan Z'ye HER ŞEY o dile dönecek — istisnasız.** Türkçe seçilince ekranda İngilizce hiçbir metin kalmamalı: sabit arayüz metinleri, dinamik içerik (e-posta KONU'ları, gövde/içerik), tablo başlıkları, rozetler, tür etiketleri, özetler — **iç, dış, rakam, segment, ne varsa.** Yarı Türkçe yarı İngilizce **KESİNLİKLE olmaz** (kelime-kelime yamalama yapma; tam cümle çevir).
