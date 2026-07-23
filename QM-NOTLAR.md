@@ -30,12 +30,15 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 - Kaynağı: **Etsy hazır verir** (indirilen dosya). Dosya adında **"stats" geçer** (örn. `etsy_ads_stats_2026-06-01_2026-06-30.csv`).
 - Kod: `parseRoasCSV` / `isRoasCSV` / `fetchRoasCSV`. Veri `dm[act|R|YYYY-MM]`.
 
-**Ayırt etme kuralı (öncelik sırası):**
-1. İçinde **"Listing"** sütunu varsa → **LISTING MARKETING** (kesin).
-2. Dosya adında **"stats"** varsa VEYA içerik Date+ROAS sütunlu (ürün adı yok) → **MARKETING ROAS**.
-3. Aksi halde → LISTING MARKETING.
+**Ayırt etme kuralı — HER TÜR KESİN İŞARETLE TANINIR, VARSAYILAN YOK:**
 
-`fetchStoreCSV` "stats"/ROAS dosyalarını atlar; `fetchRoasCSV` sadece ROAS dosyalarını alır (içinde "Listing" olanı almaz — `isRoasCSV` zaten dışlar).
+Bundan sonra farklı CSV'ler de gelecek. Bu yüzden "diğer her şey → LISTING" gibi bir catch-all **YOK**. Tanınmayan CSV hiçbir yere zorla konmaz (atlanır). Yeni tür gelince buraya yeni kesin işaret eklenir.
+
+1. **MARKETING ROAS** (1A) — pozitif işaret: dosya adında **"stats"** VEYA içerik **Date + ROAS/Budget** sütunlu (ürün adı YOK). Fonksiyon: `isRoasCSV`.
+2. **LISTING MARKETING** (1) — pozitif işaret: içinde **"Listing"** (ya da title/product) sütunu + sayı sütunu VAR. Fonksiyon: `isListingCSV`.
+3. **Hiçbirine uymuyorsa** → dokunma, atla (yeni tür olabilir; önce buraya kural eklenmeli).
+
+`fetchStoreCSV` yalnız `isListingCSV` olanları alır (stats/ROAS'ı atlar). `fetchRoasCSV` yalnız ROAS olanları alır.
 
 ## SÜRÜM KURALI
 
@@ -99,6 +102,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM414 | 22 Tem 2026 | CSV **pozitif tanıma**: LISTING (`isListingCSV` — "Listing" sütunu) ve ROAS (`isRoasCSV` — stats/Date+ROAS) kesin işaretle tanınır. **Catch-all fallback kaldırıldı** — tanınmayan yeni CSV hiçbir yere zorlanmaz, atlanır. `fetchStoreCSV` artık sadece `isListingCSV` olanları alıyor |
 | QM413 | 22 Tem 2026 | 1A MARKETING ROAS tablosu CSV'ye birebir uyduruldu — **Click rate** (%) ve **Budget** (Ending budget) sütunları eklendi. Tam sütun sırası: Date · Views · Clicks · Orders · Revenue · Spend · ROAS · Click rate · Budget |
 | QM412 | 22 Tem 2026 | CSV yönlendirme **dosya adıyla** da ayırt ediyor: adında **"stats"** geçen → MARKETING ROAS (1A), diğeri → LISTING MARKETING (1). `fetchStoreCSV` "stats" dosyalarını atlar. Kurallar QM-NOTLAR.md'de "CSV'LER" başlığında |
 | QM411 | 22 Tem 2026 | **YENİ 1A · MARKETING ROAS sekmesi.** Günlük Etsy Ads ROAS CSV'sini okuyor (sütunlar: Date, Views, Clicks, Orders, Revenue, Spend, ROAS, Click rate, Ending budget). `parseRoasCSV` + `isRoasCSV` (Listing CSV'den ayırt eder). Veri `dm[act\|R\|YYYY-MM]` altında ay ay saklanır. Tab içeriği: dönem seçici (ay + Son N Ay), günlük tablo + TOPLAM satırı + genel ROAS. `fetchRoasCSV` e-postadan çeker; **Senkron** da çağırıyor. `fetchStoreCSV` ROAS CSV'lerini atlıyor (yanlış parse etmesin). Nav: 1 LISTING MARKETING · **1A MARKETING ROAS** |
