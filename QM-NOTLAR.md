@@ -76,6 +76,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM409 | 21 Tem 2026 | Başlık butonları (Ayarlar/Profil/Çıkış) beyaz zemin + kırmızı çerçeve + kırmızı **extra bold** (fontWeight 900). Header'daki **$ USD para seçici kaldırıldı** (para birimi mevcut değerinde sabit kalır) |
 | QM408 | 21 Tem 2026 | Aralık (Son N Ay / YTD) seçiliyken dağılım grafiklerinin tepesine **ay ay döküm şeridi** eklendi — her ayın toplam değeri ayrı kart+mini bar olarak (örn. Son 3 → Nisan, Mayıs, Haziran). Ortak `monthStrip(field,color)` yardımcısı; Görünürlük (impressions), CTR (clicks), ROAS (revenue), Ad Share (spend) görünümlerinde. Tek ay seçiliyken görünmez |
 | QM407 | 21 Tem 2026 | Tüm sayfa başlıkları (`.mk`) beyaz kutu + kırmızı çerçeve + kırmızı yazı yapıldı, biraz küçültüldü (font 19), gradyan kaldırıldı |
 | QM406 | 21 Tem 2026 | Parantezde **yalnız shopName** (dükkan adı) gösteriliyor. legalEntity/fullName fallback'i kaldırıldı — artık şirket adı (LLC) yazmıyor; dükkan adı yoksa kırmızı "(eksik)" |
