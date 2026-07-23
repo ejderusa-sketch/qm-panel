@@ -40,6 +40,21 @@ Bundan sonra farklı CSV'ler de gelecek. Bu yüzden "diğer her şey → LISTING
 
 `fetchStoreCSV` yalnız `isListingCSV` olanları alır (stats/ROAS'ı atlar). `fetchRoasCSV` yalnız ROAS olanları alır.
 
+## ALT BAŞLIK / SUB-TAB STANDARDI (ZORUNLU — HER YERDE AYNI)
+
+**Tüm alt başlıklar ve alt sekmeler bu formatta olacak** (referans: Trademark 4.1/4.2/4.3/4.4 mavi hapları). Yeni bir alt başlık/sekme eklerken KESİNLİKLE bu stili kullan:
+
+**Hap (buton) — dış kısım:**
+- `border:2.5px solid var(--azure)` · `borderRadius:999` · `fontFamily:'Space Grotesk'` · `fontWeight:800`
+- Pasif: `background:#fff`, `color:var(--azure)`
+- Aktif: `background:var(--azure)`, `color:#fff`
+
+**Numara rozeti (içteki küçük yuvarlak):**
+- `background:#fff` · `color:var(--red)` · `border:2px solid var(--red)` · `borderRadius:999`
+- `fontFamily:'JetBrains Mono'` · `fontWeight:800` · sol tarafta
+
+Yani: **beyaz/mavi hap + içinde kırmızı numara rozeti**. Section header'lar (`.rules > .rh`) da numara taşıyorsa aynı kırmızı rozet kullanılır. Marketing (1.0–1.4) ve Trademark (4.1–4.4) bu standarttadır; **yeni her şey de öyle olacak.**
+
 ## SÜRÜM KURALI
 
 Her değişiklikte numara **+1** artar (QM377 → QM378...). Numara **DÖRT yerde** güncellenmeli:
@@ -102,6 +117,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM423 | 22 Tem 2026 | **ALT BAŞLIK STANDARDI** MD'ye kalıcı yazıldı (mavi hap + kırmızı numara rozeti — Trademark 4.x referans). ROAS başlığındaki "1A" düz metinden **kırmızı numara rozetine** çevrildi. Bundan sonra tüm yeni alt başlık/sekmeler bu formatta |
 | QM422 | 22 Tem 2026 | 1A MARKETING ROAS özet kartı (Views/Clicks/Orders/Revenue/Spend/ROAS) **veri olmasa da her zaman görünüyor** — standart tablo bu. Boşken 0 gösterir; altında veri varsa günlük tablo, yoksa CSV çek/yükle ipucu |
 | QM421 | 22 Tem 2026 | Ayarlar hero başlığından "8 —" numarası kaldırıldı — sadece SETTINGS/AYARLAR (nav 8 sekmesi zaten yok) |
 | QM420 | 22 Tem 2026 | Nav sekmeleri arası boşluk eşitlendi/açıldı (gap 8→20). **4A TRADEMARK DASHBOARD**, 4 TRADEMARK'ın hemen arkasına taşındı. Nav'daki **8 SETTINGS sekmesi kaldırıldı** (üstteki Settings butonu zaten var) |
