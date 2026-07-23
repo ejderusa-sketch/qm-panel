@@ -102,7 +102,8 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
-| QM418 | 22 Tem 2026 | "1 LISTING MARKETING" nav etiketi **iki satıra** bölündü (LISTING üstte, MARKETING altta) ve küçültüldü (0.78em) — yer kaplamasın |
+| QM419 | 22 Tem 2026 | **Tüm nav sekme etiketleri** küçültüldü ve iki-kelimeliler alt alta kırılıyor. `.tabs button` CSS: `font-size:10px`, `white-space:normal`, `max-width:84px`, `text-align:left`, `line-height:1.08`. LISTING MARKETING'in özel span'i kaldırıldı (CSS artık hepsini yönetiyor) |
+| QM418 | 22 Tem 2026 | (QM419 ile birleşti) "1 LISTING MARKETING" nav etiketi iki satır — genel CSS'e taşındı |
 | QM417 | 22 Tem 2026 | "0 DASHBOARD" (overview tab) → **"4A TRADEMARK DASHBOARD"** olarak yeniden adlandırıldı (nav butonu badge "4A" + hero başlık). Tab anahtarı hâlâ `overview` |
 | QM416 | 22 Tem 2026 | 1A ROAS tablo başlıkları **tıklanınca sıralanıyor** (büyükten küçüğe / küçükten büyüğe, ▼▲⇅ göstergeli — `roasSort` state, tüm sütunlar). Ayrıca Ayarlar/Profil/Çıkış başlık butonları **siyah çerçeve + siyah yazı** yapıldı (eskiden kırmızı) |
 | QM415 | 22 Tem 2026 | 1A MARKETING ROAS'ın tepesine **Etsy tarzı büyük özet kartı** eklendi: Views (K formatı) · Clicks · Orders · Revenue · Spend · ROAS — Etsy'nin "Your ad stats for" kartıyla birebir aynı. Altında günlük tablo. CSV toplamı Etsy özetiyle tam tutuyor (test: 108.870 view, 1.69 ROAS) |
