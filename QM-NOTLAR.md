@@ -22,6 +22,7 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 - Ürün (listing) bazında: Listing adı, Views, Clicks, Spend, Orders, Revenue.
 - Kaynağı: **biz** Etsy ekran görüntülerini alıp yapay zekâ ile CSV yapıyoruz.
 - Dosya adında "stats" **geçmez**.
+- **TANIMA İPUCU: içinde "Listing" sütunu/kelimesi geçer.** "Listing" varsa → kesin LISTING MARKETING.
 - Kod: `parseCSV` / `handleCSV` / `fetchStoreCSV`. Veri `dm[act|YYYY-MM]`.
 
 **2) CSV — MARKETING ROAS** (sekme: 1A · MARKETING ROAS)
@@ -29,7 +30,12 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 - Kaynağı: **Etsy hazır verir** (indirilen dosya). Dosya adında **"stats" geçer** (örn. `etsy_ads_stats_2026-06-01_2026-06-30.csv`).
 - Kod: `parseRoasCSV` / `isRoasCSV` / `fetchRoasCSV`. Veri `dm[act|R|YYYY-MM]`.
 
-**Ayırt etme kuralı:** dosya adında **"stats"** varsa (veya içerik Date+ROAS sütunlu, ürün adı yoksa) → MARKETING ROAS. Aksi halde → LISTING MARKETING. `fetchStoreCSV` "stats"/ROAS dosyalarını atlar; `fetchRoasCSV` sadece onları alır.
+**Ayırt etme kuralı (öncelik sırası):**
+1. İçinde **"Listing"** sütunu varsa → **LISTING MARKETING** (kesin).
+2. Dosya adında **"stats"** varsa VEYA içerik Date+ROAS sütunlu (ürün adı yok) → **MARKETING ROAS**.
+3. Aksi halde → LISTING MARKETING.
+
+`fetchStoreCSV` "stats"/ROAS dosyalarını atlar; `fetchRoasCSV` sadece ROAS dosyalarını alır (içinde "Listing" olanı almaz — `isRoasCSV` zaten dışlar).
 
 ## SÜRÜM KURALI
 
