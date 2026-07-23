@@ -102,6 +102,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM415 | 22 Tem 2026 | 1A MARKETING ROAS'ın tepesine **Etsy tarzı büyük özet kartı** eklendi: Views (K formatı) · Clicks · Orders · Revenue · Spend · ROAS — Etsy'nin "Your ad stats for" kartıyla birebir aynı. Altında günlük tablo. CSV toplamı Etsy özetiyle tam tutuyor (test: 108.870 view, 1.69 ROAS) |
 | QM414 | 22 Tem 2026 | CSV **pozitif tanıma**: LISTING (`isListingCSV` — "Listing" sütunu) ve ROAS (`isRoasCSV` — stats/Date+ROAS) kesin işaretle tanınır. **Catch-all fallback kaldırıldı** — tanınmayan yeni CSV hiçbir yere zorlanmaz, atlanır. `fetchStoreCSV` artık sadece `isListingCSV` olanları alıyor |
 | QM413 | 22 Tem 2026 | 1A MARKETING ROAS tablosu CSV'ye birebir uyduruldu — **Click rate** (%) ve **Budget** (Ending budget) sütunları eklendi. Tam sütun sırası: Date · Views · Clicks · Orders · Revenue · Spend · ROAS · Click rate · Budget |
 | QM412 | 22 Tem 2026 | CSV yönlendirme **dosya adıyla** da ayırt ediyor: adında **"stats"** geçen → MARKETING ROAS (1A), diğeri → LISTING MARKETING (1). `fetchStoreCSV` "stats" dosyalarını atlar. Kurallar QM-NOTLAR.md'de "CSV'LER" başlığında |
