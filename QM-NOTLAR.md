@@ -102,6 +102,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM422 | 22 Tem 2026 | 1A MARKETING ROAS özet kartı (Views/Clicks/Orders/Revenue/Spend/ROAS) **veri olmasa da her zaman görünüyor** — standart tablo bu. Boşken 0 gösterir; altında veri varsa günlük tablo, yoksa CSV çek/yükle ipucu |
 | QM421 | 22 Tem 2026 | Ayarlar hero başlığından "8 —" numarası kaldırıldı — sadece SETTINGS/AYARLAR (nav 8 sekmesi zaten yok) |
 | QM420 | 22 Tem 2026 | Nav sekmeleri arası boşluk eşitlendi/açıldı (gap 8→20). **4A TRADEMARK DASHBOARD**, 4 TRADEMARK'ın hemen arkasına taşındı. Nav'daki **8 SETTINGS sekmesi kaldırıldı** (üstteki Settings butonu zaten var) |
 | QM419 | 22 Tem 2026 | **Tüm nav sekme etiketleri** küçültüldü ve iki-kelimeliler alt alta kırılıyor. `.tabs button` CSS: `font-size:10px`, `white-space:normal`, `max-width:84px`, `text-align:left`, `line-height:1.08`. LISTING MARKETING'in özel span'i kaldırıldı (CSS artık hepsini yönetiyor) |
