@@ -40,6 +40,14 @@ Bundan sonra farklı CSV'ler de gelecek. Bu yüzden "diğer her şey → LISTING
 
 `fetchStoreCSV` yalnız `isListingCSV` olanları alır (stats/ROAS'ı atlar). `fetchRoasCSV` yalnız ROAS olanları alır.
 
+## MAĞAZA LİSTELERİ — ASLA KARIŞTIRMA (ZORUNLU)
+
+**İki ayrı mağaza listesi var, birbirine karıştırma / eşleştirme:**
+1. **Sol menü mağazaları** = panelin kendi hesapları (`accounts` dizisi, Gmail OAuth ile bağlı, QM1/QM2… numaralı). CSV/e-posta/trademark/policy hep buradan çekilir.
+2. **ShipStation mağazaları** = ShipStation API'sinden gelen mağazalar (`ssStores`, 2A.1 sekmesi, ~85 tane). Sadece ShipStation sipariş/adres/e-posta içindir.
+
+Bunlar **farklı sistemler**. Otomatik birbirine bağlama, isim/numara eşleştirme yapma, birini diğerinin yerine kullanma. Sol menü mağazası ≠ ShipStation mağazası. (İleride eşleştirme istenirse EJDER açıkça söyleyecek.)
+
 ## ALT BAŞLIK / SUB-TAB STANDARDI (ZORUNLU — HER YERDE AYNI)
 
 **Tüm alt başlıklar ve alt sekmeler bu formatta olacak** (referans: Trademark 4.1/4.2/4.3/4.4 mavi hapları). Yeni bir alt başlık/sekme eklerken KESİNLİKLE bu stili kullan:
