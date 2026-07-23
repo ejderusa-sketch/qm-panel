@@ -102,6 +102,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM420 | 22 Tem 2026 | Nav sekmeleri arası boşluk eşitlendi/açıldı (gap 8→20). **4A TRADEMARK DASHBOARD**, 4 TRADEMARK'ın hemen arkasına taşındı. Nav'daki **8 SETTINGS sekmesi kaldırıldı** (üstteki Settings butonu zaten var) |
 | QM419 | 22 Tem 2026 | **Tüm nav sekme etiketleri** küçültüldü ve iki-kelimeliler alt alta kırılıyor. `.tabs button` CSS: `font-size:10px`, `white-space:normal`, `max-width:84px`, `text-align:left`, `line-height:1.08`. LISTING MARKETING'in özel span'i kaldırıldı (CSS artık hepsini yönetiyor) |
 | QM418 | 22 Tem 2026 | (QM419 ile birleşti) "1 LISTING MARKETING" nav etiketi iki satır — genel CSS'e taşındı |
 | QM417 | 22 Tem 2026 | "0 DASHBOARD" (overview tab) → **"4A TRADEMARK DASHBOARD"** olarak yeniden adlandırıldı (nav butonu badge "4A" + hero başlık). Tab anahtarı hâlâ `overview` |

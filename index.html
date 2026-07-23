@@ -123,7 +123,7 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 .mk{font-family:'Space Grotesk';font-size:19px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--red);background:#fff;border:2px solid var(--red);border-radius:12px;padding:6px 16px;display:inline-block}
 .store{font-family:'JetBrains Mono';font-size:12.5px;color:var(--azure);border:1px solid var(--line2);background:rgba(31,122,224,.08);padding:5px 12px;border-radius:999px}
 @keyframes qmpulse{0%,100%{opacity:1}50%{opacity:.3}}
-.tabs{display:flex;gap:8px;margin:14px 0 4px;border-bottom:1px solid var(--line);overflow-x:auto;flex-wrap:nowrap}
+.tabs{display:flex;gap:20px;margin:14px 0 4px;border-bottom:1px solid var(--line);overflow-x:auto;flex-wrap:nowrap}
 .tabs button{font-family:'Space Grotesk';font-size:10px;font-weight:800;letter-spacing:.01em;padding:7px 9px;border:none;background:transparent;color:#111;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.13s;white-space:normal;text-align:left;line-height:1.08;max-width:84px;display:inline-flex;align-items:center;gap:5px;flex:none}
 .tabs button:hover{color:#000}
 .tabs button.on{color:var(--orange);border-bottom-color:var(--orange)}
@@ -1615,7 +1615,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM419 ☁️</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM420 ☁️</b></div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"⏳":"📷"} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast("📷 "+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -1661,17 +1661,16 @@ return(
 </div></div>
 <div className="tabs">
 <button className={tab==="nova"?"on":""} onClick={()=>setTab("nova")} style={{display:currentRole==="admin"?"":"none"}}><b className="tl">A</b> {TT("NOVA AGENT","NOVA AGENT","نووا ایجنٹ")}</button>
-<button className={tab==="overview"?"on":""} onClick={()=>setTab("overview")} style={{display:can("viewOverview")?"":"none"}}><b className="tl">4A</b> {TT("TRADEMARK DASHBOARD","TRADEMARK DASHBOARD","ڈ۳ش بورڈ")}</button>
 {can("viewMarketing")&&<button className={tab==="marketing"?"on":""} onClick={()=>setTab("marketing")}><b className="tl">1</b> {TT("LISTING MARKETING","LISTING MARKETING","مارکیٹنگ")}</button>}
 {can("viewMarketing")&&<button className={tab==="roasmkt"?"on":""} onClick={()=>setTab("roasmkt")}><b className="tl">1A</b> {TT("MARKETING ROAS","MARKETING ROAS")}</button>}
 <button className={tab==="etsyapi"?"on":""} onClick={()=>setTab("etsyapi")}><b className="tl">2</b> {TT("ETSY API","ETSY API")}</button>
 <button className={tab==="shipstation"?"on":""} onClick={()=>setTab("shipstation")}><b className="tl">2A</b> {TT("SHIPSTATION API","SHIPSTATION API")}</button>
 {can("viewFinance")&&<button className={tab==="finance"?"on":""} onClick={()=>setTab("finance")}><b className="tl">3</b> {TT("FINANCE","FINANCE","فنانس")}</button>}
 {can("viewVisibility")&&<button className={tab==="trademark"?"on":""} onClick={()=>setTab("trademark")}><b className="tl">4</b> {TT("TRADEMARK","TRADEMARK","ٹریڈ مارک")}</button>}
+<button className={tab==="overview"?"on":""} onClick={()=>setTab("overview")} style={{display:can("viewOverview")?"":"none"}}><b className="tl">4A</b> {TT("TRADEMARK DASHBOARD","TRADEMARK DASHBOARD","ڈ۳ش بورڈ")}</button>
 {can("viewDashboard")&&<button className={tab==="dashboard"?"on":""} onClick={()=>setTab("dashboard")}><b className="tl">5</b> {TT("SHOP MANAGER","SHOP MANAGER","شاپ مینیجر")}</button>}
 {can("viewIdentity")&&<button className={tab==="zidentity"?"on":""} onClick={()=>setTab("zidentity")}><b className="tl">6</b> {TT("KİMLİK","IDENTITY","شناخت")}</button>}
 {can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">7</b> {TT("EKİP","TEAM","ٹیم")}</button>}
-<button className={tab==="ayarlar"?"on":""} onClick={()=>setTab("ayarlar")} style={{display:(currentRole==="admin"||can("viewSettings"))?"":"none"}}><b className="tl">8</b> {TT("AYARLAR","SETTINGS","ترتیبات")}</button>
 <button className={tab==="etsy"?"on":""} onClick={()=>setTab("etsy")}><b className="tl">9</b> ETSY</button>
 </div>
 
@@ -2156,7 +2155,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=419; /* bu sayi her surumde artar */
+  var CURRENT=420; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
