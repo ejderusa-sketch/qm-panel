@@ -14,6 +14,23 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 **Yayın:** GitHub repo `ejderusa-sketch/qm-panel` → https://ejderusa-sketch.github.io/qm-panel/
 **Sahibi:** EJDER — ejderusa@gmail.com
 
+## CSV'LER (ÇOK ÖNEMLİ — KARIŞTIRMA)
+
+İki ayrı CSV türü var, **asla karıştırma**. E-postadan çekerken **dosya adına** göre ayırt edilir:
+
+**1) CSV — LISTING MARKETING** (sekme: 1 · LISTING MARKETING)
+- Ürün (listing) bazında: Listing adı, Views, Clicks, Spend, Orders, Revenue.
+- Kaynağı: **biz** Etsy ekran görüntülerini alıp yapay zekâ ile CSV yapıyoruz.
+- Dosya adında "stats" **geçmez**.
+- Kod: `parseCSV` / `handleCSV` / `fetchStoreCSV`. Veri `dm[act|YYYY-MM]`.
+
+**2) CSV — MARKETING ROAS** (sekme: 1A · MARKETING ROAS)
+- Günlük özet: Date, Views, Clicks, Orders, Revenue, Spend, ROAS, Click rate, Ending budget.
+- Kaynağı: **Etsy hazır verir** (indirilen dosya). Dosya adında **"stats" geçer** (örn. `etsy_ads_stats_2026-06-01_2026-06-30.csv`).
+- Kod: `parseRoasCSV` / `isRoasCSV` / `fetchRoasCSV`. Veri `dm[act|R|YYYY-MM]`.
+
+**Ayırt etme kuralı:** dosya adında **"stats"** varsa (veya içerik Date+ROAS sütunlu, ürün adı yoksa) → MARKETING ROAS. Aksi halde → LISTING MARKETING. `fetchStoreCSV` "stats"/ROAS dosyalarını atlar; `fetchRoasCSV` sadece onları alır.
+
 ## SÜRÜM KURALI
 
 Her değişiklikte numara **+1** artar (QM377 → QM378...). Numara **DÖRT yerde** güncellenmeli:
@@ -76,6 +93,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM412 | 22 Tem 2026 | CSV yönlendirme **dosya adıyla** da ayırt ediyor: adında **"stats"** geçen → MARKETING ROAS (1A), diğeri → LISTING MARKETING (1). `fetchStoreCSV` "stats" dosyalarını atlar. Kurallar QM-NOTLAR.md'de "CSV'LER" başlığında |
 | QM411 | 22 Tem 2026 | **YENİ 1A · MARKETING ROAS sekmesi.** Günlük Etsy Ads ROAS CSV'sini okuyor (sütunlar: Date, Views, Clicks, Orders, Revenue, Spend, ROAS, Click rate, Ending budget). `parseRoasCSV` + `isRoasCSV` (Listing CSV'den ayırt eder). Veri `dm[act\|R\|YYYY-MM]` altında ay ay saklanır. Tab içeriği: dönem seçici (ay + Son N Ay), günlük tablo + TOPLAM satırı + genel ROAS. `fetchRoasCSV` e-postadan çeker; **Senkron** da çağırıyor. `fetchStoreCSV` ROAS CSV'lerini atlıyor (yanlış parse etmesin). Nav: 1 LISTING MARKETING · **1A MARKETING ROAS** |
 | QM410 | 21 Tem 2026 | `addAcct` artık yeni mağazayı listenin **en başına** ekliyor (prepend). Ayrıca **1 MARKETING → 1 LISTING MARKETING** olarak yeniden adlandırıldı (nav `tabMkt` + hero başlık). Not: numaralar konuma göre olduğu için yeni mağaza QM01 olur, diğerleri +1 kayar (veri store ID'ye bağlı olduğu için bozulmaz) |
 | QM409 | 21 Tem 2026 | Başlık butonları (Ayarlar/Profil/Çıkış) beyaz zemin + kırmızı çerçeve + kırmızı **extra bold** (fontWeight 900). Header'daki **$ USD para seçici kaldırıldı** (para birimi mevcut değerinde sabit kalır) |
