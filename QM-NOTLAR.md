@@ -55,6 +55,18 @@ Bundan sonra farklı CSV'ler de gelecek. Bu yüzden "diğer her şey → LISTING
 
 Yani: **beyaz/mavi hap + içinde kırmızı numara rozeti**. Section header'lar (`.rules > .rh`) da numara taşıyorsa aynı kırmızı rozet kullanılır. Marketing (1.0–1.4) ve Trademark (4.1–4.4) bu standarttadır; **yeni her şey de öyle olacak.**
 
+## DİL / ÇEVİRİ KURALI (ZORUNLU)
+
+**Dil değişince A'dan Z'ye HER ŞEY o dile dönecek — istisnasız.** Türkçe seçilince ekranda İngilizce hiçbir metin kalmamalı: sabit arayüz metinleri, dinamik içerik (e-posta KONU'ları, gövde/içerik), tablo başlıkları, rozetler, tür etiketleri, özetler — **iç, dış, rakam, segment, ne varsa.** Yarı Türkçe yarı İngilizce **KESİNLİKLE olmaz** (kelime-kelime yamalama yapma; tam cümle çevir).
+
+Mekanizma (`index.html`):
+- **Sabit metinler:** `TT(tr,en,ur)` fonksiyonu (`uiLang`'e göre). Yeni her metni TT ile yaz.
+- **Etsy e-posta konuları (şablon):** `trEtsy(s)` — `_ETSY_FULL` içinde **tam-cümle şablon eşleşmesi** (regex → komple Türkçe cümle). Yeni Etsy şablonu görülürse buraya ekle. Politika adları `_POL_TR` sözlüğünde, aylar `_MO_TR`.
+- **Serbest metin (e-posta gövdesi):** `aiTR(text,apiKey)` — Anthropic API ile tam çeviri. Modal açılınca TR + API anahtarı varsa otomatik çevrilir (`showMail`).
+- **Politika özeti (3 madde):** `aiBullets(title,ctx,apiKey)`.
+
+Yeni bir tablo/modal/liste eklerken: dinamik konu → `trEtsy(...)`, gövde → `showMail`/`aiTR`, sabitler → `TT`. **Test: TR'ye geçince tek bir İngilizce kelime kalmamalı.**
+
 ## SÜRÜM KURALI
 
 Her değişiklikte numara **+1** artar (QM377 → QM378...). Numara **DÖRT yerde** güncellenmeli:
@@ -117,6 +129,8 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM436 | 23 Tem 2026 | **TAM CÜMLE çeviri** (`trEtsy`: şablon eşleşme, karışık dil YOK) + modal e-posta gövdesi **API ile Türkçe** (`aiTR`, `showMail`). **NEW POLICY = sadece haber** (kaldırma/ihlal e-postaları dışlandı); **policy ihlalleri → Trademark Dashboard**; Trademark Dashboard'a **"E-postaları Tara"** butonu; `fetchStoreTrademark` IP-policy/ihlal uyarılarını da yakalıyor. Legal satırlarına **"📋 3 Maddede Özetle"** (`aiBullets`) butonu. DİL/ÇEVİRİ KURALI eklendi |
+| QM435 | 23 Tem 2026 | TR seçiliyken Etsy e-posta KONU'ları Türkçe (ilk sürüm — sonra QM436'da tam-cümleye çevrildi) |
 | QM434 | 23 Tem 2026 | `legal` edge function Supabase'e **deploy edildi**. Etsy veri-merkezi IP'lerini **bot koruması (JS-challenge)** ile blokladığı için canlı scraping çalışmıyor → fonksiyon canlıyı dener, bloklanınca **küratör resmi liste (37 politika, gerçek etsy.com/legal verisi)** döndürür (`source:"curated"`). Tarihli politikalar (yürürlük) üstte. Web-item'a **"↗ Etsy'de Aç"** butonu eklendi (metin sunucudan çekilemediği için link kullanıcının tarayıcısında açılır). SEED listesi değişince güncellenmeli |
 | QM433 | 23 Tem 2026 | **03 NEW ETSY POLICY**'ye 2. kaynak: **"Etsy Legal — Canlı Kaynak"** (etsy.com/legal). Yeni **`legal` edge function** (`supabase/functions/legal/index.ts`) Etsy'nin resmi politika listesini (sellers/buyers/third-party bölümleri) çekip parse eder. Her satır istenen düzende: **🔗 link · tarih · tek cümle özet · 📖 Oku**. Oku → o politikanın metnini modalda gösterir. **Gizli anahtar GEREKMEZ** (Etsy legal public). Deploy: `legal` fonksiyonunu Supabase'e kur |
 | QM432 | 23 Tem 2026 | DASHBOARD altına 3. alt sekme: **📜 03 NEW ETSY POLICY**. Etsy'nin yeni/güncellenen politika duyurularını (policy / terms of use / house rules / seller handbook) tüm mağazaların e-postasından çeker (`fetchStorePolicy`, Senkron'a bağlı). Askı/kimlik/vergi e-postaları hariç tutulur (ALARMING'e ait). **Yürürlük tarihi (effective date)** parse edilip ayrı **YÜRÜRLÜK** sütununda gösterilir. `PolicyTab` bileşeni, veri `settings.policyNews` |
