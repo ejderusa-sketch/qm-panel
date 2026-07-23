@@ -93,6 +93,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM413 | 22 Tem 2026 | 1A MARKETING ROAS tablosu CSV'ye birebir uyduruldu — **Click rate** (%) ve **Budget** (Ending budget) sütunları eklendi. Tam sütun sırası: Date · Views · Clicks · Orders · Revenue · Spend · ROAS · Click rate · Budget |
 | QM412 | 22 Tem 2026 | CSV yönlendirme **dosya adıyla** da ayırt ediyor: adında **"stats"** geçen → MARKETING ROAS (1A), diğeri → LISTING MARKETING (1). `fetchStoreCSV` "stats" dosyalarını atlar. Kurallar QM-NOTLAR.md'de "CSV'LER" başlığında |
 | QM411 | 22 Tem 2026 | **YENİ 1A · MARKETING ROAS sekmesi.** Günlük Etsy Ads ROAS CSV'sini okuyor (sütunlar: Date, Views, Clicks, Orders, Revenue, Spend, ROAS, Click rate, Ending budget). `parseRoasCSV` + `isRoasCSV` (Listing CSV'den ayırt eder). Veri `dm[act\|R\|YYYY-MM]` altında ay ay saklanır. Tab içeriği: dönem seçici (ay + Son N Ay), günlük tablo + TOPLAM satırı + genel ROAS. `fetchRoasCSV` e-postadan çeker; **Senkron** da çağırıyor. `fetchStoreCSV` ROAS CSV'lerini atlıyor (yanlış parse etmesin). Nav: 1 LISTING MARKETING · **1A MARKETING ROAS** |
 | QM410 | 21 Tem 2026 | `addAcct` artık yeni mağazayı listenin **en başına** ekliyor (prepend). Ayrıca **1 MARKETING → 1 LISTING MARKETING** olarak yeniden adlandırıldı (nav `tabMkt` + hero başlık). Not: numaralar konuma göre olduğu için yeni mağaza QM01 olur, diğerleri +1 kayar (veri store ID'ye bağlı olduğu için bozulmaz) |
