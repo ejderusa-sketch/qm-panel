@@ -14,6 +14,27 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 **Yayın:** GitHub repo `ejderusa-sketch/qm-panel` → https://ejderusa-sketch.github.io/qm-panel/
 **Sahibi:** EJDER — ejderusa@gmail.com
 
+## VERİ GÜVENLİĞİ & PERFORMANS (KRİTİK — 23 Tem 2026)
+
+**Yaşanan sorun:** Sayfadan ayrılıp dönünce sol menüdeki QM mağazaları boş görünüyordu ("bağlı mağaza yok"). Web/veri büyüdükçe artıyordu; açılış çok yavaştı ("Hesap hazırlanıyor" takılıyordu).
+
+**Kök sebep:** Supabase veritabanı en küçük **Nano** compute'ta (0.5 GB RAM, paylaşımlı CPU) idi → sorgular yetişemeyip **asılıyordu** (8-12 sn timeout). Veri KAYBOLMUYORDU (yalnızca ~0.03 GB, diskte güvende), sadece **çekilemiyordu**.
+
+**Çözümler:**
+1. **Compute: Nano → Micro** (1 GB RAM, 2 çekirdek CPU). Pro planında Micro **zaten ödendiği için EK ÜCRET YOK** (+$0.00). Supabase → Settings → Compute and Disk. DB Nano'ya düşerse tekrar Micro'ya çek.
+2. **Kod kilitleri (QM448) — DATA KAYBI ÖNLEME:**
+   - Boş/başarısız bulut okuması sol menüyü **BOŞALTMAZ** (`if(am.length){setAccounts(am)...}` — yoksa önbellek/mevcut kalır).
+   - Buluta **ASLA boş mağaza listesi yazılmaz** (`if(!accounts.length)return;` — store.set atlanır). → panel mağazaları silemez, önbellekten kendini onarır.
+3. **Hesaba özel önbellek (QM447):** `qm_accts::email` / `qm_settings::email` — başka hesabın (novainnc) boş verisi ejderusa'ya geçince görünmez.
+4. **Açılış hızlandırma (QM445-446):** veri cihazda önbellekte (localStorage), açılışta **anında** gösterilir; bulut yüklemesi arka planda + paralel (Promise.all); "Hesap hazırlanıyor" da `qm_boot` önbelleğiyle anında geçilir.
+
+**VERİ KAYBI GARANTİSİ (3 katman):**
+1. Kod kilitleri → panel asla boş yazıp silmez, önbellekten onarır.
+2. Cihaz önbelleği (`qm_accts::email`) → son iyi hâl hep elde.
+3. **Supabase Pro günlük yedek (7 gün saklanır)** → en kötü ihtimalde bile geri yüklenebilir (Dashboard → Database → Backups).
+
+**ZORUNLU KURAL (yeni kod):** Bulut okuma/yazma eklerken: **boş/başarısız okumada mevcut veriyi EZME; boş listeyi buluta YAZMA.** Compute Nano'ya düşerse Micro'ya çek (ücretsiz).
+
 ## CSV'LER (ÇOK ÖNEMLİ — KARIŞTIRMA)
 
 İki ayrı CSV türü var, **asla karıştırma**. E-postadan çekerken **dosya adına** göre ayırt edilir:
