@@ -28,11 +28,15 @@ Deno.serve(async (req) => {
     let url = "";
     if (action === "orders") {
       const p = new URLSearchParams();
-      p.set("orderStatus", body.status || "awaiting_shipment");
+      const st = body.status;
+      if (st && st !== "any" && st !== "all") p.set("orderStatus", st);
       p.set("page", String(body.page || 1));
       p.set("pageSize", String(body.pageSize || 100));
       if (body.storeId) p.set("storeId", String(body.storeId));
       if (body.sortBy) p.set("sortBy", String(body.sortBy));
+      if (body.sortDir) p.set("sortDir", String(body.sortDir));
+      if (body.orderDateStart) p.set("orderDateStart", String(body.orderDateStart));
+      if (body.orderDateEnd) p.set("orderDateEnd", String(body.orderDateEnd));
       url = base + "/orders?" + p.toString();
     } else if (action === "stores") {
       url = base + "/stores";
