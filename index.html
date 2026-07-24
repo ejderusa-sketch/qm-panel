@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM487 · 24 Tem 2026 · DASHBOARD'a 07 NOTLAR (MD) alt sekmesi: panel kendi QM-NOTLAR.md'sini fetch edip marked.js ile render eder (baslik/tablo/kod bicimli, .mdbox CSS). "Yenile" butonu. MD guncellenince panelde otomatik gorunur. marked.min.js CDN eklendi
      QM486 · 24 Tem 2026 · CSV Kaynagi tablosu # sutunu hiyerarsik: 1.1 Listing · 1.2 ROAS · 1.3 Revenue · 1.4 Statement (CSV alt sekmeleriyle eslesir)
      QM485 · 24 Tem 2026 · LISTING MARKETING pillerinden (CSV 1)/(CSV 2) parantezleri kaldirildi (1.1.1 etsy ads, 1.1.5 roas)
      QM484 · 24 Tem 2026 · CSV alt sekmesine 1.3 REVENUE ve 1.4 STATEMENT pilleri eklendi (placeholder icerik: Dashboard/Stats/Revenue ve Finances/Activity Summary). CSV turleri artik: 1.1 Listing · 1.2 ROAS · 1.3 Revenue · 1.4 Statement
@@ -137,6 +138,7 @@ document.open();document.write('<!doctype html><meta charset="utf-8"><title>QM �
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script type="text/babel" data-presets="react">
 const {useState,useEffect,useMemo,useRef,useCallback}=React;
 
@@ -193,6 +195,22 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 .tabs button .tl{display:inline-flex;align-items:center;justify-content:center;min-width:23px;width:auto;padding:0 5px;box-sizing:border-box;height:22px;border-radius:6px;background:#fff;color:var(--red);border:2px solid var(--red);font-family:'JetBrains Mono';font-size:13px;font-weight:800;flex:none}
 .tabs button.on .tl{background:#fff;color:var(--red)}
 .tabs button:not(.on) .tl{background:#fff;color:var(--red)}
+.mdbox{font-size:13px;line-height:1.6;color:var(--ink);overflow-x:auto;padding:4px 2px}
+.mdbox h1{font-size:20px;font-weight:800;margin:18px 0 8px;color:var(--azure)}
+.mdbox h2{font-size:16px;font-weight:800;margin:20px 0 8px;padding-top:12px;border-top:1px solid var(--line);color:var(--ink)}
+.mdbox h3{font-size:14px;font-weight:800;margin:14px 0 6px}
+.mdbox p{margin:6px 0}
+.mdbox ul,.mdbox ol{margin:6px 0;padding-left:22px}
+.mdbox li{margin:3px 0}
+.mdbox code{font-family:'JetBrains Mono';font-size:12px;background:var(--panel2);border:1px solid var(--line2);border-radius:5px;padding:1px 5px}
+.mdbox pre{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;overflow-x:auto}
+.mdbox pre code{border:none;background:none;padding:0}
+.mdbox blockquote{margin:8px 0;padding:6px 12px;border-left:3px solid var(--azure);background:var(--panel2);color:var(--muted)}
+.mdbox table{border-collapse:collapse;width:100%;font-size:12px;margin:10px 0}
+.mdbox th,.mdbox td{border:1px solid var(--line2);padding:5px 8px;text-align:left;vertical-align:top}
+.mdbox th{background:var(--panel2);font-weight:800}
+.mdbox a{color:var(--azure)}
+.mdbox hr{border:none;border-top:1px solid var(--line);margin:14px 0}
 
 /* command */
 .cmd{margin:18px 0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#eef3ff 0%,#f6f8fc 55%,#fdf1e9 100%)}
@@ -1267,6 +1285,13 @@ return null;})()}
 {readMail&&<div onClick={()=>setReadMail(null)} style={{position:"fixed",inset:0,background:"rgba(15,23,42,.45)",backdropFilter:"blur(3px)",zIndex:80,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}><div onClick={e=>e.stopPropagation()} style={{background:"#fff",border:"1px solid var(--line2)",borderRadius:16,width:"96%",maxWidth:820,maxHeight:"90vh",overflow:"auto",padding:24}}><div style={{fontFamily:"'Space Grotesk'",fontWeight:800,fontSize:17,marginBottom:12}}>{TT("E-posta","Email")}</div>{readMail.loading?<div className="empty" style={{padding:26}}><p>{TT("Yükleniyor…","Loading…")}</p></div>:<div><div style={{fontSize:12.5,color:"var(--faint)",marginBottom:10,lineHeight:1.9}}><div><b style={{color:"var(--ink)"}}>{TT("Kimden","From")}:</b> {readMail.from||"—"}</div><div><b style={{color:"var(--ink)"}}>{TT("Konu","Subject")}:</b> {readMail.subject||"—"}</div></div><div style={{whiteSpace:"pre-wrap",fontSize:13,lineHeight:1.6,color:"#111",background:"var(--bg2)",border:"1px solid var(--line2)",borderRadius:10,padding:"14px 16px",maxHeight:"62vh",overflow:"auto"}}>{readMail.body||"—"}</div></div>}<div style={{display:"flex",justifyContent:"flex-end",marginTop:16}}><button onClick={()=>setReadMail(null)} className="btn">{TT("Kapat","Close")}</button></div></div></div>}
 <div style={{marginTop:24,display:'none',gap:12}}><div id="nova-belma" style={{flex:1}}><div style={{fontWeight:700,fontSize:14,marginBottom:8}}>Belma Sigorta Başvurusu</div><textarea placeholder='Notlar, adımlar, başvuru durumu...' style={{width:'100%',minHeight:80,fontSize:12,padding:6,boxSizing:'border-box',background:'var(--bg2)',color:'var(--txt)',border:'1px solid var(--border)',borderRadius:4,resize:'vertical'}}/></div></div></div>);
 }
+function NotlarMD(){
+const[md,setMd]=useState("");const[err,setErr]=useState("");const[ld,setLd]=useState(true);
+const load=useCallback(()=>{setLd(true);setErr("");fetch("QM-NOTLAR.md?t="+Date.now()).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.text();}).then(t=>{setMd(t);setLd(false);}).catch(e=>{setErr(String((e&&e.message)||e));setLd(false);});},[]);
+useEffect(()=>{load();},[load]);
+const html=useMemo(()=>{try{return window.marked?window.marked.parse(md||""):(md||"");}catch(e){return "<pre>"+String(md||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")+"</pre>";}},[md]);
+return <div style={{padding:"8px 0 40px"}}><div className="rules"><div className="rh"><b style={{display:"inline-flex",alignItems:"center",justifyContent:"center",minWidth:24,padding:"1px 7px",marginRight:8,borderRadius:999,background:"#fff",color:"var(--red)",border:"2px solid var(--red)",fontFamily:"'JetBrains Mono'",fontSize:12,fontWeight:800}}>07</b><span style={{fontSize:15,fontWeight:800}}>QM-NOTLAR.md</span><button onClick={load} style={{marginLeft:"auto",fontSize:12,fontWeight:800,color:"var(--azure)",background:"#fff",border:"2px solid var(--azure)",borderRadius:999,padding:"5px 13px",cursor:"pointer"}}>{TT("Yenile","Reload")}</button></div>{ld?<div style={{padding:16,color:"var(--faint)",fontSize:13}}>{TT("Yükleniyor…","Loading…")}</div>:err?<div style={{padding:"12px 14px",border:"2px solid var(--red)",borderRadius:10,background:"#fff5f5",fontSize:12.5,color:"var(--red)",fontWeight:700}}>{TT("Okunamadı","Could not read")}: {err}<div style={{fontSize:11.5,color:"var(--muted)",fontWeight:400,marginTop:6}}>{TT("QM-NOTLAR.md panelle aynı klasörde (GitHub'a push edilmiş) olmalı.","QM-NOTLAR.md must be in the same folder as the panel (pushed to GitHub).")}</div></div>:<div className="mdbox" dangerouslySetInnerHTML={{__html:html}}/>}</div></div>;
+}
 function AlarmingTab({settings,accounts,onRead,onScanAll}){const[readMail,setReadMail]=useState(null);const[scanning,setScanning]=useState(false);
 const showMail=async(obj)=>{setReadMail(obj);if(uiLang==="tr"&&settings.apiKey&&obj&&obj.body){const t=await aiTR(obj.body,settings.apiKey);if(t)setReadMail(m=>({...(m||obj),body:t,trDone:true}));}};
 const alarming=(Array.isArray(settings.alarming)?settings.alarming:[]).slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
@@ -1801,7 +1826,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM486</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM487</b></div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"TR":(lang==="en"?"EN":"اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:"qmpulse 1s infinite"}}/>{TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"":""} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast(""+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -1847,7 +1872,7 @@ return(
 </div></div>
 <div style={{display:"flex",gap:18,alignItems:"center",flexWrap:"wrap",margin:"14px 0 8px"}}>
 <div className="tabs" style={{margin:0,border:"none",gap:0,overflow:"visible"}}>{can("viewOverview")&&<button className={tab==="dash"?"on":""} onClick={()=>setTab("dash")}><b className="tl">0</b> DASHBOARD</button>}</div>
-{tab==="dash"&&can("viewOverview")&&[["alarming","01","ALARMING"],["overview","02","TRADEMARK"],["allviz","03","VISIBILITY"],["roas","04","ROAS"],["policy","05","NEW ETSY POLICY"],["csvsrc","06",TT("CSV KAYNAĞI","CSV SOURCE")]].map(([k,n,lb])=>{const _on=dashView===k;const _big=(k==="csvsrc");return <button key={k} onClick={()=>setDashView(k)} style={{display:"inline-flex",alignItems:"center",fontFamily:"'Space Grotesk'",fontSize:_big?15:13.5,fontWeight:800,textTransform:"lowercase",padding:_big?"5px 12px":"5px 11px",borderRadius:999,cursor:"pointer",border:"2px solid "+(_on?"var(--green)":"rgba(226,59,78,.38)"),background:_on?"var(--green)":"#fff",color:_on?"#fff":"var(--red)"}}><b style={{display:"inline-flex",alignItems:"center",justifyContent:"center",minWidth:20,padding:"1px 5px",marginRight:6,borderRadius:999,background:"#fff",color:"var(--red)",border:"1.5px solid rgba(226,59,78,.4)",fontFamily:"'JetBrains Mono'",fontSize:13,fontWeight:800}}>{n}</b>{lb}</button>;})}
+{tab==="dash"&&can("viewOverview")&&[["alarming","01","ALARMING"],["overview","02","TRADEMARK"],["allviz","03","VISIBILITY"],["roas","04","ROAS"],["policy","05","NEW ETSY POLICY"],["csvsrc","06",TT("CSV KAYNAĞI","CSV SOURCE")],["notlar","07",TT("NOTLAR (MD)","NOTES (MD)")]].map(([k,n,lb])=>{const _on=dashView===k;const _big=(k==="csvsrc");return <button key={k} onClick={()=>setDashView(k)} style={{display:"inline-flex",alignItems:"center",fontFamily:"'Space Grotesk'",fontSize:_big?15:13.5,fontWeight:800,textTransform:"lowercase",padding:_big?"5px 12px":"5px 11px",borderRadius:999,cursor:"pointer",border:"2px solid "+(_on?"var(--green)":"rgba(226,59,78,.38)"),background:_on?"var(--green)":"#fff",color:_on?"#fff":"var(--red)"}}><b style={{display:"inline-flex",alignItems:"center",justifyContent:"center",minWidth:20,padding:"1px 5px",marginRight:6,borderRadius:999,background:"#fff",color:"var(--red)",border:"1.5px solid rgba(226,59,78,.4)",fontFamily:"'JetBrains Mono'",fontSize:13,fontWeight:800}}>{n}</b>{lb}</button>;})}
 </div>
 <div className="tabs">
 <button className={tab==="nova"?"on":""} onClick={()=>setTab("nova")} style={{display:currentRole==="admin"?"":"none"}}><b className="tl">A</b> {TT("NOVA AGENT","NOVA AGENT","نووا ایجنٹ")}</button>
@@ -1887,6 +1912,7 @@ return(
 {dashView==="policy"&&<PolicyTab settings={settings} setSettings={setSettings} accounts={accounts} onRead={readStoreMail} onScanAll={async()=>{const conn=(accounts||[]).filter(a=>a.gmailConnected&&a.email);for(const a of conn){try{await fetchStorePolicy(a);}catch(e){}}}} legalItems={legalItems} legalLoad={legalLoad} legalErr={legalErr} onFetchLegal={fetchLegal} onReadLegal={readLegal}/>}
 {dashView==="roas"&&renderAllRoas()}
 {dashView==="allviz"&&renderAllViz()}
+{dashView==="notlar"&&<NotlarMD/>}
 {dashView==="csvsrc"&&<div style={{padding:"8px 0 40px"}}><div className="rules"><div className="rh"><b style={{display:"inline-flex",alignItems:"center",justifyContent:"center",minWidth:24,padding:"1px 7px",marginRight:8,borderRadius:999,background:"#fff",color:"var(--red)",border:"2px solid var(--red)",fontFamily:"'JetBrains Mono'",fontSize:12,fontWeight:800}}>06</b><span style={{fontSize:15,fontWeight:800}}>{TT("CSV Kaynağı","CSV Source")}</span></div><div style={{fontSize:13,color:"var(--muted)",lineHeight:1.6}}>{TT("Tüm mağazaların Etsy Ads CSV kaynağı buradan yönetilir. 'Veri Çek' ile bağlı mağazaların Gmail'inden Etsy Ads CSV'leri toplu çekilir; ROAS (04) ve Görünürlük (05) bu veriden beslenir.","All stores' Etsy Ads CSV source is managed here. 'Pull Data' fetches Etsy Ads CSVs from connected stores' Gmail; ROAS (04) and Visibility (05) feed from this data.")}</div>
 <div style={{overflowX:"auto",marginTop:12}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:12.5}}><thead><tr style={{textAlign:"left",color:"var(--muted)",fontSize:11}}><th style={{padding:"5px 8px"}}>#</th><th style={{padding:"5px 8px"}}>{TT("KAYNAK","SOURCE")}</th><th style={{padding:"5px 8px"}}>{TT("KATEGORİ","CATEGORY")}</th><th style={{padding:"5px 8px"}}>{TT("RAPOR","REPORT")}</th><th style={{padding:"5px 8px"}}>{TT("TÜR","TYPE")}</th><th style={{padding:"5px 8px"}}>{TT("TÜR 2","TYPE 2")}</th><th style={{padding:"5px 8px"}}>{TT("YÖNTEM","METHOD")}</th><th style={{padding:"5px 8px"}}>{TT("NOT","NOTE")}</th></tr></thead><tbody>{[["1.1","CSV","Marketing","Etsy Ads","Listing","Screenshot","100 listing","LISTING"],["1.2","CSV","Marketing","Etsy Ads","ROAS","Download CSV","","ROAS"],["1.3","CSV","Dashboard","Stats","View All","Download CSV","","REVENUE"],["1.4","CSV","Finances","Activity Summary","","Download CSV","","STATEMENT"]].map((r,i)=>(<tr key={i} style={{borderTop:"1px solid var(--line)"}}><td style={{padding:"5px 8px",fontWeight:800,color:"var(--faint)"}}>{r[0]}</td><td style={{padding:"5px 8px",fontWeight:700}}>{r[1]}</td><td style={{padding:"5px 8px"}}>{r[2]}</td><td style={{padding:"5px 8px"}}>{r[3]}</td><td style={{padding:"5px 8px",fontWeight:700,color:"var(--azure)"}}>{r[4]||"—"}</td><td style={{padding:"5px 8px",fontWeight:700,color:"var(--orange)"}}>{r[7]||"—"}</td><td style={{padding:"5px 8px"}}>{r[5]}</td><td style={{padding:"5px 8px",color:"var(--muted)"}}>{r[6]||""}</td></tr>))}</tbody></table></div></div></div>}
 </div>}
@@ -2372,7 +2398,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=452; /* bu sayi her surumde artar */
+  var CURRENT=487; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
