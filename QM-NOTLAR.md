@@ -14,6 +14,16 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 **Yayın:** GitHub repo `ejderusa-sketch/qm-panel` → https://ejderusa-sketch.github.io/qm-panel/
 **Sahibi:** EJDER — ejderusa@gmail.com
 
+## YETKİLENDİRME (8.1) — KURALLAR & YAPILACAKLAR
+
+Amaç: İçeri giren kişiye (üye/manager) **modül modül** farklı yetkiler vermek. Owner (ejderusa) her şeyi görür.
+
+1. **Yetki kartı DEFAULT AÇIK kalmalı** — ekran/kart kapanmasın (P'ye basınca açılıyor; açık kalsın).
+2. **Modül başlıkları ana NAV başlıklarıyla SENKRON olmalı.** Nav başlıkları değişince (0 DASHBOARD, 1 CSV, 2 ETSY API, 2A SHIPSTATION, 3 FINANCE, 4 TRADEMARK, 5 SHOP MANAGER, 6 KİMLİK, 7 EKİP, 9 ETSY …) yetki grid'i de **aynı** başlık/numaralara dönmeli. **ŞU AN SENKRON DEĞİL** — grid eski başlıkları (1·MARKETING, 4·GÖRÜNÜRLÜK vb.) gösteriyor. Tek kaynak: nav yapısı; PERMS listesi nav ile eşleştirilecek. (Dikkat: `can()`/`TAB_PERM` anahtarları değişince gating bozulmasın — anahtarlar sabit, sadece etiket/numara/grup nav'a uydurulur; yeni tab'lar için yeni perm eklenir.)
+3. Her modülün alt başlıkları (0.1, 1.1, 1.2 …) Aç/Kapalı olarak verilir; **her yerle senkron** çalışır.
+4. **QM mağaza listesi (MAĞAZALAR chips) ŞİMDİLİK yetkilendirmeden KALDIRILDI** — ileride mağaza-bazlı yetki eklenecek.
+5. **NOVA AGENT yetkilendirmenin DIŞINDA** — sadece owner'a ait; hiçbir üye görmez, yetki listesinde çıkmaz. (Zaten `currentRole==="admin"` ile korunuyor, PERMS'te yok.)
+
 ## TRADEMARK / COPYRIGHT / POLİTİKA AYRIMI (02 Dashboard)
 
 Gelen Etsy IP/ihlal e-postaları `fetchStoreTrademark` içinde **otomatik** sınıflanır (`c.type`). Ayrımı e-postanın konu+gövdesindeki anahtar kelimelerden yapar:
