@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM446 · 23 Tem 2026 · HIZ 2: "Hesap hazirlaniyor" ekrani da artik aninda geciliyor — oturum/rol bilgisi onbellege alinip (qm_boot) acilista ANINDA ready oluyor, dogrulama (bootstrap) arka planda. Birakilan sekmeye (qm_tab) aninda donuluyor
      QM445 · 23 Tem 2026 · HIZ: magaza+ayar cihazda onbellege alinip (localStorage qm_accts/qm_settings) acilista ANINDA gosteriliyor, bulut yuklemesi arka planda + paralel (Promise.all). Ikinci acilistan itibaren panel aninda acilir. + Login ekranina "Sifremi unuttum" butonu (resetPasswordForEmail -> e-postaya sifirlama linki)
      QM444 · 23 Tem 2026 · 2A SHIPSTATION siparis gorunumu ShipStation ekrani gibi iki panelli: solda magaza listesi (sipiris sayilariyla, tiklaninca filtre) + sagda siparis tablosu (Yas·Magaza·Alici·Siparis#·Tarih·Urun·SKU·Servis·Adet·Tutar). Cek butonu magazalari da otomatik getirir. Varsayilan gorunum orders
      QM443 · 23 Tem 2026 · DASHBOARD pill numara rozetleri daha da kucultuldu (minWidth 13, fontSize 8, ince cerceve), sayilar siyah
@@ -595,6 +596,7 @@ async function bootstrap(){
     currentStores=(_slot&&_slot.allStores)?"ALL":((_slot&&Array.isArray(_slot.stores))?_slot.stores.slice():[]);
   }
   _shared=null;
+  try{localStorage.setItem("qm_boot",JSON.stringify({a:currentAccountId,r:currentRole,e:currentUserEmail,p:currentPermissions,s:currentStores}));}catch(_){}
   return currentAccountId;
 }
 async function _loadShared(){
@@ -1700,7 +1702,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM445 ☁️</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM446 ☁️</b></div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"⏳":"📷"} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast("📷 "+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -2237,7 +2239,7 @@ const[session,setSession]=useState(undefined);
 const[ready,setReady]=useState(false);
 const[gate,setGate]=useState("checking");
 useEffect(()=>{sb.auth.getSession().then(({data})=>setSession(data.session));const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{currentAccountId=null;_shared=null;setReady(false);setGate("checking");setSession(s)});return()=>sub.subscription.unsubscribe()},[]);
-useEffect(()=>{let ok=true;if(session){bootstrap().then(()=>{if(ok)setReady(true)}).catch(()=>{if(ok)setReady(true)});}return()=>{ok=false}},[session]);
+useEffect(()=>{let ok=true;if(session){try{const _b=JSON.parse(localStorage.getItem("qm_boot")||"null");const _se=((session.user&&session.user.email)||"").toLowerCase();if(_b&&_b.e&&_b.e===_se){currentAccountId=_b.a;currentRole=_b.r;currentUserEmail=_b.e;currentPermissions=_b.p;currentStores=_b.s;setReady(true);}}catch(_){}bootstrap().then(()=>{if(ok)setReady(true)}).catch(()=>{if(ok)setReady(true)});}return()=>{ok=false}},[session]);
 useEffect(()=>{let ok=true;if(session&&ready){(async()=>{const em=(currentUserEmail||"").toLowerCase();if(em===OWNER_EMAIL){if(ok)setGate("ok");return;}try{const list=await accessGet();if(list===null){let _im=false;try{const _r=await sb.from("members").select("email").eq("email",em).limit(1);_im=!!(_r&&_r.data&&_r.data.length);}catch(_m){}if(ok)setGate(_im?"ok":"pending");return;}const me=list.find(x=>(x.email||"").toLowerCase()===em);if(me&&me.status==="approved"){if(ok)setGate("ok");}else if(me&&me.status==="blocked"){if(ok)setGate("blocked");}else{let _isMem=false;try{const _r=await sb.from("members").select("email").eq("email",em).limit(1);_isMem=!!(_r&&_r.data&&_r.data.length);}catch(_m){}if(_isMem){if(ok)setGate("ok");}else{if(!me){try{await accessAddPending(em);}catch(_){}}if(ok)setGate("pending");}}}catch(_){if(ok)setGate("pending");}})();}return()=>{ok=false}},[session,ready]);
 if(session===undefined)return <div id="boot">Yükleniyor…</div>;
 if(!session)return <AuthGate/>;
@@ -2253,7 +2255,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=445; /* bu sayi her surumde artar */
+  var CURRENT=446; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
