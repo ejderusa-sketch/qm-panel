@@ -14,6 +14,18 @@ Ayrı JS/CSS dosyası yok — her şey `index.html` içinde.
 **Yayın:** GitHub repo `ejderusa-sketch/qm-panel` → https://ejderusa-sketch.github.io/qm-panel/
 **Sahibi:** EJDER — ejderusa@gmail.com
 
+## TRADEMARK / COPYRIGHT / POLİTİKA AYRIMI (02 Dashboard)
+
+Gelen Etsy IP/ihlal e-postaları `fetchStoreTrademark` içinde **otomatik** sınıflanır (`c.type`). Ayrımı e-postanın konu+gövdesindeki anahtar kelimelerden yapar:
+- **Trademark** → marka, **®**, **™**, "registration number / reg no", "brand" geçiyorsa.
+- **Copyright** → **DMCA**, "copyright infringement/complaint/claim", **counter-notice**, "telif", "artwork" geçiyorsa.
+- **Politika** → Etsy politika ihlali: "**don't follow our policy**", "trust & safety", "prohibited items", "we removed … policy".
+- **Belirsizse → varsayılan `trademark`** (bu yüzden bazen copyright olması gereken kayıt trademark'a düşebilir, örn. QM32).
+
+Dashboard sütunları buna göre: **02.1 Trademark · 02.2 Copyright · 02.3 Politika** (hepsi `typeOf(c)` → `c.type`).
+
+**YANLIŞ SINIFLANIRSA — elle düzeltme (QM449):** Trademark (4) sekmesinde her kaydın altındaki **"Tür: Trademark / Copyright / Politika"** düğmesine bas (`upC(c.id,"type",...)`). Değişince Dashboard'da doğru sütuna geçer, e-posta/form akışı da (copyright → Etsy Formu, trademark → Email Gönder) türe göre değişir.
+
 ## VERİ GÜVENLİĞİ & PERFORMANS (KRİTİK — 23 Tem 2026)
 
 **Yaşanan sorun:** Sayfadan ayrılıp dönünce sol menüdeki QM mağazaları boş görünüyordu ("bağlı mağaza yok"). Web/veri büyüdükçe artıyordu; açılış çok yavaştı ("Hesap hazırlanıyor" takılıyordu).
