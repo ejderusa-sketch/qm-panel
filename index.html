@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM448 · 23 Tem 2026 · VERI GUVENLIGI: (1) bos/basarisiz bulut okumasi sol menuyu BOSALTMAZ (am.length yoksa mevcut/onbellek kalir), (2) buluta ASLA bos magaza listesi yazilmaz (accounts bos ise store.set atlanir). Boylece DB yavas/bos yanit verse bile magazalar silinemez, onbellekten kendini onarir
      QM447 · 23 Tem 2026 · Onbellek artik HESABA OZEL (qm_accts::email / qm_settings::email) — baska hesabin (or novainnc) bos verisi yanlislikla gorunmuyordu; ejderusa'ya gecince kendi 78 magazasi gelir
      QM446 · 23 Tem 2026 · HIZ 2: "Hesap hazirlaniyor" ekrani da artik aninda geciliyor — oturum/rol bilgisi onbellege alinip (qm_boot) acilista ANINDA ready oluyor, dogrulama (bootstrap) arka planda. Birakilan sekmeye (qm_tab) aninda donuluyor
      QM445 · 23 Tem 2026 · HIZ: magaza+ayar cihazda onbellege alinip (localStorage qm_accts/qm_settings) acilista ANINDA gosteriliyor, bulut yuklemesi arka planda + paralel (Promise.all). Ikinci acilistan itibaren panel aninda acilir. + Login ekranina "Sifremi unuttum" butonu (resetPasswordForEmail -> e-postaya sifirlama linki)
@@ -1388,7 +1389,7 @@ const [a,s,d]=await Promise.all([store.get("q:a",[]),store.get("q:s",DS),store.g
 const dmSaved=(d&&d.__v===2)?(d.dm||{}):(d||{});
 const accSaved=(d&&d.__v===2&&Array.isArray(d.accts))?d.accts:(Array.isArray(a)?a:[]);
 const am=accSaved.filter(x=>x&&x.id&&!DEMO_IDS.has(x.id));
-setAccounts(am);setAct((()=>{try{const _sv=localStorage.getItem("qm_act");if(_sv&&am.some(x=>x.id===_sv))return _sv;}catch(e){}return (am[0]&&am[0].id)||null;})());
+if(am.length){setAccounts(am);setAct((()=>{try{const _sv=localStorage.getItem("qm_act");if(_sv&&am.some(x=>x.id===_sv))return _sv;}catch(e){}return (am[0]&&am[0].id)||null;})());}
 const sr=s&&s.rules;
 const rules=(s&&s.rulesV===5&&Array.isArray(sr))?sr:DS.rules;
 const savedW=(s&&Array.isArray(s.warnings))?s.warnings:DS.warnings;
@@ -1398,9 +1399,9 @@ const dzChecks=[...savedD];for(const dd of DS.dzChecks){const ex=dzChecks.find(c
 const trendTopics=(s&&Array.isArray(s.trendTopics))?s.trendTopics:DS.trendTopics;
 setSettings({...DS,...s,rules,warnings,dzChecks,trendTopics,...((s&&s.rulesV===5)?{}:{minImp:1000,minClicks:30})});
 const mig={};Object.keys(dmSaved||{}).forEach(k=>{if(k.startsWith("V::")){mig[k]=dmSaved[k];return;}const md=k.match(/^(.+)\|(\d{4})-(\d{2})-\d{2}$/);if(md){const nk=md[1]+"|"+md[2]+"-"+md[3];if((dmSaved[k]||[]).length>=((mig[nk]||[]).length))mig[nk]=dmSaved[k];return;}if(/\|\d{4}-\d{2}$/.test(k)){mig[k]=dmSaved[k];}});
-const _sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");Object.keys(mig).forEach(k=>{if(k.startsWith("V::"))return;const arr=mig[k]||[];const seen=new Set();const out=[];for(const r of arr){const sg=_sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);}}mig[k]=out;});try{const _ce=(currentUserEmail||"");localStorage.setItem("qm_accts::"+_ce,JSON.stringify(am));localStorage.setItem("qm_settings::"+_ce,JSON.stringify({...DS,...s,rules,warnings,dzChecks,trendTopics}));}catch(_){}setDm(mig);setLoaded(true)})()},[]);
+const _sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");Object.keys(mig).forEach(k=>{if(k.startsWith("V::"))return;const arr=mig[k]||[];const seen=new Set();const out=[];for(const r of arr){const sg=_sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);}}mig[k]=out;});try{const _ce=(currentUserEmail||"");if(am.length)localStorage.setItem("qm_accts::"+_ce,JSON.stringify(am));localStorage.setItem("qm_settings::"+_ce,JSON.stringify({...DS,...s,rules,warnings,dzChecks,trendTopics}));}catch(_){}setDm(mig);setLoaded(true)})()},[]);
 
-useEffect(()=>{if(!loaded)return;try{localStorage.setItem("qm_accts::"+(currentUserEmail||""),JSON.stringify(accounts));}catch(_){}if(skipSave.current){skipSave.current=false;return;}const t=setTimeout(async()=>{const err=await store.set("q:d",{__v:2,dm,accts:accounts});if(err)setToast("⚠ Buluta kaydedilemedi: "+(err.message||err.hint||err.code||JSON.stringify(err)).slice(0,120));},600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
+useEffect(()=>{if(!loaded)return;try{localStorage.setItem("qm_accts::"+(currentUserEmail||""),JSON.stringify(accounts));}catch(_){}if(skipSave.current){skipSave.current=false;return;}const t=setTimeout(async()=>{if(!accounts.length)return;const err=await store.set("q:d",{__v:2,dm,accts:accounts});if(err)setToast("⚠ Buluta kaydedilemedi: "+(err.message||err.hint||err.code||JSON.stringify(err)).slice(0,120));},600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
 useEffect(()=>{if(!loaded)return;try{localStorage.setItem("qm_settings::"+(currentUserEmail||""),JSON.stringify(settings));}catch(_){}const t=setTimeout(()=>store.set("q:s",settings),600);return()=>clearTimeout(t)},[settings,loaded]);
 
 const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
@@ -1703,7 +1704,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM447 ☁️</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM448 ☁️</b></div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"⏳":"📷"} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast("📷 "+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -2256,7 +2257,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=447; /* bu sayi her surumde artar */
+  var CURRENT=448; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
