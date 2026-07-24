@@ -143,8 +143,9 @@ Ayrıca bu dosyanın "SÜRÜM GEÇMİŞİ" tablosuna satır eklenir.
 1. Claude `~/Documents/qm-panel/index.html` dosyasını doğrudan düzenler.
 2. Sürüm numarasını artırır, geçmişe not düşer.
 3. Değişiklikten sonra JSX'i Babel ile derleyip sözdizimi hatası olmadığını doğrular.
-4. EJDER dosyayı GitHub'da `index.html` üzerine yükleyip commit eder.
-5. Paneli `?v=qm3xx` ile açar (tarayıcı önbelleğini atlatmak için).
+4. **HER İŞ BİTİNCE CLAUDE COMMIT ATAR (ZORUNLU).** İş tamamlandığında Claude kendisi `git add -A && git commit -m "QM4xx"` yapar — EJDER'in ayrıca commit atmasını beklemez. Böylece her adım repoda kayıtlı kalır ve geri alınabilir. (Push/yayına alma: EJDER `YAYINLA.command`'a çift tıklar ya da Claude'a "yayınla" der; push public içerik olduğu için Claude her seferinde onay ister.)
+5. Commit mesajı = sürüm numarası (örn. `QM487`).
+6. EJDER paneli `?v=qm4xx` ile açıp doğrular (tarayıcı önbelleğini atlatmak için).
 
 ## KOD YAPISI — ÖNEMLİ YERLER
 
