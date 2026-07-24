@@ -23,6 +23,7 @@ Amaç: İçeri giren kişiye (üye/manager) **modül modül** farklı yetkiler v
 3. Her modülün alt başlıkları (0.1, 1.1, 1.2 …) Aç/Kapalı olarak verilir; **her yerle senkron** çalışır.
 4. **QM mağaza listesi (MAĞAZALAR chips) ŞİMDİLİK yetkilendirmeden KALDIRILDI** — ileride mağaza-bazlı yetki eklenecek.
 5. **NOVA AGENT yetkilendirmenin DIŞINDA** — sadece owner'a ait; hiçbir üye görmez, yetki listesinde çıkmaz. (Zaten `currentRole==="admin"` ile korunuyor, PERMS'te yok.)
+6. **İÇERİ GİREN, OWNER ÇIKARANA KADAR İÇERDE KALIR (ZORUNLU).** Onaylanmış üye/arkadaş **asla otomatik silinmez/çıkarılmaz** — sadece owner elle "erişimi kaldır" derse çıkar. Üye listesi (`settings.mgrList`) + erişim (`shared_state.accessList` + `members` tablosu) **boş okuma/hata durumunda ASLA ezilmez** (QM452 koruması). Bir üye kaybolduysa DB krizinden olmuştur; erişim genelde `accessList`/`members`'ta durur → owner verisi düzgün yüklenince geri gelir.
 
 ## TRADEMARK / COPYRIGHT / POLİTİKA AYRIMI (02 Dashboard)
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM452 · 23 Tem 2026 · UYE KORUMASI: onaylanmis uye/arkadas listesi (mgrList) artik bos yazilip SILINEMEZ (_mgrGuardLen — gorulen en yuksek uye sayisindan sonra bos yazma bloklanir). DB krizi/bos okuma uyeleri silmez. Kural: iceri giren owner cikarana kadar kalir
      QM451 · 23 Tem 2026 · Yetkilendirme (8.1): QM magaza listesi karttan kaldirildi (magaza-bazli yetki simdilik kapali → onayli herkes tum magazalari gorur, bootstrap currentStores="ALL"). Yeni yetki karti ACIK gelir. NOVA AGENT zaten owner'a ozel/yetki listesinde yok. (Modul basliklarini nav ile tam senkronlama ayri is — MD'de spec)
      QM450 · 23 Tem 2026 · Gorunurluk Dagilimi (1.3.1) tepesine "Apron / Onluk" ayri karti (turuncu, ayri yuzde) — CATS'e apron kategorisi eklendi (\bapron), Embroidery + Apron + Other uc kart
      QM449 · 23 Tem 2026 · Trademark (4) sekmesinde her kaydin altina "Tur: Trademark/Copyright/Politika" degistirme dugmesi (upC type) — yanlis siniflanan (or QM32) tek tikla duzeltilir, Dashboard'da dogru sutuna gecer
@@ -500,6 +501,7 @@ const DEFAULT_GCID="507868834696-m1gnrlcu7ba620knq4ck1cj58fs5qu97.apps.googleuse
 const STORE_COLORS=["#ef6606","#1f7ae0","#0f9d63","#8b5cf6","#e11d48","#0891b2","#d97706","#db2777","#4f46e5","#16a34a","#0284c7","#dc2626","#7c3aed","#ca8a04","#059669"];
 const COLMAP={"q:a":"accounts","q:s":"settings","q:d":"data"};
 let _shared=null, currentAccountId=null, currentRole=null, currentPermissions=null, currentUserEmail=null, currentStores="ALL";
+let _mgrGuardLen=0; /* gorulen en yuksek uye sayisi — boş yazip uyeleri silmeyi engeller */
 /* İzinler: admin/owner => hepsi (currentPermissions=null); üye => kendi permissions jsonb */
 const PERMS=[
  {key:"viewOverview",code:"0.1",group:"0 · Dashboard",tr:"Dashboard görüntüle",en:"View Dashboard"},
@@ -1405,7 +1407,7 @@ const mig={};Object.keys(dmSaved||{}).forEach(k=>{if(k.startsWith("V::")){mig[k]
 const _sig=r=>[r.name||"",toNum(r.impressions),toNum(r.clicks),toNum(r.spend),toNum(r.revenue),toNum(r.orders)].join("|");Object.keys(mig).forEach(k=>{if(k.startsWith("V::"))return;const arr=mig[k]||[];const seen=new Set();const out=[];for(const r of arr){const sg=_sig(r);if(!seen.has(sg)){seen.add(sg);out.push(r);}}mig[k]=out;});try{const _ce=(currentUserEmail||"");if(am.length)localStorage.setItem("qm_accts::"+_ce,JSON.stringify(am));localStorage.setItem("qm_settings::"+_ce,JSON.stringify({...DS,...s,rules,warnings,dzChecks,trendTopics}));}catch(_){}setDm(mig);setLoaded(true)})()},[]);
 
 useEffect(()=>{if(!loaded)return;try{localStorage.setItem("qm_accts::"+(currentUserEmail||""),JSON.stringify(accounts));}catch(_){}if(skipSave.current){skipSave.current=false;return;}const t=setTimeout(async()=>{if(!accounts.length)return;const err=await store.set("q:d",{__v:2,dm,accts:accounts});if(err)setToast("⚠ Buluta kaydedilemedi: "+(err.message||err.hint||err.code||JSON.stringify(err)).slice(0,120));},600);return()=>clearTimeout(t)},[accounts,dm,loaded]);
-useEffect(()=>{if(!loaded)return;try{localStorage.setItem("qm_settings::"+(currentUserEmail||""),JSON.stringify(settings));}catch(_){}const t=setTimeout(()=>store.set("q:s",settings),600);return()=>clearTimeout(t)},[settings,loaded]);
+useEffect(()=>{if(!loaded)return;const _ml=(Array.isArray(settings.mgrList)?settings.mgrList.length:0);if(_ml>_mgrGuardLen)_mgrGuardLen=_ml;const _wipe=(_mgrGuardLen>0&&_ml===0);if(!_wipe){try{localStorage.setItem("qm_settings::"+(currentUserEmail||""),JSON.stringify(settings));}catch(_){}}const t=setTimeout(()=>{if(!_wipe)store.set("q:s",settings);},600);return()=>clearTimeout(t)},[settings,loaded]);
 
 const flash=m=>{setToast(m);clearTimeout(tRef.current);tRef.current=setTimeout(()=>setToast(""),2200)};
 const setRows=n=>setDm(m=>({...m,[key]:typeof n==="function"?n(m[key]||[]):n}));
@@ -1708,7 +1710,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM451 ☁️</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM452 ☁️</b></div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"🇹🇷 TR":(lang==="en"?"🇬🇧 EN":"🇵🇰 اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:"qmpulse 1s infinite"}}/>🔄 {TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"⏳":"📷"} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast("📷 "+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -2261,7 +2263,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=451; /* bu sayi her surumde artar */
+  var CURRENT=452; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
