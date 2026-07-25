@@ -207,6 +207,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM520 | 24 Tem 2026 | **PANDORA = kalıcı müşteri deposu.** NOVA'daki PANDORA sekmesi ShipStation müşterilerini (`ssCounts`, prop) **eyalete göre** gruplar: sol tablo eyalet (A→Z, tam ABD adı) + müşteri sayısı + TOPLAM; eyalete tıklayınca sağda o eyaletin müşterileri (email+isim+adres); en altta **büyük TOPLAM rakamı**. "Senkronize Et" → `ssFetchCounts` (tüm geçmiş). Veri kalıcı (ssCounts localStorage) |
 | QM519 | 24 Tem 2026 | **ShipStation verisi kalıcı**: `ssStores`/`ssOrders`/`ssCounts` artık localStorage'a yazılıyor (`qm_ss_stores`/`qm_ss_orders`/`qm_ss_counts`), açılışta geri yükleniyor. Eskiden `useState(null)` idi → yenileyince kayboluyordu. `ssCounts` kaydederken küçültülüyor (orderDate/email/username/shipTo/storeId). **Kural MD'ye kalın yazıldı: çekilen/senkronlanan HER veri kalıcı olmalı** |
 | QM518 | 24 Tem 2026 | CSV pill satırına (1.1 Listing · 1.2 ROAS · 1.3 Revenue · 1.4 Statement) **"↻ Yenile" butonu** eklendi (`reloadCloud` — veriyi buluttan yeniden yükler) |
 | QM517 | 24 Tem 2026 | NOVA: Scan All + period (3g/7g/30g) satırı artık **sadece BOX aktifken** görünür. **BOX yanında yeni PANDORA sekmesi** (`view="pandora"`, şu an boş yer tutucu — içerik bekliyor) |
