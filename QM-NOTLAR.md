@@ -73,6 +73,8 @@ Dashboard sütunları buna göre: **02.1 Trademark · 02.2 Copyright · 02.3 Pol
 
 **ZORUNLU KURAL (yeni kod):** Bulut okuma/yazma eklerken: **boş/başarısız okumada mevcut veriyi EZME; boş listeyi buluta YAZMA.** Compute Nano'ya düşerse Micro'ya çek (ücretsiz).
 
+**⛔ EN ÖNEMLİ KURAL — ÇEKİLEN/SENKRONLANAN HER VERİ KALICI OLMALI (QM519):** Kullanıcının "Çek / Senkron / Pull" ile getirdiği HİÇBİR veri sayfa değişince ya da yenilenince KAYBOLMAZ. Yeni bir veri kaynağı/state eklerken (`useState`) MUTLAKA localStorage'a (gerekirse buluta) kalıcılaştır — açılışta oradan yükle. `useState(null)`/`useState([])` bırakıp "çekince gelir" DEME; çekilen veri kalıcı yazılmalı. Örnekler: `dm` (CSV/Ads → `qm_dm::email`), ShipStation `ssStores`/`ssOrders`/`ssCounts` (→ `qm_ss_stores`/`qm_ss_orders`/`qm_ss_counts`, ssCounts küçültülerek). **Yeni "çek" özelliği = yeni kalıcılık.**
+
 **ÇEKİLEN VERİ KALICI OLMALI — ASLA HER SAYFADA YENİDEN ÇEKİLMEZ (ZORUNLU, QM492):** Bir kez çekilen veri (CSV/Ads/ROAS/Görünürlük = `dm`, mağazalar, ayarlar) **sitenin her yerinde durur**; sayfa/sekme değişince ya da tarayıcı yenilenince **kaybolmaz, yeniden çekilmez**. Mekanizma: `dm` artık **localStorage'a** da cache'lenir (`qm_dm::email`) — açılışta anında oradan gösterilir, bulut (Supabase `q:d`) arka planda gelince güncellenir. **Bulut boş/yavaş dönerse mevcut dm EZİLMEZ** (`setDm(prev=> mig varsa mig, yoksa prev)`). Yeni bir veri türü eklerken de aynı kural: önce localStorage cache → sonra bulut; boş okuma mevcut veriyi silmez. Kullanıcı "Veri Çek"e sadece **yeni** veri için basar, gördüğünü tekrar çekmek için değil.
 
 ## CSV'LER (ÇOK ÖNEMLİ — KARIŞTIRMA)
@@ -205,6 +207,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM519 | 24 Tem 2026 | **ShipStation verisi kalıcı**: `ssStores`/`ssOrders`/`ssCounts` artık localStorage'a yazılıyor (`qm_ss_stores`/`qm_ss_orders`/`qm_ss_counts`), açılışta geri yükleniyor. Eskiden `useState(null)` idi → yenileyince kayboluyordu. `ssCounts` kaydederken küçültülüyor (orderDate/email/username/shipTo/storeId). **Kural MD'ye kalın yazıldı: çekilen/senkronlanan HER veri kalıcı olmalı** |
 | QM518 | 24 Tem 2026 | CSV pill satırına (1.1 Listing · 1.2 ROAS · 1.3 Revenue · 1.4 Statement) **"↻ Yenile" butonu** eklendi (`reloadCloud` — veriyi buluttan yeniden yükler) |
 | QM517 | 24 Tem 2026 | NOVA: Scan All + period (3g/7g/30g) satırı artık **sadece BOX aktifken** görünür. **BOX yanında yeni PANDORA sekmesi** (`view="pandora"`, şu an boş yer tutucu — içerik bekliyor) |
 | QM516 | 24 Tem 2026 | NOVA AGENT: **"TÜMÜ/ALL" sekmesi → "BOX"**. A1/A2/A3/A4 sekmeleri artık **sadece BOX aktifken** görünür (`{isAll&&<Fragment>…}`); BOX'a basınca açılır, tekil kutudayken gizli. CONNECTED INBOXES + Scan All zaten BOX'a bağlıydı. Gezinme: BOX → alt kutular |
