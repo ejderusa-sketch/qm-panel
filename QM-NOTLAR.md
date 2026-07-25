@@ -15,6 +15,8 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 4. **GİZLİLİK (kritik):** `ejderusa`ya giren normal kullanıcılar bu **ana paneli / novainnc'yi ASLA bilmemeli/görmemeli.** Ana panel gizli kalacak.
 5. **NOVA AGENT → özel NOVA PANELİ'ne taşınacak.** Orası daha şahsi/özel olacak (ejderusa'nın altında değil, ayrı/gizli).
 
+**DURUM:** **Faz 1 YAPILDI (QM525)** — `SUPER_OWNER="novainnc@gmail.com"`, `_isOwner()` yardımcısı; novainnc gizli süper-owner olarak ejderusa panelini tam yetkiyle görür, gate'e takılmaz, "SÜPER" rozeti (sadece novainnc). **Faz 2 BEKLİYOR:** (a) süper-admin'e özel gizli "Panel Değiştir" düğmesi (novainnc ↔ ejderusa ↔ NOVA), (b) NOVA AGENT'ın ayrı/özel NOVA paneline taşınması.
+
 **Not:** Bu, auth + erişim kontrolü + gizlilik içeren büyük, çok-adımlı bir değişiklik. Mevcut owner `OWNER_EMAIL="ejderusa@gmail.com"` sabiti ve yetki modeli (currentRole/PERMS) buna göre genişletilecek. Yaparken: novainnc süper-owner tanımı, hesap-geçiş (impersonate/switch) mekanizması, ana panelin ejderusa kullanıcılarından gizlenmesi. **EJDER onay verince adım adım kurulacak.**
 
 ---
@@ -225,6 +227,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM525 | 24 Tem 2026 | **SÜPER-OWNER FAZ 1:** `SUPER_OWNER="novainnc@gmail.com"`. novainnc = **gizli süper-owner**: ejderusa workspace'ini tam yetkiyle (admin, Nova dâhil) görür, gate'e takılmaz, kimse görmez. `_isOwner()` yardımcısı (OWNER_EMAIL∥SUPER_OWNER); owner kontrolleri buna çevrildi (ejderusa korunur). Sadece novainnc'ye yeşil **SÜPER** rozeti. **Faz 2 bekliyor:** panel-geçiş düğmeleri + NOVA panelinin ayrılması |
 | QM524 | 24 Tem 2026 | **PANDORA müşterileri buluta kalıcı**: `ssCounts`'tan tekrarsız müşteri listesi (email/isim/eyalet/adres) → `settings.pandoraCustomers` → **Supabase bulut** + localStorage. Boşla EZMEZ. PANDORA önce `pandoraDb` (bulut), yoksa ssCounts kullanır → yenilense/cihaz değişse bile müşteriler durur |
 | QM523 | 24 Tem 2026 | **MALİYET DÜŞÜRME:** (1) OCR sistem promptuna **prompt caching** (`cache_control` ephemeral) — her görüntüde tekrarlanan dev prompt %90 ucuza (en büyük kalem). (2) Çeviri (aiTR) + özet/trend **Haiku**'ya (`claude-haiku-4-5-20251001`). (3) Sohbet max 8000→3000, OCR 4000→2500. Görsel veri çıkarma + legal Sonnet kaldı (kalite). Model stringi sorun çıkarırsa geri al |
 | QM522 | 24 Tem 2026 | PANDORA tablosu **sıralanabilir**: EYALET / MÜŞTERİ başlığına tıklayınca sıralar (büyükten küçüğe / A-Z, ▼▲). Varsayılan MÜŞTERİ çok→az (`pSort`). Canlı sayaç senkron sırasında artar (QM521) |
