@@ -190,6 +190,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM498 | 24 Tem 2026 | LISTING MARKETING (1.1) alt pilleri **1.1.2 ↔ 1.1.5 yer değiştirdi**: artık 1.1.2 ROAS · 1.1.5 Reklam Payı (Ad Share). Numaralar sıralı kaldı, içerik + alt sekme numaraları (1.1.2.x / 1.1.5.x) takas edildi. Key'ler (a3/roas) sabit → veri/gating bozulmadı |
 | QM497 | 24 Tem 2026 | 05 CSV KAYNAĞI tablosu başlıkları **adım numaralandı**: KAYNAK=1.ADIM · KATEGORİ=2.ADIM · RAPOR=3.ADIM · TÜR=4.ADIM (süreç adımları gibi). TÜR 2/YÖNTEM/NOT aynı kaldı |
 | QM496 | 24 Tem 2026 | 06 ETSY içindeki **06.1 / 06.2 artık yan yana pill (toggle)**: hangisine basılırsa onun içeriği altta görünür, diğeri gizli. PolicyTab'a `pv` state ("live"/"emails"); azure hap + kırmızı numara rozeti; kartlar `display` ile açılır/gizlenir |
 | QM495 | 24 Tem 2026 | **"DEVAMLI SENKRON" HİSSİ DÜZELTİLDİ.** (1) Senkron noktası artık **yalnız gerçekten senkron olurken** yanıp söner (eskiden `qmpulse 1s infinite` hep çalışıyordu → hep senkronize sanılıyordu; artık `animation:syncing?...:"none"`). (2) Owner erişim-kontrol interval'i **20sn → 60sn**. **KURAL:** Otomatik/sürekli senkron YOK — ağır çekmeler yalnız kullanıcı Senkron/Pull butonuna basınca. Canlıda hâlâ sürüyorsa fix'ler **push edilmemiştir** (YAYINLA gerekir) |
