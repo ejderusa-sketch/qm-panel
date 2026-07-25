@@ -207,6 +207,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM524 | 24 Tem 2026 | **PANDORA müşterileri buluta kalıcı**: `ssCounts`'tan tekrarsız müşteri listesi (email/isim/eyalet/adres) → `settings.pandoraCustomers` → **Supabase bulut** + localStorage. Boşla EZMEZ. PANDORA önce `pandoraDb` (bulut), yoksa ssCounts kullanır → yenilense/cihaz değişse bile müşteriler durur |
 | QM523 | 24 Tem 2026 | **MALİYET DÜŞÜRME:** (1) OCR sistem promptuna **prompt caching** (`cache_control` ephemeral) — her görüntüde tekrarlanan dev prompt %90 ucuza (en büyük kalem). (2) Çeviri (aiTR) + özet/trend **Haiku**'ya (`claude-haiku-4-5-20251001`). (3) Sohbet max 8000→3000, OCR 4000→2500. Görsel veri çıkarma + legal Sonnet kaldı (kalite). Model stringi sorun çıkarırsa geri al |
 | QM522 | 24 Tem 2026 | PANDORA tablosu **sıralanabilir**: EYALET / MÜŞTERİ başlığına tıklayınca sıralar (büyükten küçüğe / A-Z, ▼▲). Varsayılan MÜŞTERİ çok→az (`pSort`). Canlı sayaç senkron sırasında artar (QM521) |
 | QM521 | 24 Tem 2026 | PANDORA/ShipStation teşhis: `ssFetchCounts` her sayfada `ssCounts`'u **canlı günceller** (sayaç 0'da kalmaz, ilerleme görünür). `ssErr` NOVA'ya prop → PANDORA'da **kırmızı hata kutusu** (ShipStation veri getirmezse sebep görünür). Not: SS_API_KEY/SS_API_SECRET Supabase secrets'ta TANIMLI — sorun eksik anahtar değil |
