@@ -188,6 +188,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM491 | 24 Tem 2026 | DASHBOARD 06 pill adı **"NEW ETSY POLICY" → "ETSY"**. İç bölümler 6'nın altına alındı: 03.1/03.2 → **06.1 (Etsy Policy — Canlı Kaynak)** / **06.2 (Etsy Policy — E-postalar)** |
 | QM490 | 24 Tem 2026 | DASHBOARD pilleri **05 ↔ 06 yer değiştirdi**: 05 CSV KAYNAĞI (`csvsrc`) · 06 NEW ETSY POLICY (`policy`). Numaralar sıralı kaldı, içerik takas edildi |
 | QM489 | 24 Tem 2026 | **GİRİŞ DONMA KORUMASI.** Gate (yetki kontrol) Supabase sorgularına **7sn zaman aşımı + 3 kez tekrar** eklendi (`wt()` = Promise.race timeout; `accessGet`, `members`, `accessAddPending` sarıldı). DB asılırsa artık sonsuz "Yetki kontrol ediliyor" ekranında donmuyor; **"Bağlantı yavaş — Yeniden Dene"** ekranı çıkıyor (`gate==="retry"`, `gateTry` sayacı butona basınca kontrolü yeniden tetikler). NOT: kök sebep genelde Supabase compute (Nano→Micro) veya proje uykuda — bunu Supabase panelinden düzelt |
 | QM488 | 24 Tem 2026 | **YETKİLENDİRME KALDIRILDI.** Linkle içeri giren onaylı her üye **NOVA AGENT hariç TÜM yetkilere** sahip (bootstrap'ta `currentPermissions=null`). Nova zaten `currentRole==="admin"` ile korunur → üye göremez. `manageTeam` de açık olduğundan **üye başkasını onaylayıp içeri alabilir**. 8.1'deki granüler modül seçimi (P/all) işlevsiz kaldı; açıklama notu güncellendi. Owner (ejderusa) her zaman admin=tüm yetki + Nova |
