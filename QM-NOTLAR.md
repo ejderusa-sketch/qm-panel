@@ -207,6 +207,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM523 | 24 Tem 2026 | **MALİYET DÜŞÜRME:** (1) OCR sistem promptuna **prompt caching** (`cache_control` ephemeral) — her görüntüde tekrarlanan dev prompt %90 ucuza (en büyük kalem). (2) Çeviri (aiTR) + özet/trend **Haiku**'ya (`claude-haiku-4-5-20251001`). (3) Sohbet max 8000→3000, OCR 4000→2500. Görsel veri çıkarma + legal Sonnet kaldı (kalite). Model stringi sorun çıkarırsa geri al |
 | QM522 | 24 Tem 2026 | PANDORA tablosu **sıralanabilir**: EYALET / MÜŞTERİ başlığına tıklayınca sıralar (büyükten küçüğe / A-Z, ▼▲). Varsayılan MÜŞTERİ çok→az (`pSort`). Canlı sayaç senkron sırasında artar (QM521) |
 | QM521 | 24 Tem 2026 | PANDORA/ShipStation teşhis: `ssFetchCounts` her sayfada `ssCounts`'u **canlı günceller** (sayaç 0'da kalmaz, ilerleme görünür). `ssErr` NOVA'ya prop → PANDORA'da **kırmızı hata kutusu** (ShipStation veri getirmezse sebep görünür). Not: SS_API_KEY/SS_API_SECRET Supabase secrets'ta TANIMLI — sorun eksik anahtar değil |
 | QM520 | 24 Tem 2026 | **PANDORA = kalıcı müşteri deposu.** NOVA'daki PANDORA sekmesi ShipStation müşterilerini (`ssCounts`, prop) **eyalete göre** gruplar: sol tablo eyalet (A→Z, tam ABD adı) + müşteri sayısı + TOPLAM; eyalete tıklayınca sağda o eyaletin müşterileri (email+isim+adres); en altta **büyük TOPLAM rakamı**. "Senkronize Et" → `ssFetchCounts` (tüm geçmiş). Veri kalıcı (ssCounts localStorage) |
