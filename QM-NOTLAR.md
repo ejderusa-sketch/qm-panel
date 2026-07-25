@@ -5,6 +5,20 @@
 
 ---
 
+## 🔒 PLANLANAN: ÇOK-PANELLİ / GİZLİ SÜPER-ADMİN MİMARİSİ (EJDER'in isteği, henüz YAPILMADI)
+
+EJDER'in tarif ettiği yeni yapı — kurulacak:
+
+1. **Süper-owner = `novainnc@gmail.com`.** Ayrı bir **ANA PANEL** olacak; EJDER buraya `novainnc@gmail.com` ile girer. Bu hesap en üst yetkili (owner + süper-admin), **her yere** girebilir.
+2. **Panel/hesap geçişi:** Ana panelden (novainnc) → **ejderusa@gmail.com** paneline geçebilmeli; ejderusa'dan → **NOVA paneline** geçebilmeli. Yani hesaplar/paneller arası geçiş (workspace switch).
+3. **novainnc her yetkiye sahip** — ejderusa dâhil tüm panellere girer.
+4. **GİZLİLİK (kritik):** `ejderusa`ya giren normal kullanıcılar bu **ana paneli / novainnc'yi ASLA bilmemeli/görmemeli.** Ana panel gizli kalacak.
+5. **NOVA AGENT → özel NOVA PANELİ'ne taşınacak.** Orası daha şahsi/özel olacak (ejderusa'nın altında değil, ayrı/gizli).
+
+**Not:** Bu, auth + erişim kontrolü + gizlilik içeren büyük, çok-adımlı bir değişiklik. Mevcut owner `OWNER_EMAIL="ejderusa@gmail.com"` sabiti ve yetki modeli (currentRole/PERMS) buna göre genişletilecek. Yaparken: novainnc süper-owner tanımı, hesap-geçiş (impersonate/switch) mekanizması, ana panelin ejderusa kullanıcılarından gizlenmesi. **EJDER onay verince adım adım kurulacak.**
+
+---
+
 ## 24 TEMMUZ 2026 OTURUM ÖZETİ (QM487 → QM512)
 
 Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
