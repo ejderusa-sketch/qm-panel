@@ -190,6 +190,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM502 | 24 Tem 2026 | **6 IDENTITY / KİMLİK** nav sekmesi kaldırıldı (buton çıkarıldı; `zidentity` içerik/izin kodu duruyor ama nav'dan erişilmiyor) |
 | QM501 | 24 Tem 2026 | CSV/LISTING MARKETING pilleri **daha ince + küçük**: gövde font 14→12 / mkSub 13→11, padding küçültüldü, çerçeve 2px→1.5px; numara rozeti minWidth 20→16, font 13→10.5 |
 | QM500 | 24 Tem 2026 | AYARLAR alt sekmeleri (8.1–8.6, 9) **dashboard pill formatına** çevrildi (`.tabs` → `.tabs.pill`): kırmızı çerçeveli hap + kırmızı numara rozeti, aktif=yeşil. Artık tüm sekme/alt sekme haplarının standardı aynı |
 | QM499 | 24 Tem 2026 | CSV / LISTING MARKETING pilleri **mavi → kırmızı/yeşil** (dashboard formatı): `csvView` (1.1–1.4), `_mk` (1.1.1), `_grpBtn` (1.1.2–1.1.5), `_mkSub` alt sekmeler. Pasif=kırmızı çerçeve/yazı, aktif=yeşil dolgu beyaz yazı; numara rozeti kırmızı. **Not:** panelde alt sekme haplarının yeni standart rengi artık kırmızı/yeşil (mavi/azure değil) |
