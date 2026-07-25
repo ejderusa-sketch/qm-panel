@@ -16,6 +16,10 @@ Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
 - **Yeni özellikler:** 06.3 **TREND** (yapay zekâ Etsy trend radarı, kalıcı — QM506); ShipStation **2.4 Müşteriler** (tekrarsız email+adres+sayı — QM507).
 - **Yetkilendirme kaldırıldı** (QM488): onaylı üye Nova hariç tüm yetkiler + başkasını içeri alabilir. Giriş donma koruması (timeout+retry, QM489).
 - **Altyapı:** ShipStation **edge function Supabase'e deploy edildi** (orderStatus=any hatası giderildi) → 2.3/2.4 çalışır. **Kural: edge function değişince Supabase → Edge Functions → shipstation → Code → Deploy updates.**
+- **ShipStation & PANDORA (QM505–524):** ShipStation edge function Supabase'e **deploy edildi** (orderStatus=any hatası giderildi); 12 ay sınırı kalktı → **tüm geçmiş** çekilir. Yeni **2.4 Müşteriler** (tekrarsız email+adres+sayı) ve **PANDORA** (NOVA'da, BOX yanında) = ABD **eyaletine göre** gruplu tekrarsız müşteri deposu; **sıralanabilir** (büyükten küçüğe / A-Z, başlığa tıkla), TOPLAM + büyük rakam, canlı sayaç, Senkronize Et butonu. Müşteri listesi `settings.pandoraCustomers` ile **Supabase buluta** kalıcı yazılır.
+- **⛔ EN KRİTİK KURAL — veri kalıcılığı:** çekilen/senkronlanan HER veri (dm, ssStores/ssOrders/ssCounts, pandoraCustomers) localStorage'a + gerekirse buluta kalıcılaştırılır; `useState(null)` bırakılıp "çekince gelir" DENMEZ. Boş okuma mevcut veriyi EZMEZ.
+- **Maliyet (QM523):** OCR sistem promptuna **prompt caching**; çeviri (aiTR) + özet/trend **Haiku**'ya; `max_tokens` kısıldı (8000→3000, OCR→2500). Görsel veri çıkarma + legal Sonnet kaldı.
+- **Numaralandırma:** mağazalar **00'dan** başlar (ilk mağaza QM00). NOVA sekmeleri "ALL"→"BOX"; A1-A4 + inbox kutuları + Scan/period sadece BOX aktifken görünür.
 - **İş akışı kuralı:** her iş bitince Claude kendisi `git commit` atar; her oturum başında bu MD okunur (kök `CLAUDE.md`).
 
 ---
