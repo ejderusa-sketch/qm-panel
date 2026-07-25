@@ -58,6 +58,8 @@ Dashboard sütunları buna göre: **02.1 Trademark · 02.2 Copyright · 02.3 Pol
 
 **ZORUNLU KURAL (yeni kod):** Bulut okuma/yazma eklerken: **boş/başarısız okumada mevcut veriyi EZME; boş listeyi buluta YAZMA.** Compute Nano'ya düşerse Micro'ya çek (ücretsiz).
 
+**ÇEKİLEN VERİ KALICI OLMALI — ASLA HER SAYFADA YENİDEN ÇEKİLMEZ (ZORUNLU, QM492):** Bir kez çekilen veri (CSV/Ads/ROAS/Görünürlük = `dm`, mağazalar, ayarlar) **sitenin her yerinde durur**; sayfa/sekme değişince ya da tarayıcı yenilenince **kaybolmaz, yeniden çekilmez**. Mekanizma: `dm` artık **localStorage'a** da cache'lenir (`qm_dm::email`) — açılışta anında oradan gösterilir, bulut (Supabase `q:d`) arka planda gelince güncellenir. **Bulut boş/yavaş dönerse mevcut dm EZİLMEZ** (`setDm(prev=> mig varsa mig, yoksa prev)`). Yeni bir veri türü eklerken de aynı kural: önce localStorage cache → sonra bulut; boş okuma mevcut veriyi silmez. Kullanıcı "Veri Çek"e sadece **yeni** veri için basar, gördüğünü tekrar çekmek için değil.
+
 ## CSV'LER (ÇOK ÖNEMLİ — KARIŞTIRMA)
 
 İki ayrı CSV türü var, **asla karıştırma**. E-postadan çekerken **dosya adına** göre ayırt edilir:
@@ -188,6 +190,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM492 | 24 Tem 2026 | **ÇEKİLEN VERİ ARTIK KALICI.** `dm` (CSV/Ads/ROAS/Görünürlük verisi) localStorage'a da cache'lenir (`qm_dm::email`) → sayfa/sekme değişince ya da tarayıcı yenilenince veri kaybolmaz, yeniden çekilmez; açılışta anında görünür, bulut arka planda günceller. Bulut boş/yavaş dönerse mevcut dm **ezilmez** (`setDm(prev=>mig varsa mig, yoksa prev)`). Kural MD'ye yazıldı (VERİ GÜVENLİĞİ bölümü) |
 | QM491 | 24 Tem 2026 | DASHBOARD 06 pill adı **"NEW ETSY POLICY" → "ETSY"**. İç bölümler 6'nın altına alındı: 03.1/03.2 → **06.1 (Etsy Policy — Canlı Kaynak)** / **06.2 (Etsy Policy — E-postalar)** |
 | QM490 | 24 Tem 2026 | DASHBOARD pilleri **05 ↔ 06 yer değiştirdi**: 05 CSV KAYNAĞI (`csvsrc`) · 06 NEW ETSY POLICY (`policy`). Numaralar sıralı kaldı, içerik takas edildi |
 | QM489 | 24 Tem 2026 | **GİRİŞ DONMA KORUMASI.** Gate (yetki kontrol) Supabase sorgularına **7sn zaman aşımı + 3 kez tekrar** eklendi (`wt()` = Promise.race timeout; `accessGet`, `members`, `accessAddPending` sarıldı). DB asılırsa artık sonsuz "Yetki kontrol ediliyor" ekranında donmuyor; **"Bağlantı yavaş — Yeniden Dene"** ekranı çıkıyor (`gate==="retry"`, `gateTry` sayacı butona basınca kontrolü yeniden tetikler). NOT: kök sebep genelde Supabase compute (Nano→Micro) veya proje uykuda — bunu Supabase panelinden düzelt |
