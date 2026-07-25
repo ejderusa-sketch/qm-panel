@@ -190,6 +190,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM506 | 24 Tem 2026 | **06.3 TREND (Etsy Trend Radarı)** eklendi (06 ETSY altına). Yapay zekâ (Anthropic API, `settings.apiKey`) ile güncel ABD Etsy tasarım trendleri (t-shirt/canvas/apron) kaynaklara göre gruplu (Google/moda/Etsy forum/mevsimsel). "Yenile" üretir; sonuç `settings.trendReport`'ta **kalıcı** (bulut+localStorage), `marked` ile render. PolicyTab `pv="trends"`. İleride zamanlı görev ile otomatik yenilenebilir |
 | QM505 | 24 Tem 2026 | **2 ETSY API iptal** (nav butonu silindi); **SHIPSTATION artık "2"** (eskiden 2A). Alt sekmeler 2A.1/2A.2/2A.3 → 2.1/2.2/2.3, hero başlığı 2A → 2. Etsy API içerik/izin kodu duruyor ama nav'dan erişilmiyor |
 | QM504 | 24 Tem 2026 | **Mağaza numaraları 00'dan başlıyor** (ilk mağaza QM00, eskiden QM01). Tüm basım yerleri `i+1 → i`: sidebar, Legal & Tax, ROAS/Viz tabloları, Etsy API dropdown, hero aktif mağaza rozeti. Veri store ID'ye bağlı → bozulmaz |
 | QM503 | 24 Tem 2026 | LEGAL & TAX mağaza listesi **10'arlı grid** (asker gibi dizildi): flex-wrap yerine `grid repeat(10,minmax(0,1fr))`, satır satır sırayla (QM01–10 · 11–20 …). Uzun isimler ellipsis + tooltip; font 11.5→11 |
