@@ -205,6 +205,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM518 | 24 Tem 2026 | CSV pill satırına (1.1 Listing · 1.2 ROAS · 1.3 Revenue · 1.4 Statement) **"↻ Yenile" butonu** eklendi (`reloadCloud` — veriyi buluttan yeniden yükler) |
 | QM517 | 24 Tem 2026 | NOVA: Scan All + period (3g/7g/30g) satırı artık **sadece BOX aktifken** görünür. **BOX yanında yeni PANDORA sekmesi** (`view="pandora"`, şu an boş yer tutucu — içerik bekliyor) |
 | QM516 | 24 Tem 2026 | NOVA AGENT: **"TÜMÜ/ALL" sekmesi → "BOX"**. A1/A2/A3/A4 sekmeleri artık **sadece BOX aktifken** görünür (`{isAll&&<Fragment>…}`); BOX'a basınca açılır, tekil kutudayken gizli. CONNECTED INBOXES + Scan All zaten BOX'a bağlıydı. Gezinme: BOX → alt kutular |
 | QM515 | 24 Tem 2026 | **Mağaza numaraları 0-tabanlı** (ilk mağaza 00, NEWCUSTOMTEE 01…): `i+1 → i`. Fazladan statik "00" yer tutucu kaldırıldı (ilk gerçek mağaza zaten 00). Not: QM504→508 arası gidip gelmişti; nihai karar **00'dan başla** |
