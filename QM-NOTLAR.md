@@ -205,6 +205,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM515 | 24 Tem 2026 | **Mağaza numaraları 0-tabanlı** (ilk mağaza 00, NEWCUSTOMTEE 01…): `i+1 → i`. Fazladan statik "00" yer tutucu kaldırıldı (ilk gerçek mağaza zaten 00). Not: QM504→508 arası gidip gelmişti; nihai karar **00'dan başla** |
 | QM514 | 24 Tem 2026 | NOVA AGENT sekmeleri (TÜMÜ · A1 · A2 · A3/A4) **dashboard kırmızı/yeşil pill** formatına çevrildi (eskiden mavi/ink + opacity dimleme). Inbox pill'lerindeki "· Gelen Kutusu/Inbox" eki kaldırıldı → yalnız e-posta görünüyor |
 | QM513 | 24 Tem 2026 | ShipStation çekme **12 ay sınırı kaldırıldı → tüm geçmiş**. `ssFetchCounts`'tan `orderDateStart` çıkarıldı (tarih filtresi yok = tüm siparişler), sayfa limiti 80→200. Buton "Tüm Siparişleri Çek". 2.3 Adetler + 2.4 Müşteriler artık tüm zamanların verisini alır (sayfa 500'den az dönünce durur) |
 | QM512 | 24 Tem 2026 | Sidebar **"00" hanesi tıklanabilir**: basınca `addAcct` (yeni boş mağaza eklenir, isim/email yazıp Google ile bağlanır); etiket "+ Email / Mağaza Bağla". **Ayrıca: shipstation edge function Supabase'e DEPLOY edildi** (tarayıcıdan, orderStatus=any hatası giderildi) → 2.3 Sipariş Adetleri / 2.4 Müşteriler artık çalışır. **Kural: edge function güncellenince Supabase → Edge Functions → shipstation → Code → Deploy updates** |
