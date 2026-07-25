@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM511 · 24 Tem 2026 · DUZELTME: ".tabs.pill" CSS'i (geri-al'da yanlislikla silinmisti) geri eklendi. Ayarlar alt sekmeleri (8.1-8.6, 9) QM500'de pill class'i almisti ama CSS yoktu → kutu kaliyordu; artik dashboard pill formatinda (kirmizi hap + numara rozeti, aktif=yesil)
      QM510 · 24 Tem 2026 · Sidebar STORES en ustune bos "00" hanesi eklendi (gorsel yer tutucu, kesik cizgili, "(bos hane)"). Gercek magazalar 01'den devam. Ileride BYDREAM icin doldurulabilir
      QM509 · 24 Tem 2026 · SEKME SECIMI KALICI: dashView (dashboard alt sekmesi), ssView (2 ShipStation), csvView (1 CSV), pv (06 Etsy alt sekmesi) artik localStorage'a yaziliyor (qm_dashview/qm_ssview/qm_csvview/qm_policyview). Ayrilinca/yenileyince son secili sekme korunuyor (ana tab zaten qm_tab ile kaliciydi)
      QM508 · 24 Tem 2026 · MAGAZA NUMARALANDIRMASI GERI ALINDI (QM504 iptal): magazalar tekrar 01'den basliyor (NEWCUSTOMTEE=01), rakamlar kaymiyor. i -> i+1 (sidebar, Legal&Tax, ROAS/Viz, Etsy API dropdown, hero rozeti)
@@ -218,6 +219,13 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoo
 .tabs button .tl{display:inline-flex;align-items:center;justify-content:center;min-width:23px;width:auto;padding:0 5px;box-sizing:border-box;height:22px;border-radius:6px;background:#fff;color:var(--red);border:2px solid var(--red);font-family:'JetBrains Mono';font-size:13px;font-weight:800;flex:none}
 .tabs button.on .tl{background:#fff;color:var(--red)}
 .tabs button:not(.on) .tl{background:#fff;color:var(--red)}
+/* QM511 · pill varyanti (dash alt sekmeleri gibi) — kirmizi hap + numara rozeti, aktif=yesil */
+.tabs.pill{border-bottom:none;gap:10px;flex-wrap:wrap;align-items:center}
+.tabs.pill button{font-size:13.5px;padding:5px 11px;border:2px solid rgba(226,59,78,.38);border-radius:999px;background:#fff;color:var(--red);white-space:nowrap;max-width:none;text-transform:lowercase;margin-bottom:0}
+.tabs.pill button:hover{color:var(--red);border-color:var(--red)}
+.tabs.pill button.on{color:#fff;background:var(--green);border-color:var(--green)}
+.tabs.pill button .tl{min-width:20px;padding:1px 5px;height:auto;border-radius:999px;border:1.5px solid rgba(226,59,78,.4)}
+.tabs.pill button.on .tl{background:#fff;color:var(--red);border-color:rgba(226,59,78,.4)}
 .mdbox{font-size:13px;line-height:1.6;color:var(--ink);overflow-x:auto;padding:4px 2px}
 .mdbox h1{font-size:20px;font-weight:800;margin:18px 0 8px;color:var(--azure)}
 .mdbox h2{font-size:16px;font-weight:800;margin:20px 0 8px;padding-top:12px;border-top:1px solid var(--line);color:var(--ink)}
@@ -1850,7 +1858,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM510</b></div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM511</b></div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"TR":(lang==="en"?"EN":"اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:syncing?"qmpulse 1s infinite":"none"}}/>{TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"":""} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast(""+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -2426,7 +2434,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=510; /* bu sayi her surumde artar */
+  var CURRENT=511; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;

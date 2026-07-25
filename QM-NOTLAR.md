@@ -190,6 +190,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM511 | 24 Tem 2026 | **DÜZELTME:** `.tabs.pill` CSS'i (bir "geri al"da yanlışlıkla silinmişti) geri eklendi. Ayarlar alt sekmeleri (8.1–8.6, 9) QM500'de `pill` class'ı almıştı ama CSS yoktu → kutu kalıyordu; artık dashboard pill formatında (kırmızı hap + numara rozeti, aktif=yeşil). **Not:** pill haplarının CSS'i `.tabs.pill`'de; silme |
 | QM510 | 24 Tem 2026 | Sidebar STORES en üstüne boş **"00" hanesi** eklendi (görsel yer tutucu, kesik çizgili, "(boş hane)"). Gerçek mağazalar 01'den devam. İleride BYDREAM için doldurulabilir |
 | QM509 | 24 Tem 2026 | **Sekme seçimi kalıcı**: dashView (dashboard alt sekmesi), ssView (2 ShipStation), csvView (1 CSV), pv (06 Etsy alt sekmesi) artık localStorage'a yazılıyor (`qm_dashview`/`qm_ssview`/`qm_csvview`/`qm_policyview`). Ayrılınca/yenileyince son seçili sekme korunuyor (ana `tab` zaten `qm_tab` ile kalıcıydı) |
 | QM508 | 24 Tem 2026 | **Mağaza numaralandırması geri alındı** (QM504 iptal): mağazalar tekrar **01'den** başlıyor (NEWCUSTOMTEE=01), rakamlar kaymıyor. `i → i+1` (sidebar, Legal&Tax, ROAS/Viz, Etsy API dropdown, hero rozeti) |
