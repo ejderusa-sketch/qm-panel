@@ -205,6 +205,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM513 | 24 Tem 2026 | ShipStation çekme **12 ay sınırı kaldırıldı → tüm geçmiş**. `ssFetchCounts`'tan `orderDateStart` çıkarıldı (tarih filtresi yok = tüm siparişler), sayfa limiti 80→200. Buton "Tüm Siparişleri Çek". 2.3 Adetler + 2.4 Müşteriler artık tüm zamanların verisini alır (sayfa 500'den az dönünce durur) |
 | QM512 | 24 Tem 2026 | Sidebar **"00" hanesi tıklanabilir**: basınca `addAcct` (yeni boş mağaza eklenir, isim/email yazıp Google ile bağlanır); etiket "+ Email / Mağaza Bağla". **Ayrıca: shipstation edge function Supabase'e DEPLOY edildi** (tarayıcıdan, orderStatus=any hatası giderildi) → 2.3 Sipariş Adetleri / 2.4 Müşteriler artık çalışır. **Kural: edge function güncellenince Supabase → Edge Functions → shipstation → Code → Deploy updates** |
 | QM511 | 24 Tem 2026 | **DÜZELTME:** `.tabs.pill` CSS'i (bir "geri al"da yanlışlıkla silinmişti) geri eklendi. Ayarlar alt sekmeleri (8.1–8.6, 9) QM500'de `pill` class'ı almıştı ama CSS yoktu → kutu kalıyordu; artık dashboard pill formatında (kırmızı hap + numara rozeti, aktif=yeşil). **Not:** pill haplarının CSS'i `.tabs.pill`'de; silme |
 | QM510 | 24 Tem 2026 | Sidebar STORES en üstüne boş **"00" hanesi** eklendi (görsel yer tutucu, kesik çizgili, "(boş hane)"). Gerçek mağazalar 01'den devam. İleride BYDREAM için doldurulabilir |
