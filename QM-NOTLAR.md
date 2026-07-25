@@ -190,6 +190,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM508 | 24 Tem 2026 | **Mağaza numaralandırması geri alındı** (QM504 iptal): mağazalar tekrar **01'den** başlıyor (NEWCUSTOMTEE=01), rakamlar kaymıyor. `i → i+1` (sidebar, Legal&Tax, ROAS/Viz, Etsy API dropdown, hero rozeti) |
 | QM507 | 24 Tem 2026 | **SHIPSTATION 2.4 MÜŞTERİLER**: çekilen tüm siparişlerden (ssCounts+ssOrders) **tekrarsız müşteri** (e-postaya göre dedup) e-posta+isim+adres tablosu + toplam sayı. Adres shipTo'dan, e-posta `customerEmail` (yoksa @'li `customerUsername`). "Son 12 Ay Siparişlerini Çek" ile beslenir |
 | QM506 | 24 Tem 2026 | **06.3 TREND (Etsy Trend Radarı)** eklendi (06 ETSY altına). Yapay zekâ (Anthropic API, `settings.apiKey`) ile güncel ABD Etsy tasarım trendleri (t-shirt/canvas/apron) kaynaklara göre gruplu (Google/moda/Etsy forum/mevsimsel). "Yenile" üretir; sonuç `settings.trendReport`'ta **kalıcı** (bulut+localStorage), `marked` ile render. PolicyTab `pv="trends"`. İleride zamanlı görev ile otomatik yenilenebilir |
 | QM505 | 24 Tem 2026 | **2 ETSY API iptal** (nav butonu silindi); **SHIPSTATION artık "2"** (eskiden 2A). Alt sekmeler 2A.1/2A.2/2A.3 → 2.1/2.2/2.3, hero başlığı 2A → 2. Etsy API içerik/izin kodu duruyor ama nav'dan erişilmiyor |
