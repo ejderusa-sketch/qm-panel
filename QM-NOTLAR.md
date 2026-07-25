@@ -190,6 +190,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM493 | 24 Tem 2026 | **OTOMATİK 30dk SENKRON KALDIRILDI.** Eskiden her 30dk'da tüm mağazaları (57×5 çekme) otomatik senkronluyordu → "sürekli senkron / bilgi akıyor / durmuyor" hissine sebep oluyordu. Artık senkron **yalnız elle** (Senkron butonu). Veri zaten kalıcı (QM492 localStorage cache) olduğu için otomatik çekmeye gerek yok. Kural: ağır toplu çekme işlemleri (syncAll/pullAllCSV) **otomatik interval'a bağlanmaz**, yalnız kullanıcı tetikler |
 | QM492 | 24 Tem 2026 | **ÇEKİLEN VERİ ARTIK KALICI.** `dm` (CSV/Ads/ROAS/Görünürlük verisi) localStorage'a da cache'lenir (`qm_dm::email`) → sayfa/sekme değişince ya da tarayıcı yenilenince veri kaybolmaz, yeniden çekilmez; açılışta anında görünür, bulut arka planda günceller. Bulut boş/yavaş dönerse mevcut dm **ezilmez** (`setDm(prev=>mig varsa mig, yoksa prev)`). Kural MD'ye yazıldı (VERİ GÜVENLİĞİ bölümü) |
 | QM491 | 24 Tem 2026 | DASHBOARD 06 pill adı **"NEW ETSY POLICY" → "ETSY"**. İç bölümler 6'nın altına alındı: 03.1/03.2 → **06.1 (Etsy Policy — Canlı Kaynak)** / **06.2 (Etsy Policy — E-postalar)** |
 | QM490 | 24 Tem 2026 | DASHBOARD pilleri **05 ↔ 06 yer değiştirdi**: 05 CSV KAYNAĞI (`csvsrc`) · 06 NEW ETSY POLICY (`policy`). Numaralar sıralı kaldı, içerik takas edildi |
