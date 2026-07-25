@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM526 · 24 Tem 2026 · novainnc ARTIK BAGIMSIZ OWNER (ejderusaya bagimli DEGIL). Bootstrap owner dali `email===OWNER_EMAIL` -> `_isOwner(email)` → novainnc kendi hesabini/workspace'ini alir (kendi login+sifre, kendi verisi), gate'e takilmaz. ownerAccountId yazimi SADECE ejderusa'ya kilitlendi (novainnc ekibin workspace pointer'ini bozmaz). Boylece iki bagimsiz owner: ejderusa + novainnc. (Panel-gecis = Faz 2)
      QM525 · 24 Tem 2026 · SUPER-OWNER (FAZ 1): SUPER_OWNER="novainnc@gmail.com" eklendi. novainnc gizli super-owner: ejderusa workspace'ini TAM YETKIYLE (admin, Nova dahil) gorur, gate'e takilmaz, kimse gormez. _isOwner() yardimcisi (OWNER_EMAIL||SUPER_OWNER) — owner kontrolleri buna cevrildi (ejderusa korunur). Sadece novainnc'ye "SUPER" rozeti. FAZ 2 (bekliyor): panel-gecis dugmeleri + NOVA panelinin ayrilmasi
      QM524 · 24 Tem 2026 · PANDORA MUSTERILERI BULUTA KALICI: ssCounts'tan tekrarsiz musteri listesi (email/isim/eyalet/adres) hesaplanip settings.pandoraCustomers'a yaziliyor → Supabase buluta + localStorage (settings kaliciligi). Bosla EZMEZ (if _list.length). PANDORA once pandoraDb'yi (bulut) kullanir, yoksa ssCounts. Boylece yenilense/cihaz degisse bile musteriler durur
      QM523 · 24 Tem 2026 · MALIYET DUSURME: (1) OCR gorsel okuma sistem promptuna PROMPT CACHING (cache_control ephemeral) — her goruntude tekrar eden dev prompt %90 ucuza okunur (en buyuk kalem). (2) Ceviri (aiTR) ve ozet/trend HAIKU'ya alindi (claude-haiku-4-5, ~3-4x ucuz). (3) Sohbet max_tokens 8000->3000, OCR 4000->2500. Gorsel VERI CIKARMA + legal Sonnet kaldi (kalite). NOT: model stringi calismazsa geri al
@@ -674,7 +675,7 @@ async function bootstrap(){
      tüm onaylı kullanıcılar aynı workspace'i (aynı account_state) okur => herkes aynı mağazaları görür */
   let ownerAcc=null;
   try{const{data:_p}=await sb.from("shared_state").select("settings").eq("id","main").maybeSingle();ownerAcc=(_p&&_p.settings&&_p.settings.ownerAccountId)||null;}catch(_e){}
-  if(email===OWNER_EMAIL){
+  if(_isOwner(email)){
     try{await sb.from("members").update({user_id:u.id}).is("user_id",null).eq("email",email);}catch(e){}
     let owned=[];try{owned=((await sb.from("accounts").select("id").eq("owner_id",u.id)).data)||[];}catch(e){}
     let aid=owned&&owned[0]&&owned[0].id;
@@ -690,7 +691,7 @@ async function bootstrap(){
     }
     currentAccountId=aid||ownerAcc||null; currentRole="admin"; currentPermissions=null; currentStores="ALL";
     /* pointer'ı owner'ın gerçek veri hesabına sabitle (managerlar buradan okuyacak) */
-    if(currentAccountId&&currentAccountId!==ownerAcc){
+    if((""+(email||"")).toLowerCase()===OWNER_EMAIL&&currentAccountId&&currentAccountId!==ownerAcc){
       try{const{data:_p2}=await sb.from("shared_state").select("settings").eq("id","main").maybeSingle();const _s=(_p2&&_p2.settings)||{};_s.ownerAccountId=currentAccountId;await sb.from("shared_state").upsert({id:"main",settings:_s,updated_at:new Date().toISOString()},{onConflict:"id"});}catch(_e){}
     }
   }else{
@@ -1873,7 +1874,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar">
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM525</b>{(""+(currentUserEmail||"")).toLowerCase()===SUPER_OWNER&&<span style={{marginLeft:6,fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:6,padding:"1px 6px",letterSpacing:".05em"}}>SÜPER</span>}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM526</b>{(""+(currentUserEmail||"")).toLowerCase()===SUPER_OWNER&&<span style={{marginLeft:6,fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:6,padding:"1px 6px",letterSpacing:".05em"}}>SÜPER</span>}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"TR":(lang==="en"?"EN":"اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:syncing?"qmpulse 1s infinite":"none"}}/>{TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"":""} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast(""+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -2448,7 +2449,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=525; /* bu sayi her surumde artar */
+  var CURRENT=526; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
