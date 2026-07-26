@@ -35,13 +35,20 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 3. **(S3)** HESAP AÇANLAR listesinde her hesap **e-posta** ile gösterilir.
 4. **(S4)** Bir hesabın e-postasına basınca detay: **1) Ad Soyad · 2) Telefon · 3) Şirket adı (opsiyonel)**. Sıralama: **#1 = ejderusa sabit başta**, yeniler kayıt sırasıyla altına.
 5. **(S5)** Kayıt formu alanları: **E-posta, Şifre, Ad Soyad, Telefon, Şirket(opsiyonel)**.
-6. **(S6/S7)** Yeni hesaplarda **NOVA AGENT + SHIPSTATION var** (kendi verileriyle). **HESAP AÇANLAR YALNIZ nova'da** (novainnc) — normal hesap sahibi başka hesabı göremez/giremez (izolasyon/gizlilik korunur).
+6. **(S6/S9 — NİHAİ)** **NOVA AGENT = yalnız nova (novainnc) süper-panosu; HİÇBİR hesapta yok.** Nova'dan bütün hesaplara geçilir; hesaplardan nova'ya geçilmez (dönüş = logout + nova'ya tekrar giriş). **HESAP AÇANLAR da yalnız nova'da.**
 7. **(S8)** Yeni hesap sahibi **kendi ekibini davet linkiyle ekleyebilir** (kendi hesabının owner'ı).
-8. **(S9 — KARAR BEKLİYOR)** Sen HESAP AÇANLAR'dan ejderusa'ya geçince NOVA AGENT sekmesi ejderusa'da görünsün mü? (Şu an QM534: ejderusa'da NOVA AGENT yok, yalnız nova'da.) — EJDER netleştirecek.
+8. **(S10)** Yeni hesap = **ejderusa panelinin BİREBİR AYNISI ama BOŞ hali** (tüm sekmeler aynı).
+9. **(S11)** **SHIPSTATION yalnız nova panelinde**; diğer hesaplarda YOK.
+10. **(S12)** Yeni boş hesapta **Kurallar/MD/Ayarlar gibi sabit içerikler DOLU gelir** (şablon).
+11. **(S13/S15/S21/S22)** Nova, nova panelinden **her hesaba GO ile girip görebilir, veri çekebilir, hataları düzeltip müdahale edebilir** — her türlü yetki nova'da. Diğer hesapların verisi kendine özel; nova hepsine erişir.
+12. **(S14)** Bir hesabın sahibi/kullanıcıları **yalnız kendi hesabını** görür; başka hesaba ve nova'ya **asla geçemez**.
+13. **(S16)** Hesabı **silme/dondurma (erişim kapatma)** yetkisi **yalnız nova'da**.
+14. **(S17)** Şimdilik **100 hesaba kadar** açılabilir. **Her hesabın bir NUMARASI var; ejderusa = 1 no.**
+15. **(S18)** **1 hesap = 1 e-posta** (aynı e-posta ikinci kez hesap açamaz). AMA hesap içinde **sol tarafta mağaza sayısı istenildiği kadar**: yeni hesap **10 boş e-posta/mağaza kutusu (default)** ile başlar, sonra artırılabilir.
+16. **(S19)** Yeni hesap açılınca nova'ya **bildirim: ışık yanıp söner** (HESAP AÇANLAR'da).
+17. **(S20)** **ejderusa'nın verileri kendine özel; mevcut her şey ejderusa'da kalır**, yeni açılanlar sıfırdan boş başlar.
 
-**Kalan sorular (S10–S20) sorulacak:** izolasyon detayı, hesap silme/dondurma (sadece nova), hesap sayısı sınırı, 1 e-posta=1 hesap mı, yeni hesap bildirimi, mevcut verilerin ejderusa'da kalması onayı, boş panelde sabit içerik (Kurallar/MD/Ayarlar) dolu mu gelsin, vb.
-
-**Teknik plan (yapılınca):** Supabase `accounts` (her kayıt = 1 satır, owner_id) + `members` + `account_state` (izole veri) zaten var. Eklenecek: (a) **Kaydol ekranı** (signUp + Ad Soyad/Telefon/Şirket → `profiles`/account meta), (b) HESAP AÇANLAR'ı **tekil hesaplar**a çevir (şu an üyelikleri listeliyor → ejderusa 9× tekrar hatası), her satır e-posta + tıklayınca profil detayı, (c) yeni hesaba geçiş zaten `qm_switch_acc` ile çalışır.
+**Teknik plan (yapılınca):** Supabase `accounts` (her kayıt = 1 satır, owner_id, **hesap no**) + `members` + `account_state` (izole veri) zaten var. Eklenecek: (a) **Kaydol ekranı** (signUp + Ad Soyad/Telefon/Şirket → `profiles`/account meta), (b) HESAP AÇANLAR'ı **tekil hesaplar**a çevir (şu an üyelikleri listeliyor → ejderusa 9× tekrar hatası), her satır **no + e-posta**, tıklayınca **Ad Soyad/Telefon/Şirket** detayı; ejderusa = #1, (c) yeni boş hesap **10 boş mağaza kutusu** ile başlar, (d) yeni kayıt olunca nova'da **yanıp sönen bildirim ışığı**, (e) hesap **sil/dondur** yalnız nova, (f) max 100 hesap. Nova geçişi zaten `qm_switch_acc` ile çalışır.
 
 ---
 
