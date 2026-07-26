@@ -273,6 +273,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM555 | 26 Tem 2026 | **SHIPSTATION 2.3 → 2026 AY AY:** "Son 7 Gün / Son 1–12 Ay" birikimli dönemler kaldırıldı; yerine **2026 takvim ayları** (Ocak…Aralık) sütunları — her hücre o mağazanın o 2026 ayındaki sipariş adedi (sadece 2026 sayılır). **TOPLAM sütunu** (mağaza 2026 toplamı) + TOPLAM satırı + genel toplam. Başlık "2026 Ay Ay". |
 | QM554 | 26 Tem 2026 | **HESAP AÇANLAR rozeti C → D** (kullanıcı isteği). Süper nav: **A** NOVA AGENT · **B** SHIPSTATION · **D** HESAP AÇANLAR (C atlandı). Hero: "D — HESAP AÇANLAR". |
 | QM553 | 26 Tem 2026 | **SÜPER NAV A/B/C:** super-home nav rozetleri **A** (NOVA AGENT) · **B** (SHIPSTATION API, eski "2") · **C** (HESAP AÇANLAR, eski "H"). Hero başlıkları da "B — SHIPSTATION API" / "C — HESAP AÇANLAR" oldu. |
 | QM552 | 26 Tem 2026 | **HESAP AÇANLAR — çift "ejderusa" düzeltildi + profil bilgisi:** (1) `ejderusa@gmail.com` ve domainsiz `ejderusa` ayrı satır oluyordu (farklı email anahtarı, ikisi de `/ejder/` → ikisi de "(ana)"). Artık ejder* kayıtları **tek kanonik `OWNER_EMAIL` satırında** birleşiyor (`byE` key=`isEj?OWNER_EMAIL:e`; email OWNER_EMAIL; ownerId korunur). Tek "ejderusa@gmail.com (ana)". (2) Her hesap satırının **altında Ad Soyad / Telefon / Şirket** (profiles → `detailOf`) **hep görünür** (açılır ok değil). |
