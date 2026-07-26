@@ -258,6 +258,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM545 | 25 Tem 2026 | **03.1 OTOMATİK KONULAR (mağaza bazlı):** 03.1 artık listing başlıklarından **otomatik** en sık konu kelimelerini çıkarır (STOP kelimeler hariç, min 3 harf, **en fazla 40**). Üstte 40 konu renkli lejandı. Her mağaza için: o konuyu içeren listinglerin mağazanın toplam gösteriminde payı (**%**), chip olarak; en çok gösterilen mağaza üstte. (Önceki 6 sabit kategori yerine.) |
 | QM544 | 25 Tem 2026 | **(1) 03.1 KONU SIRALAMASI AYRI SEKME:** `renderAllViz(mode)` → 03 sadece tablo, **03.1** sadece sıralama; dashboard alt-nav'da 03 yanında **"03.1 KONU"** sekmesi. **(2) HESAP AÇANLAR nova ana ekranında:** `tab=nova & _superHome` iken NOVA AGENT'ın üstünde HesapAcanlar kutusu (ejderusa #1) — ayrı sekmeye gitmeden aynı ekranda geçiş. **(3)** Fazla hesaplar listede gizli; kalıcı DB silme Supabase'den |
 | QM543 | 25 Tem 2026 | **HESAP AÇANLAR FİLTRE:** Eski karışık hesaplar (novaagencies8, thenova_agencies, belmakilic01) `_HIDE` ile listeden gizlendi. Sadece ejderusa (ana) + gerçek hesaplar kalır. (Kalıcı DB silme ayrı — Supabase'den.) |
 | QM542 | 25 Tem 2026 | **NOVA AGENT SADELEŞTİRME:** A1 (userEmail inbox) + A3/A4 (`EXTRA_INBOXES`) sekmeleri **kaldırıldı** — sadece **BOX + PANDORA + A2 (Önemli)** kaldı (BOX zaten tüm kutuları birleştiriyor). Hero'daki **"bekleyen istek" pili kaldırıldı**. Kalıcı view A1/A3/A4'te kalmışsa BOX'a düşer (guard) |
