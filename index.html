@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM546 · 25 Tem 2026 · (1) NAV: HESAP ACANLAR sekmesi marginLeft:auto kaldirildi -> NOVA AGENT + SHIPSTATION + HESAP ACANLAR yan yana. (2) HESAP ACANLAR SONSUZ "Yukleniyor" DUZELTILDI: Supabase sorgulari takilinca setAccs hic cagrilmiyordu -> tum sorgulara 6sn timeout (Promise.race) + unmount guard eklendi; artik her durumda liste gelir (ejderusa erisilir).
      QM545 · 25 Tem 2026 · 03.1 OTOMATIK KONULAR (mağaza bazli): 03.1 artik listing basliklarindan OTOMATIK en sik konu kelimelerini cikariyor (STOP kelimeler haric, min 3 harf, en fazla 40). Ust kisimda 40 konu lejandi (renkli). Her magaza icin: o konuyu iceren listinglerin magazanin toplam gosteriminde payi (%), chip olarak, en cok gosterilen magaza ustte. (Onceki 6 sabit kategori yerine.)
      QM544 · 25 Tem 2026 · (1) 03.1 KONU SIRALAMASI AYRI SEKME: renderAllViz(mode) -> 03 sadece tablo, 03.1 sadece siralama; dash alt-nav'da 03 yaninda "03.1 KONU" sekmesi. (2) HESAP ACANLAR nova ana ekranina eklendi: tab=nova & _superHome iken NOVA AGENT'in ustunde HesapAcanlar kutusu (ejderusa #1) — ayri sekmeye gitmeden ayni ekranda gecis. (3) Fazla hesaplar listede gizli (QM543); kalici DB silme Supabase'den.
      QM543 · 25 Tem 2026 · HESAP ACANLAR FILTRE: eski karisik hesaplar (novaagencies8, thenova_agencies, belmakilic01) listeden gizlendi (_HIDE). Sadece ejderusa (ana) + gercek hesaplar kalir. (Kalici DB silme ayri — Supabase'den.)
@@ -1370,9 +1371,9 @@ const[accs,setAccs]=useState(null);
 const[prof,setProf]=useState({});
 const[open,setOpen]=useState(null);
 const _cur=(()=>{try{return sessionStorage.getItem("qm_switch_acc")||"";}catch(_){return "";}})();
-useEffect(()=>{if(!_isSuper)return;(async()=>{
-let ejId=null;try{const{data:_p}=await sb.from("shared_state").select("settings").eq("id","main").maybeSingle();ejId=(_p&&_p.settings&&_p.settings.ownerAccountId)||null;}catch(_){}
-let _ac=[],_mm=[];try{_ac=(await sb.from("accounts").select("id,company_name,owner_id")).data||[];}catch(_){}try{_mm=(await sb.from("members").select("account_id,email,user_id,role")).data||[];}catch(_){}
+useEffect(()=>{if(!_isSuper)return;let _alv=true;(async()=>{const wt=(p,ms)=>Promise.race([Promise.resolve(p),new Promise(r=>setTimeout(()=>r({data:null}),ms))]);
+let ejId=null;try{const _r=await wt(sb.from("shared_state").select("settings").eq("id","main").maybeSingle(),6000);const _p=_r&&_r.data;ejId=(_p&&_p.settings&&_p.settings.ownerAccountId)||null;}catch(_){}
+let _ac=[],_mm=[];try{const _r=await wt(sb.from("accounts").select("id,company_name,owner_id"),6000);_ac=(_r&&_r.data)||[];}catch(_){}try{const _r2=await wt(sb.from("members").select("account_id,email,user_id,role"),6000);_mm=(_r2&&_r2.data)||[];}catch(_){}
 /* her hesabın SAHİBİNİN e-postası: owner_id ile eşleşen üye → admin üye → herhangi üye → şirket adı */
 const emailOf=(a)=>{let m=_mm.find(x=>x&&x.account_id===a.id&&x.user_id&&a.owner_id&&x.user_id===a.owner_id);if(m&&m.email)return(""+m.email).toLowerCase();m=_mm.find(x=>x&&x.account_id===a.id&&x.role==="admin");if(m&&m.email)return(""+m.email).toLowerCase();m=_mm.find(x=>x&&x.account_id===a.id&&x.email);if(m&&m.email)return(""+m.email).toLowerCase();return(""+(a.company_name||"")).toLowerCase();};
 /* TEKİL hesap = sahibin e-postasına göre grupla (tekrarları birleştir); ejderusa = kanonik ownerAccountId */
@@ -1380,9 +1381,9 @@ const _HIDE=["novaagencies8@gmail.com","thenova_agencies@gmail.com","belmakilic0
 const byE={};(Array.isArray(_ac)?_ac:[]).forEach(a=>{const e=emailOf(a);if(!e||e===SUPER_OWNER||_HIDE.indexOf(e)>=0)return;const isEj=(e===OWNER_EMAIL||/ejder/.test(e));const id=(isEj&&ejId)?ejId:a.id;if(!byE[e])byE[e]={email:e,id,ownerId:a.owner_id,ej:isEj};else if(isEj&&ejId)byE[e].id=ejId;});
 if(!byE[OWNER_EMAIL]&&ejId){byE[OWNER_EMAIL]={email:OWNER_EMAIL,id:ejId,ownerId:null,ej:true};}
 const list=Object.values(byE).sort((x,y)=>(y.ej?1:0)-(x.ej?1:0));
-setAccs(list);
-try{const{data:_pr}=await sb.from("profiles").select("*");const pm={};(_pr||[]).forEach(p=>{if(p&&p.user_id)pm[p.user_id]=p;});setProf(pm);}catch(_){}
-})();},[]);
+if(_alv)setAccs(list);
+try{const _r3=await wt(sb.from("profiles").select("*"),6000);const _pr=(_r3&&_r3.data)||[];const pm={};_pr.forEach(p=>{if(p&&p.user_id)pm[p.user_id]=p;});if(_alv)setProf(pm);}catch(_){}
+})();return()=>{_alv=false;};},[]);
 if(!_isSuper)return null;
 const go=(id)=>{try{if(id)sessionStorage.setItem("qm_switch_acc",id);else sessionStorage.removeItem("qm_switch_acc");}catch(_){}try{localStorage.removeItem("qm_switch_acc");}catch(_){}try{location.reload();}catch(_){}};
 const detailOf=(a)=>{const p=(a.ownerId&&prof[a.ownerId])||{};return{ad:p.fullName||p.full_name||p.name||"",tel:p.phone||p.tel||p.telefon||"",sirket:p.company||p.companyName||p.company_name||p.sirket||""};};
@@ -1938,7 +1939,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar" style={_superHome?{display:"none"}:undefined}>
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM545</b>{(""+(currentUserEmail||"")).toLowerCase()===SUPER_OWNER&&<span style={{marginLeft:6,fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:6,padding:"1px 6px",letterSpacing:".05em"}}>SÜPER</span>}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM546</b>{(""+(currentUserEmail||"")).toLowerCase()===SUPER_OWNER&&<span style={{marginLeft:6,fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:6,padding:"1px 6px",letterSpacing:".05em"}}>SÜPER</span>}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"TR":(lang==="en"?"EN":"اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:syncing?"qmpulse 1s infinite":"none"}}/>{TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"":""} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast(""+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -1997,7 +1998,7 @@ return(
 {/* 6 KİMLİK/IDENTITY sekmesi kaldırıldı (QM502) */}
 {!_superHome&&can("manageTeam")&&<button className={tab==="ekip"?"on":""} onClick={()=>setTab("ekip")}><b className="tl">7</b> {TT("EKİP","TEAM","ٹیم")}</button>}
 {!_superHome&&can("viewEtsy")&&<button className={tab==="etsy"?"on":""} onClick={()=>setTab("etsy")}><b className="tl">9</b> ETSY</button>}
-{_superHome&&<button className={tab==="hesaplar"?"on":""} onClick={()=>setTab("hesaplar")} style={{marginLeft:"auto"}}><b className="tl">H</b> {TT("HESAP AÇANLAR","ACCOUNTS")}</button>}
+{_superHome&&<button className={tab==="hesaplar"?"on":""} onClick={()=>setTab("hesaplar")}><b className="tl">H</b> {TT("HESAP AÇANLAR","ACCOUNTS")}</button>}
 </div>
 
 {tab==="ekip"&&can("manageTeam")&&<EkipPanel settings={settings} setSettings={setSettings}/>}
@@ -2517,7 +2518,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=545; /* bu sayi her surumde artar */
+  var CURRENT=546; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;

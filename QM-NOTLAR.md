@@ -258,6 +258,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM546 | 25 Tem 2026 | **(1) NAV yan yana:** HESAP AÇANLAR sekmesi `marginLeft:auto` kaldırıldı → NOVA AGENT + SHIPSTATION + HESAP AÇANLAR yan yana. **(2) HESAP AÇANLAR sonsuz "Yükleniyor" DÜZELTİLDİ:** Supabase sorguları takılınca `setAccs` hiç çağrılmıyordu → tüm sorgulara **6sn timeout** (`Promise.race`) + unmount guard; artık her durumda liste gelir, **ejderusa erişilebilir** |
 | QM545 | 25 Tem 2026 | **03.1 OTOMATİK KONULAR (mağaza bazlı):** 03.1 artık listing başlıklarından **otomatik** en sık konu kelimelerini çıkarır (STOP kelimeler hariç, min 3 harf, **en fazla 40**). Üstte 40 konu renkli lejandı. Her mağaza için: o konuyu içeren listinglerin mağazanın toplam gösteriminde payı (**%**), chip olarak; en çok gösterilen mağaza üstte. (Önceki 6 sabit kategori yerine.) |
 | QM544 | 25 Tem 2026 | **(1) 03.1 KONU SIRALAMASI AYRI SEKME:** `renderAllViz(mode)` → 03 sadece tablo, **03.1** sadece sıralama; dashboard alt-nav'da 03 yanında **"03.1 KONU"** sekmesi. **(2) HESAP AÇANLAR nova ana ekranında:** `tab=nova & _superHome` iken NOVA AGENT'ın üstünde HesapAcanlar kutusu (ejderusa #1) — ayrı sekmeye gitmeden aynı ekranda geçiş. **(3)** Fazla hesaplar listede gizli; kalıcı DB silme Supabase'den |
 | QM543 | 25 Tem 2026 | **HESAP AÇANLAR FİLTRE:** Eski karışık hesaplar (novaagencies8, thenova_agencies, belmakilic01) `_HIDE` ile listeden gizlendi. Sadece ejderusa (ana) + gerçek hesaplar kalır. (Kalıcı DB silme ayrı — Supabase'den.) |
