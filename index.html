@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- ===== QM SÜRÜM GEÇMİŞİ (en yeni en üstte) =====
+     QM543 · 25 Tem 2026 · HESAP ACANLAR FILTRE: eski karisik hesaplar (novaagencies8, thenova_agencies, belmakilic01) listeden gizlendi (_HIDE). Sadece ejderusa (ana) + gercek hesaplar kalir. (Kalici DB silme ayri — Supabase'den.)
      QM542 · 25 Tem 2026 · NOVA AGENT SADELESTIRME: A1 (userEmail inbox) + A3/A4 (EXTRA_INBOXES) sekmeleri KALDIRILDI — sadece BOX + PANDORA + A2 (Onemli) kaldi (BOX zaten hepsini birlestiriyor). "bekleyen istek" pili (hero) kaldirildi. Kalici view A1/A3/A4'te kalmissa BOX'a duser (guard).
      QM541 · 25 Tem 2026 · SON EKRANA DON: NOVA AGENT ic alt gorunumu (BOX/PANDORA/A1/A2/A3/A4) artik kalici (qm_novaview) + gun secimi 3/7/30 kalici (qm_novadays). Ana sekme zaten qm_tab ile kaliciydi -> ayrilip geri gelince acilan ekrana donuluyor.
      QM540 · 25 Tem 2026 · 03 GORUNURLUK'e 03.1 KONU SIRALAMASI: tablonun altina yeni bolum — her (hesap × adli konu: emb/apron/canvas/bts/senior/mama) kombinasyonu, o hesabin toplam gosteriminde konunun yuzdesi ile, BUYUKTEN KUCUGE gosterim sirali (bar + %). Diger haric.
@@ -1373,7 +1374,8 @@ let _ac=[],_mm=[];try{_ac=(await sb.from("accounts").select("id,company_name,own
 /* her hesabın SAHİBİNİN e-postası: owner_id ile eşleşen üye → admin üye → herhangi üye → şirket adı */
 const emailOf=(a)=>{let m=_mm.find(x=>x&&x.account_id===a.id&&x.user_id&&a.owner_id&&x.user_id===a.owner_id);if(m&&m.email)return(""+m.email).toLowerCase();m=_mm.find(x=>x&&x.account_id===a.id&&x.role==="admin");if(m&&m.email)return(""+m.email).toLowerCase();m=_mm.find(x=>x&&x.account_id===a.id&&x.email);if(m&&m.email)return(""+m.email).toLowerCase();return(""+(a.company_name||"")).toLowerCase();};
 /* TEKİL hesap = sahibin e-postasına göre grupla (tekrarları birleştir); ejderusa = kanonik ownerAccountId */
-const byE={};(Array.isArray(_ac)?_ac:[]).forEach(a=>{const e=emailOf(a);if(!e||e===SUPER_OWNER)return;const isEj=(e===OWNER_EMAIL||/ejder/.test(e));const id=(isEj&&ejId)?ejId:a.id;if(!byE[e])byE[e]={email:e,id,ownerId:a.owner_id,ej:isEj};else if(isEj&&ejId)byE[e].id=ejId;});
+const _HIDE=["novaagencies8@gmail.com","thenova_agencies@gmail.com","belmakilic01@gmail.com"];
+const byE={};(Array.isArray(_ac)?_ac:[]).forEach(a=>{const e=emailOf(a);if(!e||e===SUPER_OWNER||_HIDE.indexOf(e)>=0)return;const isEj=(e===OWNER_EMAIL||/ejder/.test(e));const id=(isEj&&ejId)?ejId:a.id;if(!byE[e])byE[e]={email:e,id,ownerId:a.owner_id,ej:isEj};else if(isEj&&ejId)byE[e].id=ejId;});
 if(!byE[OWNER_EMAIL]&&ejId){byE[OWNER_EMAIL]={email:OWNER_EMAIL,id:ejId,ownerId:null,ej:true};}
 const list=Object.values(byE).sort((x,y)=>(y.ej?1:0)-(x.ej?1:0));
 setAccs(list);
@@ -1938,7 +1940,7 @@ return(
 <style>{CSS}</style>
 <div className="shell">
 <aside className="sidebar" style={_superHome?{display:"none"}:undefined}>
-<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM542</b>{(""+(currentUserEmail||"")).toLowerCase()===SUPER_OWNER&&<span style={{marginLeft:6,fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:6,padding:"1px 6px",letterSpacing:".05em"}}>SÜPER</span>}</div></div>
+<div className="brand"><span className="dot"/><div><div className="qm-name" style={{color:"#1b2a6b"}}>QM</div><div className="qm-sub">{TT("Etsy paneli","Etsy panel")} · <b style={{color:"var(--azure)"}}>QM543</b>{(""+(currentUserEmail||"")).toLowerCase()===SUPER_OWNER&&<span style={{marginLeft:6,fontSize:9,fontWeight:800,color:"#fff",background:"var(--green)",borderRadius:6,padding:"1px 6px",letterSpacing:".05em"}}>SÜPER</span>}</div></div>
 <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"stretch"}}><button className="lang-btn" onClick={()=>setSettings(s=>({...s,lang:s.lang==="tr"?"en":(s.lang==="en"?"ur":"tr")}))} title="TR → EN → UR (اردو)">{lang==="tr"?"TR":(lang==="en"?"EN":"اردو")}</button><div style={{display:"flex",gap:6,flexWrap:"wrap"}}><button className="lang-btn" onClick={syncAll} title={TT("Tüm bağlı mağazaların e-postalarını çek","Sync all connected stores")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",flex:"none",border:"1.5px solid var(--red)",background:syncing?"#22c55e":"var(--red)",animation:syncing?"qmpulse 1s infinite":"none"}}/>{TT("Senkron","Sync")}</button><button className="lang-btn" onClick={()=>{const el=document.getElementById("shotInput");if(el)el.click();}} title={TT("Ekran görüntülerini seç → yapay zekâ CSV'ye çevirsin (seçili mağaza + ay)","Pick screenshots → AI converts to CSV (active store + month)")} style={{flex:"1 1 90px",background:"#fff",color:"var(--red)",borderColor:"var(--red)",fontWeight:800,fontSize:12,padding:"7px 8px",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>{imgBusy?"":""} {TT("CSV Yap","Make CSV")}</button></div></div>
 <input id="shotInput" type="file" accept="image/*" multiple style={{display:"none"}} onChange={async e=>{const _fs=Array.from(e.target.files||[]);const _el=document.getElementById("shotInput");if(!_fs.length){if(_el)_el.value="";return;}if(!act){window.alert(TT("Önce soldan bir mağaza seç.","Select a store first."));if(_el)_el.value="";return;}let _mon=/^\d{4}-\d{2}$/.test(period)?period:"";if(!_mon){const _def=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0");const _ans=window.prompt(TT("Bu görüntüler hangi aya ait? (YYYY-AA — örn 2026-07 = Temmuz)","Which month? (YYYY-MM)"),_def);if(_ans===null||!/^\d{4}-\d{2}$/.test((_ans||"").trim())){if(_el)_el.value="";return;}_mon=_ans.trim();}const _p=_mon.split("-");const _lbl=(TR_MONTHS[(+_p[1])-1]||_p[1])+" "+_p[0];if(!window.confirm(TT("Bu ","These ")+_fs.length+TT(" görüntü CSV'ye çevrilip şuraya yazılacak:","  screenshots → CSV, saved to:")+"\n\n"+TT("MAĞAZA","STORE")+": "+(acctName||act)+"\n"+TT("AY","MONTH")+": "+_lbl+"\n\n"+TT("Doğru mu?","Correct?"))){if(_el)_el.value="";return;}let _ok=0;for(const f of _fs){try{await handleImage(f,_mon);_ok++;}catch(_x){}}if(_el)_el.value="";try{setPeriod(_mon);}catch(_){}setToast(""+_ok+"/"+_fs.length+" "+TT("görüntü → ","screenshots → ")+(acctName||act)+" · "+_lbl);}}/>
 </div>
@@ -2515,7 +2517,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 /* ===== Otomatik surum takibi — yeni yayin cikinca herkese "Yenile" serdi ===== */
 (function(){
   if(location.protocol==="file:")return;
-  var CURRENT=542; /* bu sayi her surumde artar */
+  var CURRENT=543; /* bu sayi her surumde artar */
   var banner=null;
   function showBanner(nv){
     if(banner)return;
