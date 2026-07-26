@@ -258,6 +258,8 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM544 | 25 Tem 2026 | **(1) 03.1 KONU SIRALAMASI AYRI SEKME:** `renderAllViz(mode)` → 03 sadece tablo, **03.1** sadece sıralama; dashboard alt-nav'da 03 yanında **"03.1 KONU"** sekmesi. **(2) HESAP AÇANLAR nova ana ekranında:** `tab=nova & _superHome` iken NOVA AGENT'ın üstünde HesapAcanlar kutusu (ejderusa #1) — ayrı sekmeye gitmeden aynı ekranda geçiş. **(3)** Fazla hesaplar listede gizli; kalıcı DB silme Supabase'den |
+| QM543 | 25 Tem 2026 | **HESAP AÇANLAR FİLTRE:** Eski karışık hesaplar (novaagencies8, thenova_agencies, belmakilic01) `_HIDE` ile listeden gizlendi. Sadece ejderusa (ana) + gerçek hesaplar kalır. (Kalıcı DB silme ayrı — Supabase'den.) |
 | QM542 | 25 Tem 2026 | **NOVA AGENT SADELEŞTİRME:** A1 (userEmail inbox) + A3/A4 (`EXTRA_INBOXES`) sekmeleri **kaldırıldı** — sadece **BOX + PANDORA + A2 (Önemli)** kaldı (BOX zaten tüm kutuları birleştiriyor). Hero'daki **"bekleyen istek" pili kaldırıldı**. Kalıcı view A1/A3/A4'te kalmışsa BOX'a düşer (guard) |
 | QM541 | 25 Tem 2026 | **SON EKRANA DÖN:** NOVA AGENT iç alt görünümü (BOX/PANDORA/A1/A2/A3/A4) artık **kalıcı** (`qm_novaview`) + gün seçimi 3/7/30 kalıcı (`qm_novadays`). Ana sekme zaten `qm_tab` ile kalıcıydı → ayrılıp geri gelince açık olan ekrana dönülüyor |
 | QM540 | 25 Tem 2026 | **03 GÖRÜNÜRLÜK → 03.1 KONU SIRALAMASI:** Tablonun altına yeni bölüm — her **(hesap × adlı konu:** emb/apron/canvas/bts/senior/mama**)** kombinasyonu, o hesabın toplam gösteriminde konunun **yüzdesi** ile, **büyükten küçüğe** gösterim sıralı (bar + % + views). Diğer hariç |
