@@ -5,6 +5,21 @@
 
 ---
 
+## ⛔ 0 NUMARALI ZORUNLU KURAL — VERİ KALICILIĞI (TÜM QM + NOVA, İSTİSNASIZ)
+
+**EJDER'in emri (26 Tem 2026):** Bir kez çekilen / senkronlanan / indirilen HİÇBİR veri GERİ GİTMEZ, sıfırlanmaz, baştan başlamaz. Bu kural **istisnasız tüm QM sekmeleri VE tüm NOVA bölümleri** için geçerlidir.
+
+Uygulama kuralları (her yeni özellikte de uy):
+1. **Çekilen HER veri kalıcı yazılır:** `localStorage` + mümkünse Supabase **buluta** (settings/shared_state). Örn: `dm`, CSV/marketing, finance, trademark, visibility, identity; NOVA: `ssStores`, `ssOrders`, `ssCounts`, `pandoraCustomers`, `storeOrders2026`, inbox/important listeleri.
+2. **Boş/başarısız okuma mevcut veriyi ASLA EZMEZ.** Yaz/oku her yerde `if(list.length){...}` guard'ı olmalı; bulut boş/timeout dönerse cache/mevcut korunur.
+3. **`useState(null)` bırakıp "çekince gelir" DENMEZ.** Açılışta önce localStorage cache'inden ANINDA yüklenir, bulut arka planda **merge** eder (geri gitmez).
+4. **Sayfadan ayrılıp dönünce, yenileyince, cihaz değişince** veri yerinde durur (kalıcı view/seçim state'leri de: `qm_ssview`, `qm_novaview`, vb.).
+5. Yeni bir "çek/senkronize/indir" düğmesi eklenince bu 4 madde otomatik uygulanır — aksi halde iş EKSİK sayılır.
+
+> Bu, aşağıdaki eski "veri güvenliği" ve "EN KRİTİK KURAL" notlarının üstüne konan **genel/bağlayıcı** kuraldır.
+
+---
+
 ## 🔒 PLANLANAN: ÇOK-PANELLİ / GİZLİ SÜPER-ADMİN MİMARİSİ (EJDER'in isteği, henüz YAPILMADI)
 
 EJDER'in tarif ettiği yeni yapı — kurulacak:

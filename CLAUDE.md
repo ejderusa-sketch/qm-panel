@@ -12,3 +12,4 @@
 2. **SÜRÜM +1:** her değişiklikte sürüm numarası artar; 4 yerde güncellenir (üst yorum, footer rozeti, `var CURRENT=`, `version.txt`) + QM-NOTLAR.md sürüm geçmişine satır.
 3. **BABEL DOĞRULA:** değişiklikten sonra JSX'i Babel ile derleyip sözdizimi hatası olmadığını kontrol et.
 4. Push (yayına alma) public içerik olduğu için EJDER `YAYINLA.command`'a çift tıklar ya da onay verir.
+5. **VERİ KALICILIĞI (0 numaralı kural):** çekilen/senkronlanan/indirilen HİÇBİR veri geri gitmez/sıfırlanmaz — tüm QM + NOVA için `localStorage` + bulut, boş okuma mevcut veriyi EZMEZ. Detay QM-NOTLAR.md'nin en üstünde.
