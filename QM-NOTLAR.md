@@ -21,6 +21,30 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 
 ---
 
+## 🆕 PLANLANAN: KAYIT / ÇOK-KİRACILI (MULTI-TENANT) HESAP AÇMA (25 Tem 2026, EJDER'in isteği — SORU-CEVAP ile netleşti, henüz YAPILMADI)
+
+**Vizyon:** Tek uygulama (`index.html`, `ejderusa-sketch.github.io/qm-panel`). Herkes aynı sayfayı açar; fark sadece **veride**. Yeni kaydolan → **ejderusa gibi ama BOMBOŞ** bir panel (mağaza/email bağlı değil). Biz ejderusa üzerinde geliştirdikçe aynı şablon güncellenir → yeni kaydolanlar otomatik en güncel paneli alır. Email/mağaza bağlandıkça başlıklar/veriler dolar. Her hesabın verisi **izole**.
+
+**İki giriş yolu:**
+- **Hesap açanlar** → herkese açık **"Kaydol"** ekranı; kendi e-posta + şifresiyle **ayrı yeni hesap** açar.
+- **Mevcut hesaba katılacaklar** → o hesabın **davet linki** ile girer (mevcut EKİP/24s link sistemi).
+
+**Toplanan kararlar (soru-cevap):**
+1. **(S1)** Yeni hesap açma = herkese açık Kaydol ekranı. Katılım = davet linki.
+2. **(S2)** Kaydolunca panel **HEMEN açılır** — nova onayı GEREKMEZ.
+3. **(S3)** HESAP AÇANLAR listesinde her hesap **e-posta** ile gösterilir.
+4. **(S4)** Bir hesabın e-postasına basınca detay: **1) Ad Soyad · 2) Telefon · 3) Şirket adı (opsiyonel)**. Sıralama: **#1 = ejderusa sabit başta**, yeniler kayıt sırasıyla altına.
+5. **(S5)** Kayıt formu alanları: **E-posta, Şifre, Ad Soyad, Telefon, Şirket(opsiyonel)**.
+6. **(S6/S7)** Yeni hesaplarda **NOVA AGENT + SHIPSTATION var** (kendi verileriyle). **HESAP AÇANLAR YALNIZ nova'da** (novainnc) — normal hesap sahibi başka hesabı göremez/giremez (izolasyon/gizlilik korunur).
+7. **(S8)** Yeni hesap sahibi **kendi ekibini davet linkiyle ekleyebilir** (kendi hesabının owner'ı).
+8. **(S9 — KARAR BEKLİYOR)** Sen HESAP AÇANLAR'dan ejderusa'ya geçince NOVA AGENT sekmesi ejderusa'da görünsün mü? (Şu an QM534: ejderusa'da NOVA AGENT yok, yalnız nova'da.) — EJDER netleştirecek.
+
+**Kalan sorular (S10–S20) sorulacak:** izolasyon detayı, hesap silme/dondurma (sadece nova), hesap sayısı sınırı, 1 e-posta=1 hesap mı, yeni hesap bildirimi, mevcut verilerin ejderusa'da kalması onayı, boş panelde sabit içerik (Kurallar/MD/Ayarlar) dolu mu gelsin, vb.
+
+**Teknik plan (yapılınca):** Supabase `accounts` (her kayıt = 1 satır, owner_id) + `members` + `account_state` (izole veri) zaten var. Eklenecek: (a) **Kaydol ekranı** (signUp + Ad Soyad/Telefon/Şirket → `profiles`/account meta), (b) HESAP AÇANLAR'ı **tekil hesaplar**a çevir (şu an üyelikleri listeliyor → ejderusa 9× tekrar hatası), her satır e-posta + tıklayınca profil detayı, (c) yeni hesaba geçiş zaten `qm_switch_acc` ile çalışır.
+
+---
+
 ## 24 TEMMUZ 2026 OTURUM ÖZETİ (QM487 → QM512)
 
 Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
