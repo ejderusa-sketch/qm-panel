@@ -5,6 +5,71 @@
 
 ---
 
+## 🔒 MAĞAZA SIRASI — SABİT / DEĞİŞMEZ (EJDER emri, 30 Tem 2026)
+
+**Bu sıra KİLİTLİDİR. Mağaza numaraları (QM00, QM01…) ARTIK DEĞİŞMEZ.** Herhangi bir işlem (senkron, yükleme, kova birleştirme) bu sırayı bozmamalı. Sıra kayarsa aşağıdaki referansa göre geri getir.
+
+| No | Mağaza | E-posta |
+|----|--------|---------|
+| 00 | BYDREAM | — |
+| 01 | NEWCUSTOMTEE | serdaretsyy@gmail.com |
+| 02 | BESTBABATEE | bestbabatee58@gmail.com |
+| 03 | BESTHANDY | ejderetsy@gmail.com |
+| 04 | CUSTOMHADMADE | lokmanetsyy@gmail.com |
+| 05 | GIFTBULENT | bulentwaco@gmail.com |
+| 06 | FAMILY | etsy.inceus@gmail.com |
+| 07 | BEUTY | akifetsyy@gmail.com |
+| 08 | SOFTQUALITY | fatmaemerald1@gmail.com |
+| 09 | HAPPY | hamdietsy1@gmail.com |
+| 10 | YUKSELETSY | yukseletsyy@gmail.com |
+| 11 | VIRGINIA | virginiafashion057@gmail.com |
+| 12 | BLUEDREAM | islametsyy@gmail.com |
+| 13 | FAST | nihanetsyy@gmail.com |
+| 14 | NEWTRENDY | lutfietsy@gmail.com |
+| 15 | DIZAYN ARIF | sallyshopus@gmail.com |
+| 16 | NEWERA | muharremetsy@gmail.com |
+| 17 | SELMAN | onlinexclothingx@gmail.com |
+| 18 | CUSTOM ODESS | outfiquesk@gmail.com |
+| 19 | PRINT | moonlightcustomm@gmail.com |
+| 20 | WHEAT | wheatcollection02@gmail.com |
+| 21 | SS | softcare.llc.ny@gmail.com |
+| 22 | SALIM | yourrsalim@gmail.com |
+| 23 | SHIRT | arifgomleksizetsy@gmail.com |
+| 24 | TARIK NO | coralgiftcustomerservice@gmail.com |
+| 25 | LOTUS | lotusdesingtx@gmail.com |
+| 26 | CUSSTOMHUB | cusstomhub@gmail.com |
+| 27 | MYMAMA | thethreadnestt@gmail.com |
+| 28 | MYCUSTOM | customembrioder@gmail.com |
+| 29 | TARIK NO | (boş) |
+| 30 | TARIK NO | crescentdesignusa@gmail.com |
+| 31 | CUSTOMDTF | thecustomartt@gmail.com |
+| 32 | DREAMCRUFT | dreammcraftusa@gmail.com |
+| 33 | YOURDIZAYN | yourdesignets@gmail.com |
+| 34 | NIGHTINGALE | asimetsy38@gmail.com |
+| 35 | BETY | betyetsyusa@gmail.com |
+| 36 | FLEXY | flexytee2@gmail.com |
+| 37 | FIRE | fireflytee9@gmail.com |
+| 38 | SNOW | snowflakeapparelus@gmail.com |
+| 39 | MIRAGO | redmountventuresllc@gmail.com |
+| 40 | INCEPOLITE | m.ince.esp@gmail.com |
+| 41 | INCE RUG | minceuganda@gmail.com |
+| 42 | ZEUGMA | mkalkan27etsy@gmail.com |
+| 43 | FRESH | mehmetfreshfontain@gmail.com |
+| 44 | FREE | freshfashionmd@gmail.com |
+| 45 | BESTAPAREL | zubeydedemirel605@gmail.com |
+| 46 | (isimsiz) | salihbute12@gmail.com |
+| 47–49 | (boş slot) | — |
+| 50 | A1 INBOX EJDERUSA | ejderusa@gmail.com (kutu) |
+| 51 | NOVA | novainnc@gmail.com (kutu) |
+| 52 | (boş) | — |
+| 53 | EJDERUG | ejderug@gmail.com (kutu) |
+| 54–58 | (boş slot) | — |
+| 59 | BYDREAM | (mükerrer — temizlenebilir) |
+
+> Not: 46 (salihbute) isimsiz; 29 TARIK NO e-postasız; 59 BYDREAM 00 ile mükerrer. Bunlar EJDER isterse düzeltilir ama **numara sırası bu şekilde sabit tutulur.**
+
+---
+
 ## ⛔ 0 NUMARALI ZORUNLU KURAL — VERİ KALICILIĞI (TÜM QM + NOVA, İSTİSNASIZ)
 
 **EJDER'in emri (26 Tem 2026):** Bir kez çekilen / senkronlanan / indirilen HİÇBİR veri GERİ GİTMEZ, sıfırlanmaz, baştan başlamaz. Bu kural **istisnasız tüm QM sekmeleri VE tüm NOVA bölümleri** için geçerlidir.
@@ -284,6 +349,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 | QM645 | 26 Tem 2026 | **COMPUTER ALT SEKMELERİ:** C·COMPUTER içine **3.1 Virüs · 3.2 Loginler · 3.3 Bilgiler silinsin** alt-sekme çubuğu (`compView`, `qm_compview` ile kalıcı). Seçilen bölümün başlığı+açıklaması gösterilir (içerik "yakında") |
 | QM644 | 26 Tem 2026 | **COMPUTER SEKMESİ BOX'A DÜŞÜYORDU FIX:** ~2150'deki effect süper-home'da tab nova/shipstation/hesaplar değilse otomatik **"nova"(BOX)**ya döndürüyordu; "computer" listede yoktu → COMPUTER'a basınca anında BOX çıkıyordu. Listeye `computer` eklendi → COMPUTER artık kendi C·COMPUTER bölümünü gösterir, BOX göstermez |
 | QM643 | 26 Tem 2026 | **APP-SEKME SATIRI ORTALANDI:** BOX/SHIPSTATION/COMPUTER/HESAP AÇANLAR satırı (`.tabs`) `justifyContent:center` → ekranın ortasında, solda değil |
+| QM647 | 30 Tem 2026 | **8.6 LEGAL MAĞAZA KUTUCUKLARI:** grid 10 sabit sütun → `repeat(auto-fill,minmax(158px,1fr))`; kutucuklar genişledi, font 11→10 → mağaza isimleri **tam görünür** (kesilmiyor). **Ayrıca mağaza sırası MD'ye KİLİTLENDİ** (00 BYDREAM, 01 NEWCUSTOMTEE…) — değişmemeli. NOT: 643–646 EJDER isteğiyle geri alınmıştı; bu 642 üzerine temiz artış |
 | QM642 | 26 Tem 2026 | **(1) SÜRÜM ROZETİ SÜPER GÖRÜNÜMDE:** süper owner'da sol kenar çubuğu gizli → sürüm görünmüyordu; üst başlık yanına **"(QM642)"** rozeti eklendi. Sürüm artık 5 yerde: üst yorum, sidebar, HERO rozet, `CURRENT`, version.txt. **(2) CANVAS YANLIŞ POZİTİF FIX:** "canvas" kelimesi Bella+Canvas (tişört markası) ve canvas **tote bag** (kumaş) ürünlerinde de geçiyordu → WHEAT/TOTEBAG yanlış sayılıyordu. `_CANVX` hariç-tutma eklendi (bella/tote/bag/tshirt/tee/hoodie/sweat/tank/apron/mug…) → sadece gerçek tablo/duvar canvas'ı sayılır |
 | QM641 | 26 Tem 2026 | **(1) APIKEY KALICI:** `_KEEP`'e `apiKey`/`googleClientId`/`clientId` eklendi → bulut boş/eski okuyunca **silinmez**. Anahtar silinince özet/trend/OCR "başa dönüyordu"; çözüldü. Etsy Policy özetleri (`policyBullets`) zaten kalıcı; özet için Ayarlar→8.5 API'ye Anthropic anahtarı **gerekir**. **(2) 2.8 CANVAS TESPİTİ GENİŞLETİLDİ:** sadece "canvas" değil; tablo/rulo/çerçeve/framed/rolled/ready to hang/wall art geçen kalemler de sayılır → 6 yerine tüm satan hesaplar. Senkronize Et ile yeni tespitle tazelenir (veri ezilmez, canlı hesaplanır) |
 | QM640 | 26 Tem 2026 | **03.1 TABLO = SOL MAĞAZA LİSTESİ İLE SENKRON:** görünürlük tablosu kutu/inbox hesaplarını (A1 INBOX EJDERUSA, NOVA, EJDERUG — `_isInboxAcct`) mağaza gibi gösteriyordu; sol liste bunları zaten filtreliyordu → uyuşmazlık. Artık tablo da `_isInboxAcct` olanları **gizliyor** (`filter !inbox`). **Kural:** sol mağaza listesinde yoksa tabloda/ekranda da yok. Bağlı olmayan/boş mağazalar boş kalır (kullanıcı onayı) |
