@@ -1,3 +1,4 @@
+| QM658 | 30 Tem 2026 | **08 CTR AÇIKLAMA TEK SATIR:** uzun eşik anlatımı kısaltıldı → tek satır (nowrap+ellipsis); eşik detayı zaten karar kartlarında. |
 # QM PANEL — PROJE NOTLARI
 
 > Bu dosya, Claude'un her yeni oturumda projeyi hatırlaması içindir.
