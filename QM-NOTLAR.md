@@ -349,6 +349,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 | QM645 | 26 Tem 2026 | **COMPUTER ALT SEKMELERİ:** C·COMPUTER içine **3.1 Virüs · 3.2 Loginler · 3.3 Bilgiler silinsin** alt-sekme çubuğu (`compView`, `qm_compview` ile kalıcı). Seçilen bölümün başlığı+açıklaması gösterilir (içerik "yakında") |
 | QM644 | 26 Tem 2026 | **COMPUTER SEKMESİ BOX'A DÜŞÜYORDU FIX:** ~2150'deki effect süper-home'da tab nova/shipstation/hesaplar değilse otomatik **"nova"(BOX)**ya döndürüyordu; "computer" listede yoktu → COMPUTER'a basınca anında BOX çıkıyordu. Listeye `computer` eklendi → COMPUTER artık kendi C·COMPUTER bölümünü gösterir, BOX göstermez |
 | QM643 | 26 Tem 2026 | **APP-SEKME SATIRI ORTALANDI:** BOX/SHIPSTATION/COMPUTER/HESAP AÇANLAR satırı (`.tabs`) `justifyContent:center` → ekranın ortasında, solda değil |
+| QM652 | 30 Tem 2026 | **08 CTR KARAR SÜZ:** KARAR çip filtresi (SİL/BAŞLIK DÜZELT/LİSTİNG DÜZELT/İZLE/İYİ, sayaçlı) — tek tıkla sadece o karar. 2001 listingde ortadaki kararlar artık kolay görünür. |
 | QM651 | 30 Tem 2026 | **08 CTR KARAR SIRALANABİLİR:** KARAR sütunu tıklanınca sıralanır (rütbe: SİL→BAŞLIK DÜZELT→LİSTİNG DÜZELT→İZLE→İYİ). |
 | QM650 | 30 Tem 2026 | **05 CSV KAYNAĞI 1.5 LEGAL SATIRI:** Legal & Tax · Screenshot · "AI okur → CSV/alanlara" · LEGAL. |
 | QM649 | 30 Tem 2026 | **06.4 TABLO YENİLENDİ:** 7 sütun → **SIRA NO(oto) · AY(menü) · KONU · CUSTOM MI(menü Evet/Hayır) · DETAY KELİMELER · YENİ FİKİR · NOT**. AY ve CUSTOM MI açılır menü. Eski veri (konu/ay/n1-n3) yeni alanlara migrate. Otomatik satır + kalıcı |
