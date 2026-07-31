@@ -312,15 +312,14 @@ Ayrıca bu dosyanın "SÜRÜM GEÇMİŞİ" tablosuna satır eklenir.
 
 **Neden version.txt önemli:** Açık duran paneller her 2 dakikada bir `version.txt`'yi kontrol eder. İçindeki sayı `CURRENT`'tan büyükse "Yeni sürüm — Yenile" şeridi çıkar. Yani version.txt push edilmezse dünyadaki manager'lar güncelleme uyarısı almaz.
 
-### İKİ COWORK OTURUMU — ÖNEK KURALI (EJDER)
+### SÜRÜM ÖNEK KURALI (EJDER — NOVA688'den itibaren GÜNCEL)
 
-İki ayrı Cowork oturumu aynı depoda çalışıyor ve sürüm sayaçları birbirini takip edemiyor. Çözüm: **her oturum kendi önekini kullanır, ikisi de aynı `QM-NOTLAR.md`'ye yazar.**
+**Artık TEK önek: `NOVA`.** EJDER "sürümlerin adını NOVA yapalım" dedi (31 Tem 2026, NOVA688'de). Bütün geliştirme **ejderusa paneli üzerinden** devam ediyor; ejderusa artık herhangi bir hesap gibi, "QM PANEL" özel adı kalktı.
 
-- **QM panelinde çalışan oturum → `QMxxx`** (bu oturum; ejderusa/Etsy mağaza tarafı). Sayaç bağımsız artar (QM678, QM679…).
-- **NOVA panelinde çalışan oturum → `NOVAxxx`** (diğer Cowork sayfası; novainnc süper-owner tarafı). Kendi sayacı (NOVA1, NOVA2…).
-- İkisi de **aynı** `index.html` + `QM-NOTLAR.md` üzerinde; sürüm geçmişi tablosunda QM* ve NOVA* satırları yan yana durabilir — sorun değil.
-- **Rozet/`CURRENT`/`version.txt`:** her oturum kendi önekinin son numarasını yazar; iki önek karışmaz. Çakışma olursa en son push kazanır (git); commit mesajında önek net olsun.
-- **Kural:** bu oturum HER ZAMAN `QM` öneğiyle devam eder, diğer oturum `NOVA` ile. Karışık numara verme.
+- **Bundan sonra tüm sürümler `NOVAxxx`** (NOVA688, NOVA689…). Numara kesintisiz devam eder (688'den).
+- Eski **`QMxxx`** satırları tarihsel referans olarak tabloda kalır — silme.
+- 4 yer + version.txt + bu tablo aynı şekilde güncellenir; sadece rozet metni `QM` yerine `NOVA`.
+- (ESKİ KURAL İPTAL: "QM bu oturum / NOVA diğer oturum" ayrımı artık geçerli değil — tek önek NOVA.)
 
 ## İŞ AKIŞI
 
@@ -372,6 +371,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| **NOVA688** | 31 Tem 2026 | **(1) SÜRÜM ÖNEKİ ARTIK "NOVA":** EJDER "sürümlerin adını NOVA yapalım, şu anki numaradan devam". Numara aynı (688), önek QM→NOVA; rozetler NOVA688. Bundan sonra tüm sürümler **NOVAxxx** (eski QMxxx satırları tarihsel kalır). **(2) "QM PANEL" ETİKETİ KALDIRILDI:** süper hesap seçicide ejderusa'ya özel "QM PANEL" yazısı kaldırıldı → isim · e-posta (ana) ile, diğer hesaplar gibi. (EJDER: "ejderusa artık herhangi bir account gibi, başka hesap açanlar da olacak".) |
 | QM687 | 31 Tem 2026 | **03.1 KONU YÜZDESİ = DAĞILIM (100'e toplanır):** eskiden her listing içerdiği HER konuya sayılıyordu (çakışma → tek dev listing yüzünden bir sürü sütun %90). Artık her listing **sadece ilk eşleşen** (sabit konular `_FX` öncelikli, sonra otomatik kelimeler) TEK konuya sayılır → bir mağazanın konu %'leri **~100'e toplanır**, çakışma yok. Hiçbir konuya uymayan listing = kalan. (EJDER: "hep %90 çıkıyor, bir tane %90 olur diğerleri düşük kalır".) |
 | QM686 | 31 Tem 2026 | **03.1 ZEBRA SATIR:** görünürlük tablosu satırları dönüşümlü 2 renk arka fon → tek satır açık **mavi** (#eef4ff), çift satır açık **kırmızı** (#fdecef). Donmuş ilk 4 sütun dahil (`!important`, CSS'teki #fff'i ezer). (EJDER: "her satırı biri mavi biri açık kırmız".) |
 | QM685 | 31 Tem 2026 | **DÖNEM + SIRALAMA KALICI (ekran hafızası):** `period` (Dönem: Son 6 Ay vs.) artık `qm_period` ile localStorage'a yazılıyor → her açılışta son seçilen dönem gelir (eskiden default'a dönüyordu). `vizSort` (03.1) `qm_vizsort` + `allSort` (04 ROAS) `qm_allsort` da kalıcı (fonksiyon-updater destekli). Ana tab/dashView/roasView zaten kalıcıydı → ekrandan ayrılınca dönünce **aynı ekran+dönem+sıralama** gelir. (EJDER: "hangi ekrandan ayrıldıysam o kalsın, her şeye tekrar tıklıyorum".) |
