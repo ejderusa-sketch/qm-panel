@@ -350,6 +350,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM672 | 30 Tem 2026 | **DASHBOARD PILL SIRASI:** 07 notlar (md) artık 08 csv kaynağı'ndan **önce**. Sıra: …06 etsy · 07 notlar · 08 csv kaynağı. (EJDER: "önce 7 sonra 8".) |
 | QM671 | 30 Tem 2026 | **E-POSTA ÜST SATIRA TAŞINDI:** kart üst satırındaki (numara+ok yanındaki) boş alana e-posta input'u konuldu. Alt durum satırı sadeleşti: **BAĞLI (sol) · [boşluk] · S↻ senkron (sağ)**. (EJDER: "emailleri bu boşluğa koyabilir miyiz".) |
 | QM670 | 30 Tem 2026 | **SIDEBAR BAĞLA SADELEŞTİRME:** üstteki ayrı "bağla" (gönderme izni) butonu + alttaki "Google ile Bağlan" butonu **kaldırıldı**. Sol durum pill'i tek buton oldu: bağlı **değilse** kırmızı **"bağla"** (tıkla → connectStore, yanıp söner), bağlıysa yeşil **"Bağlı"**. Tek yerden bağlan/durum. (EJDER: "bağlı olmadığında bağla yazsın kırmızı, bağlı olduğunda yeşil Bağlı".) |
 | QM669 | 30 Tem 2026 | **SIDEBAR KART ALT SATIR YENİDEN:** sıra artık **BAĞLI (sol) · gmail (orta, ortalanmış) · S↻ senkron ikonu (sağ)**. Senkron butonu "↻ Senkron" → sadece ikon **S↻**. "Bağlı" etiketi hep görünür: bağlıysa **yeşil**, bağlı değilse **kırmızı** (yanıp söner) + tıkla-bağlan. Eski ayrı Bağlı/Bağlı değil/OK rozetleri tek sol pill'de birleşti. (EJDER isteği.) |
