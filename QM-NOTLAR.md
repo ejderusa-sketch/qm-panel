@@ -312,6 +312,16 @@ Ayrıca bu dosyanın "SÜRÜM GEÇMİŞİ" tablosuna satır eklenir.
 
 **Neden version.txt önemli:** Açık duran paneller her 2 dakikada bir `version.txt`'yi kontrol eder. İçindeki sayı `CURRENT`'tan büyükse "Yeni sürüm — Yenile" şeridi çıkar. Yani version.txt push edilmezse dünyadaki manager'lar güncelleme uyarısı almaz.
 
+### İKİ COWORK OTURUMU — ÖNEK KURALI (EJDER)
+
+İki ayrı Cowork oturumu aynı depoda çalışıyor ve sürüm sayaçları birbirini takip edemiyor. Çözüm: **her oturum kendi önekini kullanır, ikisi de aynı `QM-NOTLAR.md`'ye yazar.**
+
+- **QM panelinde çalışan oturum → `QMxxx`** (bu oturum; ejderusa/Etsy mağaza tarafı). Sayaç bağımsız artar (QM678, QM679…).
+- **NOVA panelinde çalışan oturum → `NOVAxxx`** (diğer Cowork sayfası; novainnc süper-owner tarafı). Kendi sayacı (NOVA1, NOVA2…).
+- İkisi de **aynı** `index.html` + `QM-NOTLAR.md` üzerinde; sürüm geçmişi tablosunda QM* ve NOVA* satırları yan yana durabilir — sorun değil.
+- **Rozet/`CURRENT`/`version.txt`:** her oturum kendi önekinin son numarasını yazar; iki önek karışmaz. Çakışma olursa en son push kazanır (git); commit mesajında önek net olsun.
+- **Kural:** bu oturum HER ZAMAN `QM` öneğiyle devam eder, diğer oturum `NOVA` ile. Karışık numara verme.
+
 ## İŞ AKIŞI
 
 1. Claude `~/Documents/qm-panel/index.html` dosyasını doğrudan düzenler.
