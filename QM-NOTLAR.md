@@ -350,6 +350,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM675 | 30 Tem 2026 | **SIDEBAR KART ÜST SATIR:** ▲▼ oklar **en sola** alındı (sıra: ▲▼ · numara · e-posta). E-posta artık **boydan boya** (flex:1; gereksiz boş "e-posta göster" butonu kaldırıldı, gap 9→5) → uzun gmail adresleri görünür. (EJDER: "tırnak işaretini en sola al, boydan boya emailleri görelim".) |
 | QM674 | 30 Tem 2026 | **SIDEBAR ÜST BUTONLAR KESİLME KESİN FİX:** kök sebep → `.brand` div'i (display:flex **row**) bilgiden sonra kapanmıyordu; buton kolonu + shotInput `.brand` **içinde** (yan yana) kalıyordu → dar sidebar'da TR/Senkron/CSV sağa taşıp kesiliyordu (QM668'deki width:100% işe yaramıyordu çünkü kolonun kendisi dardı). `.brand` artık [nokta+QM bilgi]'den sonra kapanıyor; buton kolonu aside'ın doğrudan çocuğu (flex column) → markanın **altında** tam genişlik dikey, kesilmez. |
 | QM673 | 30 Tem 2026 | **05 CTR ÜST ŞERİT SADELEŞTİRİLDİ:** (1) Views/Clicks/Satış/CTR istatistik şeridi **kaldırıldı**. (2) CTR SÜZ (en az/en çok %) min-max filtre kutusu **kaldırıldı**. Sadece karar kartları (SİL/BAŞLIK DÜZELT/LİSTİNG DÜZELT/İZLE/İYİ + düzenlenebilir eşik + filtreli sayaç) kaldı. `ctrMin/ctrMax` state duruyor (boş = filtre yok). (EJDER: "bunu kaldır / bunu da kaldır".) |
 | QM672 | 30 Tem 2026 | **DASHBOARD PILL SIRASI:** 07 notlar (md) artık 08 csv kaynağı'ndan **önce**. Sıra: …06 etsy · 07 notlar · 08 csv kaynağı. (EJDER: "önce 7 sonra 8".) |
