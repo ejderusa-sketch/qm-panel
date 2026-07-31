@@ -362,6 +362,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM678 | 30 Tem 2026 | **05 CTR karar kartları arka fon BEYAZ:** soluk pastel yerine iç beyaz (`#fff`); renkli kenar + yazı kaldı. Aktif (seçili) kart hâlâ renk dolgulu. (EJDER: "arka fon beyaz olsun yuvarlağın içi".) |
 | QM677 | 30 Tem 2026 | **SIDEBAR KART ▲▼ OKLARI KALDIRILDI:** mağaza kartındaki yukarı/aşağı taşıma okları kaldırıldı. Sıralama hâlâ **numara rozetine çift tık → prompt** (`moveAcctTo`) ile. Üst satır artık: numara · e-posta (boydan boya) · sil. (EJDER: "gerek yok, numarayı elle gireriz".) |
 | QM676 | 30 Tem 2026 | **DİL FİX:** 05 CTR karar kartları (SİL/BAŞLIK DÜZELT/LİSTİNG DÜZELT/İZLE/İYİ) sabit Türkçeydi → `TT(...)` ile sarıldı (REMOVE/FIX TITLE/FIX LISTING/WATCH/GOOD). Artık EN'de tam çevriliyor. **KURAL:** tüm UI metinleri `TT("tr","en")` ile dile duyarlı olmalı; sabit Türkçe string bırakma (aşağıdaki "DİL KURALI" bölümü). |
 | QM675 | 30 Tem 2026 | **SIDEBAR KART ÜST SATIR:** ▲▼ oklar **en sola** alındı (sıra: ▲▼ · numara · e-posta). E-posta artık **boydan boya** (flex:1; gereksiz boş "e-posta göster" butonu kaldırıldı, gap 9→5) → uzun gmail adresleri görünür. (EJDER: "tırnak işaretini en sola al, boydan boya emailleri görelim".) |
