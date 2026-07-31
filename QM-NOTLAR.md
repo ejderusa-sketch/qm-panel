@@ -372,6 +372,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM680 | 30 Tem 2026 | **04 ROAS = LİSTİNG BAZLI:** eski mağaza-toplam tablo yerine artık **her satır bir listing** (CTR tablosu gibi). Sütunlar: MAĞAZA (QM+isim) · LISTING · Views · Clicks · Orders · Revenue · Spend · ROAS · KARAR. Listing bazında ROAS=Revenue÷Spend; sıralanabilir, TOPLAM satırı + stat şerit korundu. (EJDER: "bunda listing listing yapılması lazım".) |
 | QM679 | 30 Tem 2026 | **VARSAYILAN EKRAN = DASHBOARD:** açılışta varsayılan sekme `"csv"` → `"dash"` (qm_tab boş/ilk açılışta). Panel her açılışta DASHBOARD ekranında gelir; alt görünüm zaten `qm_dashview` ile hatırlanır (ctr vs.). Önceden seçili tab varsa yine korunur. (EJDER: "bu dashboard kaybolmasın, her açılışta bu ekran olsun".) |
 | QM678 | 30 Tem 2026 | **05 CTR karar kartları arka fon BEYAZ:** soluk pastel yerine iç beyaz (`#fff`); renkli kenar + yazı kaldı. Aktif (seçili) kart hâlâ renk dolgulu. (EJDER: "arka fon beyaz olsun yuvarlağın içi".) |
 | QM677 | 30 Tem 2026 | **SIDEBAR KART ▲▼ OKLARI KALDIRILDI:** mağaza kartındaki yukarı/aşağı taşıma okları kaldırıldı. Sıralama hâlâ **numara rozetine çift tık → prompt** (`moveAcctTo`) ile. Üst satır artık: numara · e-posta (boydan boya) · sil. (EJDER: "gerek yok, numarayı elle gireriz".) |
