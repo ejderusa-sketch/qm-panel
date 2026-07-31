@@ -339,6 +339,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM660 | 30 Tem 2026 | **NOVA + QM AYNI ANDA AYRI SEKME:** super-owner hesap geçişi artık **sekmeye özel** (URL `?as=<id>` + `sessionStorage`); `localStorage` KULLANILMIYOR. NOVA ana panel bir sekmede, ejderusa/QM (veya başka hesap) başka sekmede **aynı anda** açık kalır — biri diğerini değiştirmez/kapatmaz. "Geç/Gir" hesabı **YENİ SEKMEDE** açar (`window.open ?as=id`), NOVA sekmesi durur. "Kendi Panelim/NOVA" mevcut sekmeyi ana panele döndürür. OAuth redirect aynı sekmede sessionStorage'ı korur. `_getSwitchAcc()` helper tek kaynak. |
 | QM555 | 26 Tem 2026 | **SHIPSTATION 2.3 → 2026 AY AY:** "Son 7 Gün / Son 1–12 Ay" birikimli dönemler kaldırıldı; yerine **2026 takvim ayları** (Ocak…Aralık) sütunları — her hücre o mağazanın o 2026 ayındaki sipariş adedi (sadece 2026 sayılır). **TOPLAM sütunu** (mağaza 2026 toplamı) + TOPLAM satırı + genel toplam. Başlık "2026 Ay Ay". |
 | QM554 | 26 Tem 2026 | **HESAP AÇANLAR rozeti C → D** (kullanıcı isteği). Süper nav: **A** NOVA AGENT · **B** SHIPSTATION · **D** HESAP AÇANLAR (C atlandı). Hero: "D — HESAP AÇANLAR". |
 | QM553 | 26 Tem 2026 | **SÜPER NAV A/B/C:** super-home nav rozetleri **A** (NOVA AGENT) · **B** (SHIPSTATION API, eski "2") · **C** (HESAP AÇANLAR, eski "H"). Hero başlıkları da "B — SHIPSTATION API" / "C — HESAP AÇANLAR" oldu. |
