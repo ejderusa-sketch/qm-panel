@@ -31,9 +31,10 @@ if [ ! -d .git ]; then
   fi
 fi
 
-# Surum numarasini oku
-SURUM=$(grep -o 'QM[0-9]\{3\} ☁️' index.html | head -1 | grep -o 'QM[0-9]\{3\}')
-[ -z "$SURUM" ] && SURUM="guncelleme"
+# Surum numarasini version.txt'den oku (onek artik NOVA)
+NUM=$(cat version.txt 2>/dev/null | tr -d '[:space:]')
+SURUM="NOVA${NUM}"
+[ -z "$NUM" ] && SURUM="guncelleme"
 
 echo "Surum: $SURUM"
 echo "Gonderiliyor..."
