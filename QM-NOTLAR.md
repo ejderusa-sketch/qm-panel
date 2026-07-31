@@ -133,6 +133,17 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 
 ---
 
+## NOVA ↔ QM GEÇİŞ KURALI (QM660–661, ZORUNLU)
+
+**Kural (EJDER isteği):**
+- **NOVA → QM geçilir.** Süper-owner (novainnc) NOVA ana panelindeyken bir hesabı (ejderusa/QM veya başka) **"Geç/Gir"** ile açar → hesap **YENİ SEKMEDE** açılır (`window.open` + URL `?as=<id>`). NOVA ana paneli kendi sekmesinde açık kalmaya devam eder.
+- **QM → NOVA GEÇİLMEZ.** Hesap (QM) sekmesindeyken NOVA'ya geri dönüş anahtarı **yoktur**. Süper switcher / hesap listesi **yalnız süper-home'da** görünür; hesap görünümünde (`?as` set) gösterilmez.
+- **İki panel aynı anda ayrı açık kalır**, biri diğerini değiştirmez/kapatmaz.
+
+**Teknik (QM660):** Hesap geçişi artık **sekmeye özel** — kaynak `_getSwitchAcc()` helper'ı: URL `?as=<id>` param (varsa) → o hesap; yoksa `sessionStorage` (aynı sekmede OAuth redirect'i atlatır); yoksa NOVA ana panel. **`localStorage` KULLANILMAZ** (eski davranış tüm sekmeleri birbirine bağlıyordu → biri açılınca öbürü NOVA→QM'e dönüyordu). `qm_switch_acc` yazımı `localStorage`'dan tamamen kaldırıldı; `go(id)` hesabı yeni sekmede açar, `go("")` mevcut sekmeyi NOVA'ya döndürür (sadece hesap içi kullanılmıyorsa).
+
+---
+
 ## 24 TEMMUZ 2026 OTURUM ÖZETİ (QM487 → QM512)
 
 Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
@@ -339,6 +350,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM661 | 30 Tem 2026 | **(1) 03.1 + 04 BAŞLIK HİZASI:** sabit başlıklar (# · QM · MAĞAZA · VİEWS) dikey kategori başlıklarıyla (yükseklik 84, alta hizalı) aynı satırda üstte kalıp boşluk bırakıyordu → hepsi `verticalAlign:bottom`, başlıklar alt çizgide hizalı/derli toplu. **(2) GEÇİŞ KURALI (aşağıdaki "NOVA ↔ QM GEÇİŞ KURALI" bölümü):** NOVA → QM geçilir; QM → NOVA **geçilmez**. |
 | QM660 | 30 Tem 2026 | **NOVA + QM AYNI ANDA AYRI SEKME:** super-owner hesap geçişi artık **sekmeye özel** (URL `?as=<id>` + `sessionStorage`); `localStorage` KULLANILMIYOR. NOVA ana panel bir sekmede, ejderusa/QM (veya başka hesap) başka sekmede **aynı anda** açık kalır — biri diğerini değiştirmez/kapatmaz. "Geç/Gir" hesabı **YENİ SEKMEDE** açar (`window.open ?as=id`), NOVA sekmesi durur. "Kendi Panelim/NOVA" mevcut sekmeyi ana panele döndürür. OAuth redirect aynı sekmede sessionStorage'ı korur. `_getSwitchAcc()` helper tek kaynak. |
 | QM555 | 26 Tem 2026 | **SHIPSTATION 2.3 → 2026 AY AY:** "Son 7 Gün / Son 1–12 Ay" birikimli dönemler kaldırıldı; yerine **2026 takvim ayları** (Ocak…Aralık) sütunları — her hücre o mağazanın o 2026 ayındaki sipariş adedi (sadece 2026 sayılır). **TOPLAM sütunu** (mağaza 2026 toplamı) + TOPLAM satırı + genel toplam. Başlık "2026 Ay Ay". |
 | QM554 | 26 Tem 2026 | **HESAP AÇANLAR rozeti C → D** (kullanıcı isteği). Süper nav: **A** NOVA AGENT · **B** SHIPSTATION · **D** HESAP AÇANLAR (C atlandı). Hero: "D — HESAP AÇANLAR". |
