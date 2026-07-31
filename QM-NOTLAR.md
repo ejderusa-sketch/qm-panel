@@ -144,6 +144,18 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 
 ---
 
+## DİL KURALI (ZORUNLU)
+
+**Kural (EJDER):** Panelde görünen **HER metin** anında seçili dile çevrilmeli — Türkçeyse Türkçe, İngilizceyse İngilizce (ileride Urduca da). Ekranda **sabit/gömülü Türkçe (veya İngilizce) string BIRAKMA.**
+
+**Nasıl:** Tüm kullanıcıya görünen metinler `TT("Türkçe","English")` (varsa 3. arg Urduca) ile sarılır. `uiLang`/`settings.lang` değişince otomatik güncellenir. Buton etiketleri, kart/pill adları, tablo başlıkları, tooltip'ler, placeholder'lar, toast/uyarı mesajları — hepsi TT ile.
+
+**Sık yapılan hata:** Bir dizi/array içinde etiketleri düz string yazmak (ör. CTR karar kartlarında `"SİL"`, `"İZLE"`). Bunlar dil değişince çevrilmez. Diziye eklerken de `TT(...)` kullan. (QM676'da CTR karar kartları bu yüzden düzeltildi.)
+
+**Kontrol:** Yeni bir metin eklerken kendine sor: "Dili EN yapınca bu çevrilecek mi?" Cevap hayırsa `TT` ekle.
+
+---
+
 ## 24 TEMMUZ 2026 OTURUM ÖZETİ (QM487 → QM512)
 
 Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
@@ -350,6 +362,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM676 | 30 Tem 2026 | **DİL FİX:** 05 CTR karar kartları (SİL/BAŞLIK DÜZELT/LİSTİNG DÜZELT/İZLE/İYİ) sabit Türkçeydi → `TT(...)` ile sarıldı (REMOVE/FIX TITLE/FIX LISTING/WATCH/GOOD). Artık EN'de tam çevriliyor. **KURAL:** tüm UI metinleri `TT("tr","en")` ile dile duyarlı olmalı; sabit Türkçe string bırakma (aşağıdaki "DİL KURALI" bölümü). |
 | QM675 | 30 Tem 2026 | **SIDEBAR KART ÜST SATIR:** ▲▼ oklar **en sola** alındı (sıra: ▲▼ · numara · e-posta). E-posta artık **boydan boya** (flex:1; gereksiz boş "e-posta göster" butonu kaldırıldı, gap 9→5) → uzun gmail adresleri görünür. (EJDER: "tırnak işaretini en sola al, boydan boya emailleri görelim".) |
 | QM674 | 30 Tem 2026 | **SIDEBAR ÜST BUTONLAR KESİLME KESİN FİX:** kök sebep → `.brand` div'i (display:flex **row**) bilgiden sonra kapanmıyordu; buton kolonu + shotInput `.brand` **içinde** (yan yana) kalıyordu → dar sidebar'da TR/Senkron/CSV sağa taşıp kesiliyordu (QM668'deki width:100% işe yaramıyordu çünkü kolonun kendisi dardı). `.brand` artık [nokta+QM bilgi]'den sonra kapanıyor; buton kolonu aside'ın doğrudan çocuğu (flex column) → markanın **altında** tam genişlik dikey, kesilmez. |
 | QM673 | 30 Tem 2026 | **05 CTR ÜST ŞERİT SADELEŞTİRİLDİ:** (1) Views/Clicks/Satış/CTR istatistik şeridi **kaldırıldı**. (2) CTR SÜZ (en az/en çok %) min-max filtre kutusu **kaldırıldı**. Sadece karar kartları (SİL/BAŞLIK DÜZELT/LİSTİNG DÜZELT/İZLE/İYİ + düzenlenebilir eşik + filtreli sayaç) kaldı. `ctrMin/ctrMax` state duruyor (boş = filtre yok). (EJDER: "bunu kaldır / bunu da kaldır".) |
