@@ -350,6 +350,8 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM669 | 30 Tem 2026 | **SIDEBAR KART ALT SATIR YENİDEN:** sıra artık **BAĞLI (sol) · gmail (orta, ortalanmış) · S↻ senkron ikonu (sağ)**. Senkron butonu "↻ Senkron" → sadece ikon **S↻**. "Bağlı" etiketi hep görünür: bağlıysa **yeşil**, bağlı değilse **kırmızı** (yanıp söner) + tıkla-bağlan. Eski ayrı Bağlı/Bağlı değil/OK rozetleri tek sol pill'de birleşti. (EJDER isteği.) |
+| QM668 | 30 Tem 2026 | **SIDEBAR ÜST BUTONLAR TAM GÖRÜNÜR:** 166px'e daralınca Senkron+CSV Yap kesiliyordu → TR/Senkron/CSV Yap tam genişlik dikey istif (width:100%). |
 | QM667 | 30 Tem 2026 | **MAĞAZA NUMARALARI 1-TABANLI (00 kaldırıldı, 01'den başlar):** EJDER "00 mağazası segmentini kaldır, 01'den itibaren başlasın". Tüm gösterim yerleri `i` → `i+1`: sidebar rozeti + numara-değiştir prompt ("1'den başlar", `moveAcctTo(n-1)`), Legal&Tax QM rozetleri, Client ID listesi, Etsy API dropdown, hero aktif mağaza rozeti, 03.1/03.2/04 ROAS/CTR tablo QM sütunu + "#" sıra no. İlk mağaza **QM01**. Veri store ID'ye bağlı — bozulmaz, sadece gösterim. (NOT: QM515'teki 0-tabanlı düzen bununla değişti.) |
 | QM666 | 30 Tem 2026 | **SIDEBAR KART SIKIŞTIRILDI:** "bağla" butonu alt satırdan **üst** (numara/ok) satırındaki boş alana taşındı → alt e-posta/durum satırı kısaldı, kart daha az dikey yer kaplıyor. Kart satır aralığı gap 3→2. (EJDER: "bağlayı buraya al, az yer kaplasın".) |
 | QM665 | 30 Tem 2026 | **SIDEBAR MAĞAZA ADI TAM SATIR:** QM664'te sidebar daralınca ad kutusu (rozet+ok+butonlarla aynı satırda) kısalıp isimler kesiliyordu. Ad input'u kendi **tam-genişlik** satırına alındı (width:100%; rozet/ok/butonlar üstte ayrı satır) → uzun store isimleri tam görünür/yazılır. |
