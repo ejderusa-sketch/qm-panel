@@ -22,7 +22,7 @@
 | 07 | BEUTY | akifetsyy@gmail.com |
 | 08 | SOFTQUALITY | fatmaemerald1@gmail.com |
 | 09 | HAPPY | hamdietsy1@gmail.com |
-| 10 | YUKSELETSY | yukseletsyy@gmail.com |
+| 10 | TEE | yukseletsyy@gmail.com |
 | 11 | VIRGINIA | virginiafashion057@gmail.com |
 | 12 | BLUEDREAM | islametsyy@gmail.com |
 | 13 | FAST | nihanetsyy@gmail.com |
@@ -372,6 +372,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| QM682 | 30 Tem 2026 | **AYARLAR 8.7 MAĞAZA LİSTESİ (YEDEK):** Ayarlar alt sekmelerine **8.7 Mağaza Listesi** eklendi → No · İsim · E-posta salt-okunur tablo (boş/inbox slotlar elenir, sıralı). Sıra/isim bozulursa buradan bakılır; canlı `accounts`'tan render (hep güncel). Yukarıdaki "🔒 MAĞAZA SIRASI" kilitli tablosu da yedek. (EJDER: "settinge en sonda mağaza no/email/isim fixle, MD ye de yaz".) |
 | QM681 | 30 Tem 2026 | **BUTON ADLARI "GÜNCELLE/UPDATE":** Senkron / Veri Çek / Çekiliyor + per-store S↻ tooltip → **Güncelle / Update / Güncelleniyor**. Amaç: veri **sıfırlanmıyor**, mevcut veri durur üstüne güncellenir (Rule 0 merge zaten böyle; boş okuma ezmez, duplicate yok, yeni ay eklenir). İsim davranışı yansıtıyor. ShipStation "ShipStation'dan Çek" ayrı akış — değişmedi. (EJDER: "senkronize değil update, önceki veri dursun üstüne update etsin".) |
 | QM680 | 30 Tem 2026 | **04 ROAS = LİSTİNG BAZLI:** eski mağaza-toplam tablo yerine artık **her satır bir listing** (CTR tablosu gibi). Sütunlar: MAĞAZA (QM+isim) · LISTING · Views · Clicks · Orders · Revenue · Spend · ROAS · KARAR. Listing bazında ROAS=Revenue÷Spend; sıralanabilir, TOPLAM satırı + stat şerit korundu. (EJDER: "bunda listing listing yapılması lazım".) |
 | QM679 | 30 Tem 2026 | **VARSAYILAN EKRAN = DASHBOARD:** açılışta varsayılan sekme `"csv"` → `"dash"` (qm_tab boş/ilk açılışta). Panel her açılışta DASHBOARD ekranında gelir; alt görünüm zaten `qm_dashview` ile hatırlanır (ctr vs.). Önceden seçili tab varsa yine korunur. (EJDER: "bu dashboard kaybolmasın, her açılışta bu ekran olsun".) |
