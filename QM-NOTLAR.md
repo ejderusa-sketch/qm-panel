@@ -12,7 +12,7 @@
 
 | No | Mağaza | E-posta |
 |----|--------|---------|
-| 00 | BYDREAM | — |
+| 00 | (boş yer tutucu) | — | · BYDREAM buradan **47**'ye taşındı (EJDER, 1 Ağu 2026) |
 | 01 | NEWCUSTOMTEE | serdaretsyy@gmail.com |
 | 02 | BESTBABATEE | bestbabatee58@gmail.com |
 | 03 | BESTHANDY | ejderetsy@gmail.com |
@@ -59,15 +59,18 @@
 | 44 | FREE | freshfashionmd@gmail.com |
 | 45 | BESTAPAREL | zubeydedemirel605@gmail.com |
 | 46 | (isimsiz) | salihbute12@gmail.com |
-| 47–49 | (boş slot) | — |
+| 47 | BYDREAM | — | · (EJDER: "BYDREAM artık 00 değil, 47 nolu mağaza") |
+| 48–49 | (boş slot) | — |
 | 50 | A1 INBOX EJDERUSA | ejderusa@gmail.com (kutu) |
 | 51 | NOVA | novainnc@gmail.com (kutu) |
 | 52 | (boş) | — |
 | 53 | EJDERUG | ejderug@gmail.com (kutu) |
 | 54–58 | (boş slot) | — |
-| 59 | BYDREAM | (mükerrer — temizlenebilir) |
+| 59 | (eski BYDREAM mükerrer — artık 47'de; bu satır temizlenebilir) | — |
 
-> Not: 46 (salihbute) isimsiz; 29 TARIK NO e-postasız; 59 BYDREAM 00 ile mükerrer. Bunlar EJDER isterse düzeltilir ama **numara sırası bu şekilde sabit tutulur.**
+> Not: 46 (salihbute) isimsiz; 29 TARIK NO e-postasız. **BYDREAM artık 47 nolu** (EJDER, 1 Ağu 2026 — eskiden 00'daydı, 59'daki mükerrer temizlenebilir). Numara sırası bu şekilde sabit tutulur.
+>
+> **ÖNEMLİ:** QM numarası koda gömülü DEĞİL — `accounts.findIndex` ile mağaza listesindeki SIRADAN hesaplanır. Yani BYDREAM'in 47 görünmesi için mağaza listesinde 47. sırada olması yeter (kod değişmez). Bu tablo sadece referans/yedek.
 
 ---
 
