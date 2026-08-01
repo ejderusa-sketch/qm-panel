@@ -237,6 +237,19 @@ Dashboard sütunları buna göre: **02.1 Trademark · 02.2 Copyright · 02.3 Pol
 
 **ÇEKİLEN VERİ KALICI OLMALI — ASLA HER SAYFADA YENİDEN ÇEKİLMEZ (ZORUNLU, QM492):** Bir kez çekilen veri (CSV/Ads/ROAS/Görünürlük = `dm`, mağazalar, ayarlar) **sitenin her yerinde durur**; sayfa/sekme değişince ya da tarayıcı yenilenince **kaybolmaz, yeniden çekilmez**. Mekanizma: `dm` artık **localStorage'a** da cache'lenir (`qm_dm::email`) — açılışta anında oradan gösterilir, bulut (Supabase `q:d`) arka planda gelince güncellenir. **Bulut boş/yavaş dönerse mevcut dm EZİLMEZ** (`setDm(prev=> mig varsa mig, yoksa prev)`). Yeni bir veri türü eklerken de aynı kural: önce localStorage cache → sonra bulut; boş okuma mevcut veriyi silmez. Kullanıcı "Veri Çek"e sadece **yeni** veri için basar, gördüğünü tekrar çekmek için değil.
 
+## 📅 CSV TARİH/AY FORMATI (ZORUNLU — EJDER 1 Ağu 2026, NOVA727)
+
+**CSV'lerde ay tarihi farklı biçimlerde yazılıyor; `detectMonth`/`_monthFrom` HEPSİNİ tanımalı.** Aksi halde ay bulunamaz → CSV atlanır → mağaza boş kalır (29 mağaza bu yüzden okunmuyordu).
+
+Tanınması ZORUNLU formatlar:
+
+1. `2026-07`, `2026/07`, `2026.07`, `07-2026` (sayısal)
+2. **İngilizce ay adı:** `April`, `June`, `Jul`, `August 2026`… (MONTH_MAP)
+3. **Türkçe ay adı:** `Nisan`, `Haziran`, `Ağustos 2026`… (MONTH_MAP)
+4. **Türkçe sıra-ay:** `4.Ay`, `4. Ay`, `4 Ay`, `4.ay` → 4. ay (NOVA727'de eklendi). Yıl metinde varsa o, yoksa bu yıl.
+
+Yeni bir tarih biçimiyle karşılaşılırsa `_monthFrom`'a eklenir; "ay" kelimesi başka kelime içinde geçerse (nakış vb.) yanlış eşleşmemeli (kelime sınırı şart). "April" çalışıyordu ama "4.Ay" tanınmıyordu — asıl okunmama sebebi buydu.
+
 ## CSV'LER (ÇOK ÖNEMLİ — KARIŞTIRMA)
 
 İki ayrı CSV türü var, **asla karıştırma**. E-postadan çekerken **dosya adına** göre ayırt edilir:
