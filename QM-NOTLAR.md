@@ -371,6 +371,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| **NOVA698** | 31 Tem 2026 | **TABLO BAŞLIĞI SABİT (sticky thead):** görünürlük (.vizfz) + ROAS + CTR tablolarında sütun başlıkları nav'ın **altına** (`top:80px`) yapışır → uzun tabloda aşağı kaydırınca sütun adları hep görünür. `.stkhd thead th` global kural + ROAS/CTR tablolara class. (EJDER: "yap ekranda sabit kalsin".) NOT: "sol tarafı adımın altına al" (CSV Kaynağı tablo düzeni) belirsizdi → yapılmadı, netleştirilecek. |
 | **NOVA697** | 31 Tem 2026 | **03 CSV alt sekme numaraları:** CSV Kaynağı 03.1 → **03.01**, Listing Marketing 03.2 → **03.1** (içerik rozeti de 03.01). (EJDER isteği.) |
 | **NOVA696** | 31 Tem 2026 | **03 CSV ALT SEKME:** NOVA695'teki buton kaldırıldı; yerine 03.1'in **yanına** alt sekme çubuğu → **03.1 CSV Kaynağı · 03.2 Listing Marketing** (görünürlük 08.1/08.2 gibi). 03.2 tıklayınca gerçek Listing Marketing görünümüne geçer (`setTab("csv")` + `setCsvView("listing")`). (EJDER: "bunu 03.1 yanına 03.2 yap".) |
 | **NOVA695** | 31 Tem 2026 | **03 CSV → "03.1.2 · Listing Marketing'i aç" butonu:** CSV Kaynağı (03.1) içine buton eklendi → tıkla, gerçek Listing Marketing görünümüne geçer (`setTab("csv")` + `setCsvView("listing")`). (EJDER: "03.1.2 Listing Marketing yap".) Ayrıca **günlük kontrol** zamanlı görevi kuruldu (`nova-panel-daily-review`, her gün 09:08 salt-okuma sağlık/hata raporu). |
