@@ -271,6 +271,16 @@ Bundan sonra farklı CSV'ler de gelecek. Bu yüzden "diğer her şey → LISTING
 
 Bunlar **farklı sistemler**. Otomatik birbirine bağlama, isim/numara eşleştirme yapma, birini diğerinin yerine kullanma. Sol menü mağazası ≠ ShipStation mağazası. (İleride eşleştirme istenirse EJDER açıkça söyleyecek.)
 
+## 📊 TABLO SÜTUN STANDARDI (ZORUNLU — HER YERDE AYNI, EJDER 1 Ağu 2026)
+
+**Mağaza içeren HER tabloda şu 3 alan AYRI sütun olur (birleşik "43 ZEUGMA" YASAK):**
+
+1. **SIRA NO** (`#`) — satır sırası (1, 2, 3…), sıralamayla değişir.
+2. **MAĞAZA NO** — mağazanın numarası (ör. `43`), `accounts` sırasından (findIndex). "QM" harfi YOK, sadece sayı.
+3. **MAĞAZA** — mağaza ADI (ör. `ZEUGMA`), ayrı sütun.
+
+Bu üçü asla tek hücrede birleşmez. Geçerli tüm tablolar: ROAS (mağaza + listing), CTR, Görünürlük, Revenue Store/Listing, Statement, Overview (Trademark/Copyright/Politika), CSV Kaynağı, Legal & Tax, ShipStation vb. Yeni tablo eklenince de bu standart uygulanır.
+
 ## ALT BAŞLIK / SUB-TAB STANDARDI (ZORUNLU — HER YERDE AYNI)
 
 **Tüm alt başlıklar ve alt sekmeler bu formatta olacak** (referans: Trademark 4.1/4.2/4.3/4.4 mavi hapları). Yeni bir alt başlık/sekme eklerken KESİNLİKLE bu stili kullan:
