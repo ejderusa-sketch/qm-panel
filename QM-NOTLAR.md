@@ -326,9 +326,17 @@ Ayrıca bu dosyanın "SÜRÜM GEÇMİŞİ" tablosuna satır eklenir.
 1. Claude `~/Documents/qm-panel/index.html` dosyasını doğrudan düzenler.
 2. Sürüm numarasını artırır, geçmişe not düşer.
 3. Değişiklikten sonra JSX'i Babel ile derleyip sözdizimi hatası olmadığını doğrular.
-4. **HER İŞ BİTİNCE CLAUDE COMMIT ATAR (ZORUNLU).** İş tamamlandığında Claude kendisi `git add -A && git commit -m "QM4xx"` yapar — EJDER'in ayrıca commit atmasını beklemez. Böylece her adım repoda kayıtlı kalır ve geri alınabilir. (Push/yayına alma: EJDER `YAYINLA.command`'a çift tıklar ya da Claude'a "yayınla" der; push public içerik olduğu için Claude her seferinde onay ister.)
-5. Commit mesajı = sürüm numarası (örn. `QM487`).
-6. EJDER paneli `?v=qm4xx` ile açıp doğrular (tarayıcı önbelleğini atlatmak için).
+4. **HER İŞ BİTİNCE CLAUDE COMMIT ATAR (ZORUNLU).** İş tamamlandığında Claude kendisi `git add -A && git commit -m "NOVA7xx"` yapar — EJDER'in ayrıca commit atmasını beklemez. Böylece her adım repoda kayıtlı kalır ve geri alınabilir.
+5. Commit mesajı = sürüm numarası (örn. `NOVA700`).
+6. EJDER paneli `?v=nova7xx` ile açıp doğrular (tarayıcı önbelleğini atlatmak için).
+
+### 🚀 İŞ BÖLÜMÜ — YAYIN (EJDER emri, 31 Tem 2026 · NOVA700)
+
+**SEN (Claude) yayına hazır hale getirirsin, EJDER SADECE PUSH yapar.**
+
+- **Claude'un işi:** düzenle → sürümü 4 yerde + version.txt artır → Babel doğrula → **commit at** → her şeyi push'a hazır bırak. Yani "yayına alma" hazırlığının TAMAMI Claude'da; ayrıca onay/izin sorup beklemez, doğrudan commit'e kadar götürür.
+- **EJDER'in tek işi:** `YAYINLA.command`'a çift tıklayıp **push** yapmak (public içerik olduğu için son push EJDER'de).
+- Claude sandbox'tan push YAPAMAZ (GitHub kimliği yok) — bu yüzden son adım (push) EJDER'de. Claude iş bitince "commit hazır, YAYINLA.command'a çift tıkla" der.
 
 ## KOD YAPISI — ÖNEMLİ YERLER
 
