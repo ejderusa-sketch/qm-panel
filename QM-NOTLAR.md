@@ -82,6 +82,8 @@ Uygulama kuralları (her yeni özellikte de uy):
 4. **Sayfadan ayrılıp dönünce, yenileyince, cihaz değişince** veri yerinde durur (kalıcı view/seçim state'leri de: `qm_ssview`, `qm_novaview`, vb.).
 5. Yeni bir "çek/senkronize/indir" düğmesi eklenince bu 4 madde otomatik uygulanır — aksi halde iş EKSİK sayılır.
 
+6. **E-postadan indirilen/güncellenen CSV verisi (Revenue 03.5 / Statement 03.6 = `dm[mağaza|REV|ay]` / `dm[mağaza|STMT|ay]`) SİLİNMEZ.** Her "Güncelle" **incremental**'dir: mevcut aylar korunur, yeni ay verisi **üstüne EKLENİR** (en yeni ay üstte). Aynı ay tekrar okunmaz/ezilmez. Bu tam olarak diğer çekmeler (`|R|` ROAS, ads CSV) gibi çalışır. (EJDER: "emaile-indirilen update edilen bilgi silinmesin, bir sonraki üstüne binsin.")
+
 > Bu, aşağıdaki eski "veri güvenliği" ve "EN KRİTİK KURAL" notlarının üstüne konan **genel/bağlayıcı** kuraldır.
 
 ---
