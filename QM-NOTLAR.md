@@ -257,6 +257,15 @@ Tanınması ZORUNLU formatlar:
 2. **İngilizce ay adı:** `April`, `June`, `Jul`, `August 2026`… (MONTH_MAP)
 3. **Türkçe ay adı:** `Nisan`, `Haziran`, `Ağustos 2026`… (MONTH_MAP)
 4. **Türkçe sıra-ay:** `4.Ay`, `4. Ay`, `4 Ay`, `4.ay` → 4. ay (NOVA727'de eklendi). Yıl metinde varsa o, yoksa bu yıl.
+5. **`month (6)` / `month 6` / `month(6)`** — Etsy dosya adı formatı (ör. `Incecanvas marketing 2026 month (6).csv`) → 6. ay (NOVA729). Yıl metinde.
+6. **`Jun 1, 2026` (İngilizce ay kısaltması + gün + yıl)** — içerikteki günlük satırlardan ay adı (`jun`) okunur → o ay.
+
+**⚠️ VERİ AY AY GELİR (EJDER):** Kullanıcı CSV'leri **ay ay** atar — her dosya BİR ay, içinde o ayın GÜNLÜK satırları (Jun 1…Jun 30). Panel her dosyayı ilgili aya yazar (dm anahtarı `id|ay` ya da `id|R|ay`), üstüne biner, silinmez. Gün gün DEĞİL, ay ay.
+
+**⚠️ İKİ CSV TÜRÜ, İKİ HAT (NOVA729):**
+- **Per-listing Ads CSV** (Listing/Title sütunlu, ekran görüntüsünden) → `dm[id|ay]`.
+- **Günlük ROAS CSV** (`Date (ET)·Views·Clicks·Orders·Revenue·Spend·ROAS·Click rate·Ending budget`, satırlar gün gün) → `dm[id|R|ay]` (isRoasCSV: date + roas/ending budget var, listing yok).
+- **ROAS mağaza tablosu (04.1) İKİSİNİ de toplar** (per-listing yoksa günlüğü kullanır; views↔impressions ikisi de sayılır). Yoksa mağaza günlük CSV attıysa tabloda boş görünürdü — NOVA729'da düzeltildi.
 
 Yeni bir tarih biçimiyle karşılaşılırsa `_monthFrom`'a eklenir; "ay" kelimesi başka kelime içinde geçerse (nakış vb.) yanlış eşleşmemeli (kelime sınırı şart). "April" çalışıyordu ama "4.Ay" tanınmıyordu — asıl okunmama sebebi buydu.
 
