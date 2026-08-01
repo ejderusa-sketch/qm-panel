@@ -4,6 +4,16 @@
 > Bu dosya, Claude'un her yeni oturumda projeyi hatırlaması içindir.
 > Yeni sohbete başlarken sadece şunu yaz: **"qm-panel klasöründeki QM-NOTLAR.md'yi oku"**
 
+## 🧠 HAFIZA KURALI (ZORUNLU — EN ÖNEMLİ, EJDER 1 Ağu 2026)
+
+**Claude, chat'te söyleneni unutur; SADECE bu MD kalır.** Bu yüzden:
+
+1. **Her oturumun İLK işi bu dosyayı okumak** (CLAUDE.md de bunu emrediyor).
+2. **EJDER önemli bir kural/format/karar söylediğinde — özellikle "bir daha olmasın", "daha önce de dedik", ya da tekrar eden bir şeyse — Claude SORMADAN, HEMEN buraya yazar.** "MD'ye yaz" demesini beklemez.
+3. Kritik olanlar net başlıkla (ZORUNLU / 0-kural). Örnek unutulan: CSV tarihi "4.Ay" formatı (NOVA727'ye kadar okunmuyordu — söylenmişti ama MD'de değildi).
+4. Bir şey iki kez söyleniyorsa = MD'de eksik demektir → hemen eklenir.
+5. **MD'yi ne zaman OKUMALI (EJDER emri):** (a) her oturumun başında TAM oku; (b) **uzun oturumlarda** (context sıkışır, detay kaybolur) periyodik tekrar oku; (c) **kural olan bir alana dokunmadan ÖNCE** o bölümü tekrar oku — özellikle: CSV tarih/ay formatı (`detectMonth`), mağaza sırası/numarası, sürüm kuralı, 0-kural veri kalıcılığı, tablo sütun standardı. Her küçük işlemde baştan sona okumak şart değil ama **kural-alanına dokunuyorsan o bölümü teyit et.** (Uzun oturumda "4.Ay" bu yüzden kaçtı.)
+
 ---
 
 ## 🔒 MAĞAZA SIRASI — SABİT / DEĞİŞMEZ (EJDER emri, 30 Tem 2026)
