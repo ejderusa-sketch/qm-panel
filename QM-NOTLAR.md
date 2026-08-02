@@ -101,6 +101,8 @@ Uygulama kuralları (her yeni özellikte de uy):
 
 6. **E-postadan indirilen/güncellenen CSV verisi (Revenue 03.5 / Statement 03.6 = `dm[mağaza|REV|ay]` / `dm[mağaza|STMT|ay]`) SİLİNMEZ.** Her "Güncelle" **incremental**'dir: mevcut aylar korunur, yeni ay verisi **üstüne EKLENİR** (en yeni ay üstte). Aynı ay tekrar okunmaz/ezilmez. Bu tam olarak diğer çekmeler (`|R|` ROAS, ads CSV) gibi çalışır. (EJDER: "emaile-indirilen update edilen bilgi silinmesin, bir sonraki üstüne binsin.")
 
+7. **🔁 UPDATE = ÇİFT İŞ YOK (EJDER "bir bilgi bir kere yazıldıysa, yenisi varsa ekle, yoksa eskisi kalsın; 2 defa yüklenmesin — bütün web sayfasında böyle"):** HER "Güncelle/Update" düğmesi böyle çalışır: (a) zaten yüklenmiş şey tekrar İŞLENMEZ (okunmuş ay/dolu kayıt atlanır → hız), (b) yeni bilgi varsa EKLENİR, yoksa eski KALIR, (c) aynı kayıt 2 kez yazılmaz (dedup: `_have` / `seen`-set / dolu-hücre atla). Legal 03.7 `fetchLegalShots` de böyle: `settings.legal37[id]` doluysa AI çağrılmaz, sadece boş hücre doldurulur. Yeni "çek/oku/güncelle" özelliği eklerken bu ZORUNLU.
+
 > Bu, aşağıdaki eski "veri güvenliği" ve "EN KRİTİK KURAL" notlarının üstüne konan **genel/bağlayıcı** kuraldır.
 
 ---
