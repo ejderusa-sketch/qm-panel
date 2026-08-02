@@ -308,7 +308,8 @@ Bunlar **farklı sistemler**. Otomatik birbirine bağlama, isim/numara eşleşti
 **Mağaza içeren HER tabloda şu 3 alan AYRI sütun olur (birleşik "43 ZEUGMA" YASAK):**
 
 1. **SIRA NO** (`#`) — satır sırası (1, 2, 3…), sıralamayla değişir.
-2. **MAĞAZA NO** — mağazanın numarası (ör. `43`), `accounts` sırasından (findIndex). "QM" harfi YOK, sadece sayı.
+2. **MAĞAZA NO** — mağazanın numarası, **ham `accounts` indeksi `i` (0-TABANLI)**. "QM" harfi YOK, sadece sayı.
+   - **⚠️ ÖLÇÜ = NOVA SOL PANEL.** Sol paneldeki numara `i` (0-tabanlı) kullanır: BYDREAM=00, NEWCUSTOMTEE=01 … INCE RUG=41 (index 41). **`i+1` DEĞİL.** Tablolar eskiden `i+1` kullanıp +1 kayıyordu (BYDREAM index 0'da sayıldığı için) — NOVA731'de HEPSİ `i`'ye çekildi. Yeni tabloda da NO = `i` (sol panelle birebir). (EJDER "nova panelini ölçü al, hep öyle olsun".)
 3. **MAĞAZA** — mağaza ADI (ör. `ZEUGMA`), ayrı sütun.
 
 Bu üçü asla tek hücrede birleşmez. Geçerli tüm tablolar: ROAS (mağaza + listing), CTR, Görünürlük, Revenue Store/Listing, Statement, Overview (Trademark/Copyright/Politika), CSV Kaynağı, Legal & Tax, ShipStation vb. Yeni tablo eklenince de bu standart uygulanır.
