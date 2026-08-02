@@ -308,10 +308,12 @@ Bunlar **farklı sistemler**. Otomatik birbirine bağlama, isim/numara eşleşti
 **Mağaza içeren HER tabloda şu 3 alan AYRI sütun olur (birleşik "43 ZEUGMA" YASAK):**
 
 1. **SIRA NO** (`#`) — satır sırası (1, 2, 3…), sıralamayla değişir.
-2. **MAĞAZA NO** — mağaza numarası = **`i+1`, 2 HANELİ (01·02·03…)** — kod: `qm:String(i+1).padStart(2,"0")`. "QM" harfi YOK.
-   - **⚠️ TEK ÖLÇÜ = NOVA SOL PANEL.** Sol panel `String(i+1).padStart(2,"0")` kullanır → 01 NEWCUSTOMTEE, 02 BESTBABATEE, 03 BESTHANDY… (BYDREAM, EJDER'in taşıdığı yerde — ör. 47). **HER tablo (ROAS/CTR/Görünürlük store+listing, Revenue Store, yeni tablolar) tam bu formatı kullanır — sol panelle BİREBİR.**
-   - Hata geçmişi (bir daha yapma): NOVA731'de yanlışlıkla `i` (0-tabanlı) yapıldı → tablo sol panelle kaydı → NOVA734'te `String(i+1).padStart(2,"0")`'e dönüldü. **Kural: numara = sol panel = `i+1` 2-hane. Sıralama ayrı: `idx` (sayısal) ile — `_cl` listesinde `idx`+`qm` olmalı yoksa "roas"a düşer (NOVA733).** (EJDER "soldaki panel ölçü, md ye kural yaz".)
+2. **MAĞAZA NO** — mağaza numarası = **FİLTRELENMİŞ SIRA `j+1`, 2 HANELİ (01·02·03…)** — kod: `.filter(x=>(x.a.name||x.a.email)&&!/A1 INBOX/i.test(...)).map((...,j)=>({qm:String(j+1).padStart(2,"0")}))`. "QM" harfi YOK.
+   - **⚠️ TEK ÖLÇÜ = NOVA SOL PANEL.** Sol panel BOŞ/null haneleri ve A1 INBOX'ı ATLAYIP gerçek mağazaları sırayla numaralar → 01 NEWCUSTOMTEE, 02 BESTBABATEE… **HER tablo aynı filtre+sıra ile numaralar — sol panelle BİREBİR.**
+   - **Hata geçmişi (bir daha yapma):** ham indeks `i` kullanmak YANLIŞ — dizide index 0'da boş/null hane olduğunda (ejderusa kovası) tablo `i+1` yaptığında NEWCUSTOMTEE=02 çıkıyordu ama sol panel boşu atlayıp 01 gösteriyor → kaydı. NOVA735'te `_srows` filtre sonrası `j` (filtrelenmiş sıra) kullanacak şekilde düzeltildi: `idx:j, qm:String(j+1).padStart(2,"0")`. **Kural: numara = sol panelin gerçek-mağaza sırası = filtre sonrası `j+1`.**
+   - **KOVA DİVERJANSI (dikkat):** super-owner (novainnc) `?as=X` görünümü `qm_accts::novainnc::X` kovasını yükler; doğrudan hesap girişi `qm_accts::ejderusa` kovasını. Bunlar AYRI kopya — birinde reorder ötekine geçmez (ör. BYDREAM ejderusa kovasında silinmiş, novainnc::X kovasında hâlâ index 0). NO tutmuyorsa önce hangi kovanın yüklendiğine bak.
 3. **MAĞAZA** — mağaza ADI (ör. `ZEUGMA`), ayrı sütun.
+4. **E-POSTA** — mağazanın Gmail adresi, ayrı sütun (NOVA735, EJDER "mağazanın yanına emailleri de yaz, karışmasın"). Numara kaysa bile mağaza e-postadan net görünür.
 
 Bu üçü asla tek hücrede birleşmez. Geçerli tüm tablolar: ROAS (mağaza + listing), CTR, Görünürlük, Revenue Store/Listing, Statement, Overview (Trademark/Copyright/Politika), CSV Kaynağı, Legal & Tax, ShipStation vb. Yeni tablo eklenince de bu standart uygulanır.
 
