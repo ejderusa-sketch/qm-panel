@@ -315,6 +315,7 @@ Bunlar **farklı sistemler**. Otomatik birbirine bağlama, isim/numara eşleşti
    - **KOVA DİVERJANSI (dikkat):** super-owner (novainnc) `?as=X` görünümü `qm_accts::novainnc::X` kovasını yükler; doğrudan hesap girişi `qm_accts::ejderusa` kovasını. Bunlar AYRI kopya — birinde reorder ötekine geçmez (ör. BYDREAM ejderusa kovasında silinmiş, novainnc::X kovasında hâlâ index 0). NO tutmuyorsa önce hangi kovanın yüklendiğine bak.
 3. **MAĞAZA** — mağaza ADI (ör. `ZEUGMA`), ayrı sütun.
 4. **E-POSTA** — mağazanın Gmail adresi, ayrı sütun (NOVA735, EJDER "mağazanın yanına emailleri de yaz, karışmasın"). Numara kaysa bile mağaza e-postadan net görünür.
+   - **🟢 TEK ANA KAYNAK (NOVA738 — EJDER "sol NOVA paneli default, hepsi ona uysun, hepsinde NO·MAĞAZA·EMAIL"):** `_navList`/`_navById` satır ~1488'de tanımlı (sidebar filtresiyle `id→{no,name,email}`). Yardımcılar: `_navNo(id)`, `_navName(id)`, `_navEmail(id)`. **HER tablo numara/ad/e-postayı buradan alır → bir daha kayamaz.** Uygulandı: ROAS store+listing, CTR listing, Revenue Store/Listing, Statement, Görünürlük 08.1(NO)/08.2. Yeni tablo eklerken `_navById`/`_navNo`/`_navEmail` kullan; ASLA ham `i`/`findIndex` ile numara üretme.
 
 Bu üçü asla tek hücrede birleşmez. Geçerli tüm tablolar: ROAS (mağaza + listing), CTR, Görünürlük, Revenue Store/Listing, Statement, Overview (Trademark/Copyright/Politika), CSV Kaynağı, Legal & Tax, ShipStation vb. Yeni tablo eklenince de bu standart uygulanır.
 
