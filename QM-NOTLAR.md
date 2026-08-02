@@ -12,6 +12,9 @@
 2. **EJDER önemli bir kural/format/karar söylediğinde — özellikle "bir daha olmasın", "daha önce de dedik", ya da tekrar eden bir şeyse — Claude SORMADAN, HEMEN buraya yazar.** "MD'ye yaz" demesini beklemez.
 3. Kritik olanlar net başlıkla (ZORUNLU / 0-kural). Örnek unutulan: CSV tarihi "4.Ay" formatı (NOVA727'ye kadar okunmuyordu — söylenmişti ama MD'de değildi).
 4. Bir şey iki kez söyleniyorsa = MD'de eksik demektir → hemen eklenir.
+
+**🔵 VERİ ÇEKME KAYNAĞI (EJDER "bunu neden her seferinde söylüyorum" — 1 Ağu):** Panelin TÜM veri çekmesi **NOVA panelindeki bağlı mağaza Gmail'lerinden** olur — CSV (Etsy Ads/Revenue/Statement) hangi mekanizmayla çekiliyorsa (`getToken(acc)` + `gGet(tok,url)`, per-store OAuth) **legal/tax bilgisi de AYNI yerden, aynı yolla çekilir.** Mağazalar orada bağlı. Bir daha "nereden çekelim / örnek ver" diye SORMA — kaynak hep bu.
+- **Legal bilgiler e-postada SCREENSHOT (resim eki) olarak geliyor** → düz metin regex yetmez, **OCR gerekir** (panelin Etsy Ads ekran görüntüsü okuması gibi; `etsyAds`/`ocrSeen` pipeline'i). 03.7 Güncelle = bağlı mağaza Gmail'inden legal screenshot'ı bul → OCR → ETSY STORE (orijinal ad) + EIN/yasal ad/adres/telefon vb. sütunlara yaz (MAĞAZA'daki manuel isme dokunma, boş hücreleri doldur, kalıcı).
 5. **MD'yi ne zaman OKUMALI (EJDER emri):** (a) her oturumun başında TAM oku; (b) **uzun oturumlarda** (context sıkışır, detay kaybolur) periyodik tekrar oku; (c) **kural olan bir alana dokunmadan ÖNCE** o bölümü tekrar oku — özellikle: CSV tarih/ay formatı (`detectMonth`), mağaza sırası/numarası, sürüm kuralı, 0-kural veri kalıcılığı, tablo sütun standardı. Her küçük işlemde baştan sona okumak şart değil ama **kural-alanına dokunuyorsan o bölümü teyit et.** (Uzun oturumda "4.Ay" bu yüzden kaçtı.)
 
 ---
