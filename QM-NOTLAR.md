@@ -4,6 +4,30 @@
 > Bu dosya, Claude'un her yeni oturumda projeyi hatırlaması içindir.
 > Yeni sohbete başlarken sadece şunu yaz: **"qm-panel klasöründeki QM-NOTLAR.md'yi oku"**
 
+---
+
+## ⭐ 2 AĞUSTOS 2026 — OTURUM ÖZETİ (HER SEFERİNDE OKU)
+
+**Bu bölüm bugün yapılan her şeyi ve unutulmaması gereken kuralları tutar. NOTLAR (MD) sekmesi (owner panelinde 08) bu dosyayı canlı gösterir.**
+
+### 🔴 KRİTİK KURAL — OWNER ≠ EJDERUSA (e-posta ayrımı)
+Owner hesabındaki (novainnc, SUPER_OWNER) e-postalar/kutular ile ejderusa account'undaki e-postalar **tamamen ayrıdır, karışmaz.** Örnek: BYDREAM (ejderusa@gmail.com) bir ejderusa mağazasıdır → owner'ın "NOVA HESAPLARI" listesinde GÖRÜNMEZ. Owner kendi kutularını (novainnc + bağlı olanlar) görür, ejderusa'nınkileri değil.
+
+### 🔴 789 → 763 GERİ DÖNÜŞ (neden)
+NOVA764'ten itibaren yapılan owner-giriş/üyelik değişiklikleri owner oturumunu yanlış/boş workspace anahtarına bağladı → owner panelinde e-postalar ve ev ödevleri "kaybolmuş" göründü. **VERİ HİÇ SİLİNMEDİ — bulutta (shared_state.main) ve localStorage'da tam durdu (0-kural).** Çözüm: index.html + version.txt NOVA763'e geri döndürüldü; QM-NOTLAR.md korundu. Owner verisi = `currentAccountId=null` → `shared_state.main`. Ders: owner kimlik/anahtar (currentUserEmail / currentAccountId) çözümlemesine dokunmadan önce çok dikkatli ol; yanlış anahtar = boş görünüm (veri kaybı DEĞİL).
+
+### SÜRÜM 790–794 (763 revert üzerine)
+- **790** — Nav 0↔4 takas: 0 HESAP AÇANLAR, 4 EV ÖDEVLERİ. Sürüm 789 üzerine çıkarıldı ki herkeste "yenile" bannerı tetiklensin (banner mantığı `nv>CURRENT`).
+- **791** — Owner NOVA HESAPLARI listesinden BYDREAM çıkarıldı (yukarıdaki owner≠ejderusa kuralı).
+- **792** — BOX yeniden: birleşik "BOX (n)" sayacı kaldırıldı. Her bağlı kutu KENDİ bölümünde (e-posta başlığı + kendi sayacı + o kutunun postaları alt alta), kutular karışmaz. Pill'lerde kendi sayacı + tıkla-gizle (tekrar tıkla → hepsi). A2 Önemli her zaman toggle.
+- **793** — (1) HESAP AÇANLAR'ın BOX içindeki kopyası kaldırıldı (ayrı sekme var). (2) Dedup local-part: `norodom855@gmail.com` = `norodom855` tek satır (bir kişi = tek hesap). (3+4) EV ÖDEVLERİ kalıcı dinamik liste: her ödev {başlık, metin}, localStorage (`qm_evodev::<email>`) + bulut (settings.evOdev, _KEEP'te), her kartta 🗑 SİL, altta + Yeni ödev; **sadece SİL'e basınca silinir, boş okuma ezmez.** (5) NOTLAR (MD) owner panelinde 08 sekmesi (`tab==="mdnot"`), user dashboard'dan kaldırıldı.
+- **794** — (A) "Okundu"/aksiyon e-postayı TÜM listelerden (allItems + xItems + items) `_gid` ile siler → sayaç ve liste anında azalır (tek-kutu görünümünde de). (B) EV ÖDEVLERİ kartları sıkışık (boşluk az, kısa alan).
+
+### STANDART KURALLAR (kısa hatırlatma)
+- **Sürüm +1** her değişiklikte; 4 yer: üst yorum, hero `(NOVAxxx)`, sidebar rozet `NOVAxxx`, `var CURRENT=xxx` + version.txt + bu MD'ye satır. Babel ile doğrula. Commit'i Claude atar; **push'u (YAYINLA.command) EJDER yapar** (public içerik).
+- **0-kural (veri kalıcılığı):** çekilen/yazılan hiçbir veri geri gitmez/sıfırlanmaz; boş bulut okuması mevcut localStorage'ı EZMEZ (_KEEP koruması). Bir bilgi bir kez yazıldıysa: yenisi varsa ekle, yoksa eskisi kalsın, 2 kez yazma.
+- **NOTLAR (MD) sekmesi** `QM-NOTLAR.md` dosyasını fetch edip gösterir → bu dosya yayınlanınca (push) sekmede görünür.
+
 ## 🧠 HAFIZA KURALI (ZORUNLU — EN ÖNEMLİ, EJDER 1 Ağu 2026)
 
 **Claude, chat'te söyleneni unutur; SADECE bu MD kalır.** Bu yüzden:
