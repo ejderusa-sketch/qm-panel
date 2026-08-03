@@ -34,6 +34,9 @@ NOVA764'ten itibaren yapılan owner-giriş/üyelik değişiklikleri owner oturum
 - **793** — (1) HESAP AÇANLAR'ın BOX içindeki kopyası kaldırıldı (ayrı sekme var). (2) Dedup local-part: `norodom855@gmail.com` = `norodom855` tek satır (bir kişi = tek hesap). (3+4) EV ÖDEVLERİ kalıcı dinamik liste: her ödev {başlık, metin}, localStorage (`qm_evodev::<email>`) + bulut (settings.evOdev, _KEEP'te), her kartta 🗑 SİL, altta + Yeni ödev; **sadece SİL'e basınca silinir, boş okuma ezmez.** (5) NOTLAR (MD) owner panelinde 08 sekmesi (`tab==="mdnot"`), user dashboard'dan kaldırıldı.
 - **794** — (A) "Okundu"/aksiyon e-postayı TÜM listelerden (allItems + xItems + items) `_gid` ile siler → sayaç ve liste anında azalır (tek-kutu görünümünde de). (B) EV ÖDEVLERİ kartları sıkışık (boşluk az, kısa alan).
 
+### 🔴 PANEL ADI = "S PANELİ" (EJDER, 2 Ağu 2026)
+Panelin adı artık **"S PANELİ"** — buradaki **S = Stores (mağazalar)**. Eski "NOVA PANEL"/"NOVA" markası kaldırıldı; görünen isim her yerde **S PANELİ**. Ayrıca **SÜPER rozeti kaldırıldı** (header + HesapAcanlar). Not: sürüm öneki dahili olarak hâlâ `NOVAxxx` (commit/versiyon protokolü); sadece görünen panel adı değişti.
+
 ### STANDART KURALLAR (kısa hatırlatma)
 - **Sürüm +1** her değişiklikte; 4 yer: üst yorum, hero `(NOVAxxx)`, sidebar rozet `NOVAxxx`, `var CURRENT=xxx` + version.txt + bu MD'ye satır. Babel ile doğrula. Commit'i Claude atar; **push'u (YAYINLA.command) EJDER yapar** (public içerik).
 - **0-kural (veri kalıcılığı):** çekilen/yazılan hiçbir veri geri gitmez/sıfırlanmaz; boş bulut okuması mevcut localStorage'ı EZMEZ (_KEEP koruması). Bir bilgi bir kez yazıldıysa: yenisi varsa ekle, yoksa eskisi kalsın, 2 kez yazma.
