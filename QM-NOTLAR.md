@@ -10,8 +10,19 @@
 
 **Bu bölüm bugün yapılan her şeyi ve unutulmaması gereken kuralları tutar. NOTLAR (MD) sekmesi (owner panelinde 08) bu dosyayı canlı gösterir.**
 
-### 🔴 KRİTİK KURAL — OWNER ≠ EJDERUSA (e-posta ayrımı)
-Owner hesabındaki (novainnc, SUPER_OWNER) e-postalar/kutular ile ejderusa account'undaki e-postalar **tamamen ayrıdır, karışmaz.** Örnek: BYDREAM (ejderusa@gmail.com) bir ejderusa mağazasıdır → owner'ın "NOVA HESAPLARI" listesinde GÖRÜNMEZ. Owner kendi kutularını (novainnc + bağlı olanlar) görür, ejderusa'nınkileri değil.
+### 🔴 KRİTİK KURAL — OWNER PANELİ AYRI, EJDERUSA ARTIK NORMAL HESAP (EJDER, 2 Ağu 2026)
+**Bundan sonra (şimdiye kadar böyle değildi):**
+- **OWNER paneli = novainnc (SUPER_OWNER).** Owner paneli ayrı bir dünyadır.
+- **ejderusa artık "owner" değil — herhangi bir mağaza/hesap gibi düşünülür.** ejderusa'ya özel owner ayrıcalığı verme.
+- **Owner panelindeki NOVA HESAPLARI (A1 INBOX EJDERUSA / ejderusa@gmail.com, NOVA / novainnc@gmail.com, EJDERUG / ejderug@gmail.com) = owner'ın ŞAHSİ e-posta kutularıdır.** Bunların ejderusa store account'uyla İŞİ YOKTUR; sadece owner'ın kişisel gelen kutuları.
+- **NOTLAR (MD) owner'a aittir** → owner panelinde 08 sekmesinde durur (ejderusa/user tarafında DEĞİL).
+- Owner e-postaları ile ejderusa account e-postaları **tamamen ayrı, karışmaz.** Örn. BYDREAM (ejderusa mağazası) owner NOVA HESAPLARI'nda GÖRÜNMEZ.
+
+### 🔴 NOTLAR (MD) SEKMESİ NEDEN BOŞ GÖRÜNÜR
+NotlarMD `fetch("QM-NOTLAR.md")` ile dosyayı **ağ üzerinden** okur. Bu yüzden:
+- **Yerelde (bilgisayardaki dosyayı açınca) BOŞ/hata** → tarayıcı file:// için fetch'i engeller (CORS).
+- **Yayınlanmış canlı sitede ÇALIŞIR** (dosya panelle aynı klasörde, push edilmiş). → MD'yi görmek için YAYINLA ve canlı URL'den bak.
+- Canlı sürüm eski kalırsa (push gitmediyse) 08 sekmesi de eski olur. Push şart.
 
 ### 🔴 789 → 763 GERİ DÖNÜŞ (neden)
 NOVA764'ten itibaren yapılan owner-giriş/üyelik değişiklikleri owner oturumunu yanlış/boş workspace anahtarına bağladı → owner panelinde e-postalar ve ev ödevleri "kaybolmuş" göründü. **VERİ HİÇ SİLİNMEDİ — bulutta (shared_state.main) ve localStorage'da tam durdu (0-kural).** Çözüm: index.html + version.txt NOVA763'e geri döndürüldü; QM-NOTLAR.md korundu. Owner verisi = `currentAccountId=null` → `shared_state.main`. Ders: owner kimlik/anahtar (currentUserEmail / currentAccountId) çözümlemesine dokunmadan önce çok dikkatli ol; yanlış anahtar = boş görünüm (veri kaybı DEĞİL).
