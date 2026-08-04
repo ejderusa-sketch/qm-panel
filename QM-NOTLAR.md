@@ -54,6 +54,12 @@ Update ("↻ Update/Güncelle") butonunun yanında kompakt **1G · 1H · 1AY · 
 - **ŞABLON:** bu pill düzeni önce 03.7'de kuruldu; sonra TÜM Update butonlarına (ALARMING/Trademark/CSV/BOX) + ana "hepsini birden güncelle" butonuna yayılacak (EJDER isteği).
 - **NOT (NOVA823 fix):** pill'ler ilk başta yanlış butona (gizli "Etsy'den Çek") konmuştu, görünmüyordu; görünen "↻ Update" butonuna taşındı.
 
+### 🔴 DİL KURALI — TR/EN ANINDA TÜM SİSTEM (EJDER, 2 Ağu 2026)
+**TR/EN butonuna basınca BÜTÜN sistem anında o dile döner.** İngilizce deyince her yer İngilizce, Türkçe deyince her yer Türkçe.
+- **Her görünen metin `TT("Türkçe","English")` ile yazılır** — hiçbir yerde tek-dilli sabit metin bırakma (buton, etiket, başlık, toast, placeholder, tooltip dahil).
+- Yeni eklenen HER şey de iki dilli olmalı. Aksi halde dil değişince o metin sabit kalır → hata.
+- Aktif dil `uiLang` ile tutulur; `TT` ona göre seçer, değişiklik anında (re-render) yansır.
+
 ### STANDART KURALLAR (kısa hatırlatma)
 - **Sürüm +1** her değişiklikte; 4 yer: üst yorum, hero `(NOVAxxx)`, sidebar rozet `NOVAxxx`, `var CURRENT=xxx` + version.txt + bu MD'ye satır. Babel ile doğrula. Commit'i Claude atar; **push'u (YAYINLA.command) EJDER yapar** (public içerik).
 - **0-kural (veri kalıcılığı):** çekilen/yazılan hiçbir veri geri gitmez/sıfırlanmaz; boş bulut okuması mevcut localStorage'ı EZMEZ (_KEEP koruması). Bir bilgi bir kez yazıldıysa: yenisi varsa ekle, yoksa eskisi kalsın, 2 kez yazma.
