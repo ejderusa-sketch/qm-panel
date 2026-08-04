@@ -54,6 +54,13 @@ Update ("↻ Update/Güncelle") butonunun yanında kompakt **1G · 1H · 1AY · 
 - **ŞABLON:** bu pill düzeni önce 03.7'de kuruldu; sonra TÜM Update butonlarına (ALARMING/Trademark/CSV/BOX) + ana "hepsini birden güncelle" butonuna yayılacak (EJDER isteği).
 - **NOT (NOVA823 fix):** pill'ler ilk başta yanlış butona (gizli "Etsy'den Çek") konmuştu, görünmüyordu; görünen "↻ Update" butonuna taşındı.
 
+### 🔴 STANDART/TUTARLILIK KURALI — TÜM WEB SAYFASI STANDART (EJDER, 2 Ağu 2026)
+**Bütün panel tutarlı/standart olacak.** Aynı işi yapan her şey **aynı kelimeyi, aynı formatı, aynı şekli** kullanır — dağınık, her yeri farklı YAPMA.
+- **Tara/Update butonları:** hepsi tek kelime **"↻ Güncelle" / "↻ Update"** (eski "Tüm Mağazaları Tara / Scan All Stores / E-postaları Tara" gibi farklı isimler KALDIRILDI). Yükleniyor durumu hepsi "Güncelleniyor… / Updating…".
+- **Zaman seçici:** hepsi aynı segment pill (tek yuvarlak içinde 1G·1H·1AY·1YIL·ALL, seçili açık yeşil #7cc47f, diğerleri kırmızı). Ana düğme "Tümünü Güncelle/Update All" (hepsini yapar) — tek istisna, çünkü kapsam farklı.
+- **Yeni bir şey eklerken:** mevcut standarda uy; yeni kelime/renk/şekil uydurma. Buton, etiket, pill, renk — hep aynı dili konuşsun.
+- Kısaca: **"aynı standart, aynı format, aynı şekil — her yerde."**
+
 ### 🔴 DİL KURALI — TR/EN ANINDA TÜM SİSTEM (EJDER, 2 Ağu 2026)
 **TR/EN butonuna basınca BÜTÜN sistem anında o dile döner.** İngilizce deyince her yer İngilizce, Türkçe deyince her yer Türkçe.
 - **Her görünen metin `TT("Türkçe","English")` ile yazılır** — hiçbir yerde tek-dilli sabit metin bırakma (buton, etiket, başlık, toast, placeholder, tooltip dahil).
