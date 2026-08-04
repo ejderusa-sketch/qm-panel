@@ -48,6 +48,12 @@ Legal screenshot'ları **iki motor** okuyabilir; sıra şu:
 - **NOVA817:** Legal maili "son 20 ek" içinde faturalar arasında kayboluyordu → sorgu artık **doğrudan legal mailini hedefliyor** (`filename:legal` / `subject:legal` / "legal shop information" / "taxpayer identification"). Gömülü olsa da bulunur.
 - Test: FAMILY (etsy.inceus) → EIN 93-2298376 / BESTMOON LLC / ALI FURKAN INCE / %100 doğru okundu.
 
+### 03.7 LEGAL — ZAMAN PENCERESİ PILL'LERİ (EJDER, 2 Ağu 2026)
+Update ("↻ Update/Güncelle") butonunun yanında kompakt **1G · 1H · 1AY · 1YIL · ALL** pill'leri. Tasarım (EJDER): tıklanan **YEŞİL** (= seçili + default, `qm_legalwin` localStorage ile **hatırlanır**), diğerleri **KIRMIZI**. Tıklayınca o pencereyle tarar (`legalWinRef`; inline tarama `runLegalScan`'e ayrıldı). Varsayılan **1YIL**.
+- **KURAL — silinmez, üstüne gelir:** legal okuma sadece BOŞ hücreyi doldurur (`!cur[f]`, dolu asla ezilmez), dolu mağaza atlanır. `legal37` **_KEEP**'te → bulut boş okunsa da legal veri ezilmez (0-kural).
+- **ŞABLON:** bu pill düzeni önce 03.7'de kuruldu; sonra TÜM Update butonlarına (ALARMING/Trademark/CSV/BOX) + ana "hepsini birden güncelle" butonuna yayılacak (EJDER isteği).
+- **NOT (NOVA823 fix):** pill'ler ilk başta yanlış butona (gizli "Etsy'den Çek") konmuştu, görünmüyordu; görünen "↻ Update" butonuna taşındı.
+
 ### STANDART KURALLAR (kısa hatırlatma)
 - **Sürüm +1** her değişiklikte; 4 yer: üst yorum, hero `(NOVAxxx)`, sidebar rozet `NOVAxxx`, `var CURRENT=xxx` + version.txt + bu MD'ye satır. Babel ile doğrula. Commit'i Claude atar; **push'u (YAYINLA.command) EJDER yapar** (public içerik).
 - **0-kural (veri kalıcılığı):** çekilen/yazılan hiçbir veri geri gitmez/sıfırlanmaz; boş bulut okuması mevcut localStorage'ı EZMEZ (_KEEP koruması). Bir bilgi bir kez yazıldıysa: yenisi varsa ekle, yoksa eskisi kalsın, 2 kez yazma.
