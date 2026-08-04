@@ -506,6 +506,7 @@ Bölümler: Okul/Skyward · Acil/Önemli · Diğer · Reklam-Junk.
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| **NOVA845** | 4 Agu 2026 | **07 TEAM — izin/yetki toggle'ları buraya taşındı** (eski Ayarlar › Q8 notu kaldırıldı). Her ekip üyesi satırında **İZİNLER** butonu → modül izinleri paneli: **başlık + NO (kod)**, grup **ON/OFF**, üst köşede **HEPSİ (admin)/HİÇBİRİ**. Numaralı modül grupları (0·DASHBOARD, 1·CSV, 2·…). DB `members.permissions` (`updateMemberPerms`) optimistik güncelleme. **İzin linkleri** (Let In — Pending Requests / register link + Invite member) zaten bu sayfada — böylece tüm izinler, linkler ve yetkiler tek sayfada. |
 | **NOVA844** | 4 Agu 2026 | **01.2 BENZERLİK / RİSK kartı** (ALARMING altına eklendi — eski 8.4 similarity'nin gelişmişi). `legalInfo`+`legal37` birleştirilir; mağazalar arası **AYNI olan** isim/telefon/adres/vergi no (EIN)/kayıt no/şirket bulunur. Her eşleşme **numaralı madde** (1,2,3…) — kaç eşleşme varsa hepsi yazılır. Benzeyen mağazalar **yan yana chip** + neyin benzediği (alan rozeti + değer). **Neden:** Etsy benzer mağazaları birbirine bağlayıp KAPATIR. Bilgiler geldikçe otomatik güncellenir. Boş=yeşil "izolasyon iyi". |
 | **NOVA843** | 4 Agu 2026 | **02.4 Cases sırası trademark gibi:** AZALAN (yeni→eski) + **yıl başlıkları** (2025, 2024…). Her yıl kendi başlığı altında, yeni tarih üstte. |
 | **NOVA842** | 4 Agu 2026 | **ALARMING sırası AZALAN:** en son gelen en üstte (yeni→eski aşağı). `ts` azalan (bt-at), her iki alarming render. Yıl başlığı değişim mantığı iki yönde çalışır. |
