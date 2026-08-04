@@ -37,6 +37,17 @@ NOVA764'ten itibaren yapılan owner-giriş/üyelik değişiklikleri owner oturum
 ### 🔴 PANEL ADI = "S PANELİ" (EJDER, 2 Ağu 2026)
 Panelin adı artık **"S PANELİ"** — buradaki **S = Stores (mağazalar)**. Eski "NOVA PANEL"/"NOVA" markası kaldırıldı; görünen isim her yerde **S PANELİ**. Ayrıca **SÜPER rozeti kaldırıldı** (header + HesapAcanlar). Not: sürüm öneki dahili olarak hâlâ `NOVAxxx` (commit/versiyon protokolü); sadece görünen panel adı değişti.
 
+### 🔴 03.7 LEGAL OKUMA — HANGİ MOTOR OKUR? (EJDER, 2 Ağu 2026)
+Legal screenshot'ları **iki motor** okuyabilir; sıra şu:
+1. **BİRİNCİL = Claude AI vision (API, model `claude-sonnet-5`).** Görseli hem okur hem düzeni anlar (EIN→VERGİ ID, ad→TAM AD, adres vb. doğru sütuna). **Mağazaların çoğu/hepsi bununla okundu.** Ayarlar'daki `sk-ant-...` anahtarı + console.anthropic.com kredisi gerekir.
+2. **YEDEK = Tesseract OCR (tarayıcıda, ÜCRETSİZ).** Sadece **AI okuyamazsa / API key yoksa** devreye girer; ham metni çıkarıp regex ile alanları doldurur (AI kadar isabetli değil). **PaddleOCR kullanılmadı** — o Python/sunucu ister, tek dosyalık tarayıcı panelinde çalışmaz.
+- **2 kez okumaz:** dolu mağaza baştan atlanır (0-kural). OCR bedava, AI sadece boş mağazada → boşuna masraf yok.
+
+**KRİTİK 2 FIX (canlı test edilerek bulundu, 2 Ağu):**
+- **NOVA816:** Legal screenshot'lar çok uzun (>8000px, örn. FAMILY 5200×8225) → Anthropic API reddediyordu (400). Artık **göndermeden önce 1500px uzun-kenara küçültülür** → okunuyor.
+- **NOVA817:** Legal maili "son 20 ek" içinde faturalar arasında kayboluyordu → sorgu artık **doğrudan legal mailini hedefliyor** (`filename:legal` / `subject:legal` / "legal shop information" / "taxpayer identification"). Gömülü olsa da bulunur.
+- Test: FAMILY (etsy.inceus) → EIN 93-2298376 / BESTMOON LLC / ALI FURKAN INCE / %100 doğru okundu.
+
 ### STANDART KURALLAR (kısa hatırlatma)
 - **Sürüm +1** her değişiklikte; 4 yer: üst yorum, hero `(NOVAxxx)`, sidebar rozet `NOVAxxx`, `var CURRENT=xxx` + version.txt + bu MD'ye satır. Babel ile doğrula. Commit'i Claude atar; **push'u (YAYINLA.command) EJDER yapar** (public içerik).
 - **0-kural (veri kalıcılığı):** çekilen/yazılan hiçbir veri geri gitmez/sıfırlanmaz; boş bulut okuması mevcut localStorage'ı EZMEZ (_KEEP koruması). Bir bilgi bir kez yazıldıysa: yenisi varsa ekle, yoksa eskisi kalsın, 2 kez yazma.
