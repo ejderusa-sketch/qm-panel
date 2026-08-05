@@ -1,3 +1,4 @@
+| GITHUB907 | 5 Ağu 2026 | Sürüm etiketi prefix'i NOVA→**GITHUB** olarak değişti (footer rozeti + üst rozet). Numara devam: 907. Bundan sonra yeni sürümler GITHUB### olarak yazılır. |
 | NOVA906 | 5 Ağu 2026 | **0-KURAL SHIPSTATION (ORDERS/ssCounts):** ssFetchCounts artık MERGE eder — mevcut ssCounts korunur, yeni siparişler orderId ile ÜSTÜNE eklenir, ASLA sıfırlanmaz. Eski hata: her çekimde `_all=[]` ile sıfırdan çekip setSsCounts ile eskiyi EZİYORDU (ASC'ye geçince 2023'ten başlayıp yarıda 8000→1500 sildi). Ayrıca slim-save'e orderId eklendi (reload sonrası dedup) + save effect'e boş-guard (`ssCounts.length`) → boş dizi kaydı EZMEZ. 2.9 sabit Oca23'ten başlar, SS çekimi ASC + 300k sınır. |
 | QM658 | 30 Tem 2026 | **08 CTR AÇIKLAMA TEK SATIR:** uzun eşik anlatımı kısaltıldı → tek satır (nowrap+ellipsis); eşik detayı zaten karar kartlarında. |
 # QM PANEL — PROJE NOTLARI
