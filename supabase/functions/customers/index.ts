@@ -40,6 +40,7 @@ Deno.serve(async (req) => {
           email: (r.email || "") + "",
           addr: (r.addr || "") + "",
           state: (r.state || "") + "",
+          source: (r.source || "") + "",
         })).filter((r: any) => r.ckey);
         if (!chunk.length) continue;
         const { error } = await sb.from("customers").upsert(chunk, { onConflict: "ckey" });
@@ -50,20 +51,23 @@ Deno.serve(async (req) => {
     }
 
     if (action === "count") {
-      const { count, error } = await sb.from("customers").select("*", { count: "exact", head: true });
+      let cq = sb.from("customers").select("*", { count: "exact", head: true });
+      if (body.source) cq = cq.eq("source", (body.source || "") + "");
+      const { count, error } = await cq;
       if (error) return json({ ok: false, error: error.message }, 500);
       return json({ ok: true, count: count || 0 });
     }
 
     // list
     const q = ((body.q || "") + "").trim();
+    const src = (body.source || "") + "";
     if (q) {
       const like = "%" + q.replace(/[%,]/g, " ") + "%";
-      const { data, error } = await sb.from("customers")
-        .select("ckey,name,email,addr,state")
-        .or(`name.ilike.${like},email.ilike.${like},addr.ilike.${like}`)
-        .order("name", { ascending: true })
-        .range(0, 4999);
+      let sq = sb.from("customers")
+        .select("ckey,name,email,addr,state,source")
+        .or(`name.ilike.${like},email.ilike.${like},addr.ilike.${like}`);
+      if (src) sq = sq.eq("source", src);
+      const { data, error } = await sq.order("name", { ascending: true }).range(0, 4999);
       if (error) return json({ ok: false, error: error.message }, 500);
       return json({ ok: true, rows: data || [] });
     }
@@ -72,8 +76,10 @@ Deno.serve(async (req) => {
     let from = 0;
     const step = 1000;
     while (true) {
-      const { data, error } = await sb.from("customers")
-        .select("ckey,name,email,addr,state")
+      let lq = sb.from("customers")
+        .select("ckey,name,email,addr,state,source");
+      if (src) lq = lq.eq("source", src);
+      const { data, error } = await lq
         .order("name", { ascending: true })
         .range(from, from + step - 1);
       if (error) return json({ ok: false, error: error.message }, 500);

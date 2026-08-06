@@ -2,13 +2,18 @@
 -- ShipStation siparişlerinden çıkan müşteriler burada tutulur (tarayıcı 5MB sınırı yok).
 
 create table if not exists public.customers (
-  ckey  text primary key,          -- benzersiz anahtar: email VARSA email, YOKSA "isim|adres"
-  name  text,
-  email text,
-  addr  text,
-  state text,
+  ckey   text primary key,          -- benzersiz anahtar: "kaynak||(email VEYA isim|adres)"
+  name   text,
+  email  text,
+  addr   text,
+  state  text,
+  source text,                      -- hangi ShipStation hesabı: "ejderusa" (ileride başka hesaplar)
   updated_at timestamptz default now()
 );
+
+-- (Tablo zaten varsa source kolonunu ekle)
+alter table public.customers add column if not exists source text;
+create index if not exists customers_source_idx on public.customers (source);
 
 -- Arama için index'ler (isim / email / adres ilike)
 create index if not exists customers_name_idx  on public.customers using gin (name  gin_trgm_ops);
