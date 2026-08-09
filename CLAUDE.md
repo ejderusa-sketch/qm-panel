@@ -9,7 +9,7 @@
 
 ## ZORUNLU KURALLAR
 1. **HER İŞ BİTİNCE COMMIT AT:** iş tamamlanınca kendin `git add -A && git commit -m "QM4xx"` yap. EJDER'in commit atmasını bekleme.
-2. **SÜRÜM +1:** her değişiklikte sürüm numarası artar; 4 yerde güncellenir (üst yorum, footer rozeti, `var CURRENT=`, `version.txt`) + QM-NOTLAR.md sürüm geçmişine satır.
+2. **SÜRÜM +1:** her değişiklikte sürüm numarası artar; **5 yerde** güncellenir: (1) üst yorum, (2) footer rozeti `<b>GITHUBxxx</b>`, (3) **hero/üst köşe rozeti `(GITHUBxxx)` — hero span, ~satır 2462, KOLAY UNUTULUR**, (4) `var CURRENT=`, (5) `version.txt` + QM-NOTLAR.md sürüm geçmişine satır. NOT: kullanıcının ekranda gördüğü sürüm ÜST köşedeki `(GITHUBxxx)` rozetidir — bunu güncellemezsen kullanıcı sürümü hep eski sanır.
 3. **BABEL DOĞRULA:** değişiklikten sonra JSX'i Babel ile derleyip sözdizimi hatası olmadığını kontrol et.
 4. Push (yayına alma) public içerik olduğu için EJDER `YAYINLA.command`'a çift tıklar ya da onay verir.
 5. **VERİ KALICILIĞI (0 numaralı kural):** çekilen/senkronlanan/indirilen HİÇBİR veri geri gitmez/sıfırlanmaz — tüm QM + NOVA için `localStorage` + bulut, boş okuma mevcut veriyi EZMEZ. Detay QM-NOTLAR.md'nin en üstünde.
