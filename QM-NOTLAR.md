@@ -32,6 +32,12 @@
 2. **Manuel/dışarıdan yükleme İSTENMİYOR.** 1037'deki yeşil "CSV YÜKLE" butonu **opsiyonel ekstra** olarak duruyor (silinmedi çünkü "hiçbir şey silme" dendi); kullanılmak zorunda değil, istenirse tek adımda kaldırılır.
 3. **KALICI KURAL:** CSV'ler **e-postalardan otomatik** okunur (Gmail). Bu mekanizma **kaldırılmaz**. (Gelecek oturumlar: "API'yi sil" gibi bir istek gelse bile önce bunu doğrula — EJDER e-posta otomatik çekmenin kalmasını istedi.)
 
+### 🧩 2 İŞ: Trademark numara uyumu + IP maili Politikaya düşüyordu (1041)
+- **EJDER DEDİ:** (1) "Bunu güncellemedi" — Etsy Legal **IP infringement** maili (Warner Bros → CusstomHub) Trademark listesine düşmemiş. (2) "Bu 12'ler birbirini tutmuyor" — sidebar'da VIRGINIA **11**, Trademark tablosunda **12** (+1 kayık).
+- **YAPILAN (1041):**
+  1. **Numara uyumu:** Trademark/legal tablosundaki `_snm` **ham `accounts.findIndex+1`** kullanıyordu (inbox hesapları dahil) → sidebar `_navNo` (inbox hariç, filtrelenmiş) ile **+1 kayıyordu**. Artık `_snm` **`_navNo`** kullanır → sidebar ile **birebir aynı numara**.
+  2. **IP maili sınıflaması:** Mail gövdesinde "**Trust & Safety Team**" geçince `_isPolicy=true` oluyordu; `_ipMark` ise "**IP infringement**" / "**infringe their intellectual property**" kısaltmalı kalıbını yakalayamıyordu → `type=policy` (yanlış sekme). `_ipMark`'a bu kalıplar eklendi (test: `type=trademark` ✓) → artık **Trademark (02.1)** sekmesine düşer. **Not:** eski yanlış "policy" kayıtları için o mağazaların GÜNCELLE'sine tekrar basılmalı (yeniden sınıflanır).
+
 ### ✂️ KÂR HESABI — "YÜZDE HESABI" bloğu kaldırıldı (1040)
 - **EJDER DEDİ:** "Bunu kaldır" (6·KÂR HESABI içindeki **YÜZDE HESABI** mini hesap: SAYI + YÜZDE % → %0=, SAYI+%, SAYI−%).
 - **YAPILAN:** O IIFE bloğu (2181 karakter) tamamen silindi; GİDER DÖKÜMÜ tablosu ve girdiler aynen duruyor. Babel OK. (1040)
