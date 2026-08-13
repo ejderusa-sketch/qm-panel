@@ -32,6 +32,10 @@
 2. **Manuel/dışarıdan yükleme İSTENMİYOR.** 1037'deki yeşil "CSV YÜKLE" butonu **opsiyonel ekstra** olarak duruyor (silinmedi çünkü "hiçbir şey silme" dendi); kullanılmak zorunda değil, istenirse tek adımda kaldırılır.
 3. **KALICI KURAL:** CSV'ler **e-postalardan otomatik** okunur (Gmail). Bu mekanizma **kaldırılmaz**. (Gelecek oturumlar: "API'yi sil" gibi bir istek gelse bile önce bunu doğrula — EJDER e-posta otomatik çekmenin kalmasını istedi.)
 
+### ✂️ KÂR HESABI — "YÜZDE HESABI" bloğu kaldırıldı (1040)
+- **EJDER DEDİ:** "Bunu kaldır" (6·KÂR HESABI içindeki **YÜZDE HESABI** mini hesap: SAYI + YÜZDE % → %0=, SAYI+%, SAYI−%).
+- **YAPILAN:** O IIFE bloğu (2181 karakter) tamamen silindi; GİDER DÖKÜMÜ tablosu ve girdiler aynen duruyor. Babel OK. (1040)
+
 ### 🔴 REVENUE "GÜNCELLEMİYOR" — KÖK SEBEP: localStorage %100 DOLU (1039)
 - **EJDER DEDİ:** Revenue tablosunda 16+ mağaza boş, "güncellemiyor" (ekran: 1-15 dolu, 16-56 "—", toast "çekiliyor…").
 - **CANLI TEŞHİS (tarayıcıdan):** localStorage **4.97/5 MB — TAM DOLU**. Aktif kullanıcı **novainnc** iken bu cihazda **başka hesabın (ejderusa) verisi ~1.9MB** duruyordu (`qm_dm::ejderusa` 1153KB + `qm_settings::ejderusa` 696+71KB) + boş dm anahtarları. Disk dolu → yeni Revenue **setItem sessiz fail** → kaydedilemiyor/yeni mağazalar gelmiyor.
