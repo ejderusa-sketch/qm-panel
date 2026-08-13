@@ -20,7 +20,22 @@
 5. **(1036)** Copyright "Etsy Formu": canlı veride 943 linkin **513'ü boş**, 85'i yanlış "yeniden aç" makalesiydi. Artık link doğrulanır, geçersizse doğru **`etsy.com/legal/ip/counter`** formu açılır → **mevcut kayıtlar yeniden çekmeden düzelir**; buton tüm copyright satırlarında görünür.
 6. **(1037)** Revenue başlığına yeşil **"CSV YÜKLE"** butonu: dosyayı **FileReader ile bilgisayardan okur (GMAIL API YOK)**, Gmail çekimiyle **birebir aynı** ayrıştırma (Shop Stats→REV, STMT/REV oto-sınıf, ay tespiti), **setDm ile birleştirir** (ezmez). Çoklu dosya seçilebilir. → **CSV'ler artık apisiz okunuyor.**
 
-**Not (API tamamen silme):** EJDER "API kodunu tamamen sil" dedi; ama Revenue/Statement/Copyright/sipariş çekme hep API'ye bağlı — tümden silmek çalışan her şeyi bozardı. Önce **apisiz CSV okuma** kuruldu (1037) ki API'ye **gerek kalmasın**. API butonlarını gizleme / kodu tam çıkarma ayrı adım olarak EJDER onayıyla yapılabilir.
+**Not (API tamamen silme):** EJDER "API kodunu tamamen sil" dedi; ama Revenue/Statement/Copyright/sipariş çekme hep API'ye bağlı — tümden silmek çalışan her şeyi bozardı. Önce **apisiz CSV okuma** kuruldu (1037) ki API'ye **gerek kalmasın**.
+
+### ⚠️ NETLEŞME (aynı gün, sonradan) — EJDER DEDİ
+1. "CSV'leri **e-postalardan** alıp okuyorsun, **dışarıdan değil**."
+2. "**Her zaman yaptığın gibi, e-postalardan OTOMATİK çek.**"
+3. "**Hiçbir şey silme.**"
+
+### ✔ YAPILAN (netleşme sonrası)
+1. **HİÇBİR API SİLİNMEDİ.** Gmail'den **otomatik CSV çekme (GÜNCELLE) aynen korundu** — asıl istenen buydu.
+2. **Manuel/dışarıdan yükleme İSTENMİYOR.** 1037'deki yeşil "CSV YÜKLE" butonu **opsiyonel ekstra** olarak duruyor (silinmedi çünkü "hiçbir şey silme" dendi); kullanılmak zorunda değil, istenirse tek adımda kaldırılır.
+3. **KALICI KURAL:** CSV'ler **e-postalardan otomatik** okunur (Gmail). Bu mekanizma **kaldırılmaz**. (Gelecek oturumlar: "API'yi sil" gibi bir istek gelse bile önce bunu doğrula — EJDER e-posta otomatik çekmenin kalmasını istedi.)
+
+### 🎯 ASIL İSTENEN NETLEŞTİ — "API'yi sil" = "API · ON" ROZETİ (1038)
+- **EJDER DEDİ:** "Bunu kaldır dedim ben sana" (ekran görüntüsü: üst sağdaki yeşil **"API · ON"** rozeti) + "**ShipStation'a dokunma**, ShipStation'dan **farklı** bu."
+- **YAPILAN (1038):** Üst sağdaki **"API · ON/OFF" toggle rozeti kaldırıldı** (`settings.apiEnabled`). Bu bayrak **başka hiçbir yeri kilitlemiyordu** → hiçbir işlev bozulmadı. **ShipStation butonuna DOKUNULMADI** (o ayrı). E-postalardan otomatik CSV çekme **aynen duruyor**.
+- **DERS:** "API'yi sil" = o küçük UI rozetiydi; API altyapısı / e-posta çekme / ShipStation DEĞİL.
 
 <!-- ====================================================================== -->
 
