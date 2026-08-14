@@ -32,6 +32,12 @@
 2. **Manuel/dışarıdan yükleme İSTENMİYOR.** 1037'deki yeşil "CSV YÜKLE" butonu **opsiyonel ekstra** olarak duruyor (silinmedi çünkü "hiçbir şey silme" dendi); kullanılmak zorunda değil, istenirse tek adımda kaldırılır.
 3. **KALICI KURAL:** CSV'ler **e-postalardan otomatik** okunur (Gmail). Bu mekanizma **kaldırılmaz**. (Gelecek oturumlar: "API'yi sil" gibi bir istek gelse bile önce bunu doğrula — EJDER e-posta otomatik çekmenin kalmasını istedi.)
 
+### 🔴 REVENUE 16+ MAĞAZA OKUMUYOR — Gmail API HIZ-LİMİTİ (1042)
+- **EJDER DEDİ:** "Okumadı CSV'leri" — 16+ mağaza boş. **Kanıt:** NEWERA (16 · NewEraShirt · muharremetsy@gmail.com) Gmail'inde **Temmuz revenue.csv AÇIKÇA VAR** (Visits 1259 / Orders 38 / Revenue $1,157.91) ama panele inmemiş. (Benim önceki "dönem meselesi" cevabım YANLIŞTI — özür.)
+- **KÖK SEBEP:** `gGet` fonksiyonu Gmail API'den **429/403/5xx (hız-limiti)** gelince **hemen hata fırlatıyordu**, hiç beklemiyordu. GÜNCELLE ~50 mağazayı peş peşe çekince (her mağaza = birçok Gmail çağrısı) ilk ~15'ten sonra **limite takılıp 16+ boş** dönüyordu.
+- **YAPILAN (1042):** `gGet` artık 429/403/5xx'te hata fırlatmadan **backoff ile 5 kez tekrar dener** (1.2/2.4/3.6/4.8/6 sn) → limit geçince kaldığı yerden devam, tüm mağazalar iner. Bu tüm Gmail çağrılarını (Revenue/Statement/legal tarama) iyileştirir.
+- **NOT:** Canlı doğrulama yapılamadı (Chrome bağlantısı düştü); yayınlanınca GÜNCELLE ile 16+ mağaza dolmalı. Dolmazsa sıradaki adım: o mağazaların token/bağlantısını tek tek kontrol.
+
 ### 🧩 2 İŞ: Trademark numara uyumu + IP maili Politikaya düşüyordu (1041)
 - **EJDER DEDİ:** (1) "Bunu güncellemedi" — Etsy Legal **IP infringement** maili (Warner Bros → CusstomHub) Trademark listesine düşmemiş. (2) "Bu 12'ler birbirini tutmuyor" — sidebar'da VIRGINIA **11**, Trademark tablosunda **12** (+1 kayık).
 - **YAPILAN (1041):**
