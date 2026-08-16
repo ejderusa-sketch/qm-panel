@@ -327,6 +327,7 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 ## 24 TEMMUZ 2026 OTURUM ÖZETİ (QM487 → QM512)
 
 Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
+- **GITHUB1107** · 16 Agu 2026 · KAR HESABI: GIDER DOKUMU altina KAR DOKUMU tablosu eklendi — GELIR(ciro) / GIDER(unit) / ADET BASINA KAR = ciro-unit (adet basi) + ×adet TOPLAM. Kar>=0 yesil, <0 kirmizi vurgu. (EJDER: buraya adet basina gelir kar hanesi koy, butun giderlerden kalan geliri adet basina bol, tablo olsun.)
 - **GITHUB1106** · 16 Agu 2026 · KAR HESABI: 12 · SHIP kalemi eklendi — metin alani, 3+4+5 gibi ARTI ile birden fazla sayi yazilir, otomatik toplanir (= X gosterir); gsum ile unit(adet basi gider) ve GIDER DOKUMUNE (SHIP (12)) dahil. (EJDER: burda 12 yap ship ilave yap arti isareti koy sayi ilave edebilmeliyiz.)
 - **GITHUB1105** · 16 Agu 2026 · C DASHBOARD grubu 2 ana baslIga bolundu: 03.7 etsy legal -> E ETSY LEGAL, 08 icerde izinliler -> F ICERDE IZINLILER (ust seviye butonlar). _dashGrp legal37->E, ekip->F; C DASHBOARD butonu kaldirildi. Ust sira: A ALARMING · B MARKETING · D FINANCE · E ETSY LEGAL · F ICERDE IZINLILER. (EJDER: bunlarin her birini ana baslik yap, birisini E birisini F yap.)
 - **GITHUB1104** · 16 Agu 2026 · SHIPPING eslesmesi genisletildi: type/title icinde shipping/postage/carrier -> Kargo Etiketi. NOT: bircok POD magaza Etsy kargo etiketi ALMAZ (POD saglayici gonderir) -> SHIPPING $0 DOGRU olabilir; satira tiklayinca SHIPPING detayi — gosteriyorsa gercekten yok. (EJDER: shipping neden yok gelmiyor.)
