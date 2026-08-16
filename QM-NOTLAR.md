@@ -327,6 +327,7 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 ## 24 TEMMUZ 2026 OTURUM ÖZETİ (QM487 → QM512)
 
 Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
+- **GITHUB1094** · 16 Agu 2026 · MAGAZALAR KAYBOLMASIN + "Henuz magaza yok" flash FIX: (1) Yuklemede artik TUM localStorage qm_accts kopyalari taranir, EN COK magazasi olan hemen gosterilir (bulut beklemeden) -> 60 magaza aninda gelir, _ce anahtari yanlis cozulse bile kaybolmaz. (2) Bulut hesap tercihi (accSaved) 1090 daki "baglisi cok" yerine "magazasi cok" olacak sekilde guvenli yapildi -> stale/kucuk q:a listesi 60 lik listeyi ezmez. NOT: indirilen revenue/marketing verisi 1092 IndexedDB ile kalici; bu surum SOL taraftaki magaza listesinin bos gorunmesini/silinmesini onler. (EJDER: bunlar niye gorunmuyor, sol tarafta magazalar ve download olmus bilgiler neden siliniyor.)
 
 - **Görünüm/pill:** Nav + Dashboard + CSV/Listing Marketing + Ayarlar (8.x) + 06 Etsy alt sekmeleri hep aynı **kırmızı hap + yeşil aktif** formatına getirildi. Pill CSS'i `.tabs.pill`'de (QM511 ile geri eklendi — silme). CSV pilleri inceltildi/küçültüldü (QM501).
 - **Numara/sekme düzeni:** 06 pill = ETSY (06.1 Canlı Kaynak / 06.2 E-postalar / 06.3 Trend); 05↔06 ve 1.1.2↔1.1.5 yer değişimleri; 05 CSV tablo başlıkları 1–4. adım; 2 = SHIPSTATION (2A iptal, Etsy API kaldırıldı); 6 Identity nav kaldırıldı; Legal&Tax 10'arlı grid.
