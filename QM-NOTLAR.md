@@ -327,6 +327,7 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 ## 24 TEMMUZ 2026 OTURUM ÖZETİ (QM487 → QM512)
 
 Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
+- **GITHUB1109** · 16 Agu 2026 · 03.7 Etsy Legal & Vergi (E) tablosu basliklari CANLI/SIRALANABILIR: NO/MAGAZA/ETSY STORE/E-POSTA + tum legal alanlar (Satici Turu/Disregarded/Tam Ad/Vergi ID/Yasal Isletme/Sahiplik/Adres/Telefon/Kayit No/Yargi/Vergi Adresi) tiklaninca sirala (legalSort, ▲/▼/⇅). # sabit. (EJDER: bunlari canli yaparmisin.)
 - **GITHUB1108** · 16 Agu 2026 · KAR HESABI: KAR DOKUMU 2 panel yan yana — SOL MAVI (#e8f0fe) DETAY (Gelir/Gider/Adet basina kar, adet basi+×adet+toplam), SAG SARI (#fff7cc) CELIL KAR TABLOSU — TOPLAM (Toplam Gelir/Gider/Kar/Adet basina kar); ORTADA kalin SIYAH cizgi (5px). (EJDER: aynisindan 2 tablo, birine detay birine toplam, biri mavi biri sari, ortada siyah kalin cizgi, adi Celil Kar Tablosu.)
 - **GITHUB1107** · 16 Agu 2026 · KAR HESABI: GIDER DOKUMU altina KAR DOKUMU tablosu eklendi — GELIR(ciro) / GIDER(unit) / ADET BASINA KAR = ciro-unit (adet basi) + ×adet TOPLAM. Kar>=0 yesil, <0 kirmizi vurgu. (EJDER: buraya adet basina gelir kar hanesi koy, butun giderlerden kalan geliri adet basina bol, tablo olsun.)
 - **GITHUB1106** · 16 Agu 2026 · KAR HESABI: 12 · SHIP kalemi eklendi — metin alani, 3+4+5 gibi ARTI ile birden fazla sayi yazilir, otomatik toplanir (= X gosterir); gsum ile unit(adet basi gider) ve GIDER DOKUMUNE (SHIP (12)) dahil. (EJDER: burda 12 yap ship ilave yap arti isareti koy sayi ilave edebilmeliyiz.)
