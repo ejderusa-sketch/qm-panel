@@ -1,6 +1,8 @@
 # QM PANEL — OTURUM BAŞLANGIÇ TALİMATI
 
-**HER OTURUMDA İLK İŞ:** Bu klasördeki `QM-NOTLAR.md` dosyasını oku. Projenin tüm kuralları, sürüm geçmişi ve mimarisi oradadır. Kullanıcı ayrıca söylemese bile, bu klasörde çalışmaya başlamadan önce `QM-NOTLAR.md`'yi oku.
+**HER OTURUMDA İLK İŞ:** Bu klasördeki `QM-NOTLAR.md` VE `EJDER-100-ISTEK.md` dosyalarını oku. Projenin tüm kuralları, sürüm geçmişi ve mimarisi oradadır. Kullanıcı ayrıca söylemese bile, bu klasörde çalışmaya başlamadan önce `QM-NOTLAR.md`'yi oku.
+
+**AYRICA:** `EJDER-100-ISTEK.md` = EJDER'in geriye dönük 100 ana isteği + hiç bozulmayacak kurallar. Her oturum oku, aynı hatayı yapma.
 
 ## Özet (detay QM-NOTLAR.md'de)
 - Proje: Etsy mağaza yönetim paneli. Tek dosya: `index.html` (CDN'den React + Babel).
