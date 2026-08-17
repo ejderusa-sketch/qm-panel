@@ -327,6 +327,7 @@ EJDER'in tarif ettiği yeni yapı — kurulacak:
 ## 24 TEMMUZ 2026 OTURUM ÖZETİ (QM487 → QM512)
 
 Bu oturumda yapılanlar (detay: aşağıdaki SÜRÜM GEÇMİŞİ):
+- **GITHUB1111** · 16 Agu 2026 · Sidebar magaza SIL dugmesi GORUNUR yapildi: buton vardi ama ICI BOStu (gorunmuyordu) -> kirmizi kalin × kondu (delAcct: onay + sil + baglanti kes). Bos/istenmeyen magazalar boyle kaldirilir. (EJDER: magaza kaldirma dugmesi koy, bos olanlari kaldiralim.)
 - **GITHUB1110** · 16 Agu 2026 · (1) CELIL KAR TABLOSU (2 panel) GERI ALINDI -> tek KAR DOKUMU tablosu. (2) 6 · KAR HESABI sekmesi -> 00 · HESAP MAKINASI, EN BASA alindi, rengi YESIL; ic baslik+rozet de 00/yesil. (EJDER: bunu kaldir geri; bunun adi hesap makinasi olsun en basa koy 00 olsun rengi yesil olsun.)
 - **GITHUB1109** · 16 Agu 2026 · 03.7 Etsy Legal & Vergi (E) tablosu basliklari CANLI/SIRALANABILIR: NO/MAGAZA/ETSY STORE/E-POSTA + tum legal alanlar (Satici Turu/Disregarded/Tam Ad/Vergi ID/Yasal Isletme/Sahiplik/Adres/Telefon/Kayit No/Yargi/Vergi Adresi) tiklaninca sirala (legalSort, ▲/▼/⇅). # sabit. (EJDER: bunlari canli yaparmisin.)
 - **GITHUB1108** · 16 Agu 2026 · KAR HESABI: KAR DOKUMU 2 panel yan yana — SOL MAVI (#e8f0fe) DETAY (Gelir/Gider/Adet basina kar, adet basi+×adet+toplam), SAG SARI (#fff7cc) CELIL KAR TABLOSU — TOPLAM (Toplam Gelir/Gider/Kar/Adet basina kar); ORTADA kalin SIYAH cizgi (5px). (EJDER: aynisindan 2 tablo, birine detay birine toplam, biri mavi biri sari, ortada siyah kalin cizgi, adi Celil Kar Tablosu.)
