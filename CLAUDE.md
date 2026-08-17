@@ -15,3 +15,6 @@
 3. **BABEL DOĞRULA:** değişiklikten sonra JSX'i Babel ile derleyip sözdizimi hatası olmadığını kontrol et.
 4. Push (yayına alma) public içerik olduğu için EJDER `YAYINLA.command`'a çift tıklar ya da onay verir.
 5. **VERİ KALICILIĞI (0 numaralı kural):** çekilen/senkronlanan/indirilen HİÇBİR veri geri gitmez/sıfırlanmaz — tüm QM + NOVA için `localStorage` + bulut, boş okuma mevcut veriyi EZMEZ. Detay QM-NOTLAR.md'nin en üstünde.
+
+
+**SKILL:** Bu kurallar artik Cowork skilli olarak da kayitli: `github-panel` (cekirdek 17 kural) + `github-panel-100` (100 madde, sira no ile). Her oturum otomatik devreye girer; degisiklik olursa save_skill ile guncelle.
