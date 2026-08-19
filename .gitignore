@@ -1,3 +1,7 @@
 node_modules/
 package-lock.json
 package.json
+
+# Windows yardimci scriptleri (yerel)
+1-CEK.bat
+2-YAYINLA.bat
