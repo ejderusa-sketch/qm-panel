@@ -1,4 +1,16 @@
 <!-- ================= SON OTURUM LOGU — EJDER DEDİ → YAPILAN ================= -->
+
+## 🗒️ OTURUM LOGU — 22 Ağustos 2026 (GITHUB1126)
+
+### ▶ EJDER DEDİ
+1. **"Arkadaşta olan bana gelmiyor"** — arkadaşın (ASAD) dolu tablosu (56 mağaza / $15.706 SPEND) benim ekranımda yok, bende 47 mağaza / $7.957. **Sen bul, kalıcı çözüm: ortak çekmece.**
+
+### ✔ YAPILAN (teşhis + çözüm)
+- **TEŞHİS:** Veri kaybolmamış — **~20 hesaba dağılmış** (9'u yanlışlıkla açılmış "ejderusa" kopyası, ayrıca novainnc, norodom855, thenova, novaag8, belmakilic01). Sadece **7 hesapta gerçek veri var**. EJDER super-owner (novainnc); EJDER ile arkadaş **FARKLI account_state satırına** bakıyordu → tablo farkının tek sebebi bu. Kimse silmiyor, ayrı çekmecelerde.
+- **Bulut mimarisi:** veri `account_state` tablosunda `account_id`'ye göre ayrı satırlarda; owner ise `shared_state` id="main". ANA hesap = `cba878c3` (ejderusa).
+- **ÇÖZÜM (GITHUB1126):** Super-owner üst barına **mor "HESAPLARI BİRLEŞTİR"** düğmesi. Panelin kendi (sağlam) sb bağlantısıyla TÜM `account_state` satırlarını okur → `dm` + `accts`'ı **EN-DOLU-KAZANIR (biggest-wins)** birleştirir → **ANA hesaba yazar** → `?as=ANA` ile açar. **0-KURAL:** hiçbir şey silinmez/azalmaz, sadece eklenir; boş veri yazılmaz. Arkadaşın dolu tablosu artık ana hesapta görünür.
+- Backend o an ağır sorgulara (dev `data` blobu, `members`) zaman aşımı veriyordu; onun için harici sorgu yerine **panelin kendi bağlantısı** kullanıldı (navigasyonda 49a19681'i sorunsuz yükledi).
+
 <!-- KURAL (EJDER, 13 Agu): Bundan sonra HER oturumda önce "EJDER NE DEDİ" madde madde,
      sonra "YAPILAN" madde madde, net vurguyla buraya yazılır. -->
 
