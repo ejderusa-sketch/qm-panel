@@ -1,5 +1,17 @@
 <!-- ================= SON OTURUM LOGU — EJDER DEDİ → YAPILAN ================= -->
 
+## 🗒️ OTURUM LOGU — 22 Ağustos 2026 (GITHUB1127)
+
+### ▶ EJDER DEDİ
+1. 01.1 Etsy Talepleri'nde **45 (FREE) ve 29 (MYCUSTOM) seller info'yu onayladım, e-postaya da onay geldi ama panelde hâlâ açık istek gibi görünüyor** — tamamlananları işaretleyebileyim.
+
+### ✔ YAPILAN (GITHUB1127)
+- Her Etsy Talebi satırına **OKU yanında yeşil ✓ düğmesi**. Basınca satır **ONAYLANDI** (yeşil) olur, **en alta iner**, solar; tekrar **↺** ile geri alınır.
+- Kalıcı: `settings.alarming[].done` → buluta (q:s) yazılır, **0-kural** korur (kaybolmaz). Sıralama: bitmişler en altta, sonra tarih.
+- Sadece **AlarmingTab** (01.1) değişti; 06.2 PolicyTab tablosuna dokunulmadı.
+
+---
+
 ## 🗒️ OTURUM LOGU — 22 Ağustos 2026 (GITHUB1126)
 
 ### ▶ EJDER DEDİ
