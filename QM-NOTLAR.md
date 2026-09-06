@@ -1,5 +1,17 @@
 <!-- ================= SON OTURUM LOGU — EJDER DEDİ → YAPILAN ================= -->
 
+## 🗒️ OTURUM LOGU — 22 Ağustos 2026 (GITHUB1128)
+
+### ▶ EJDER DEDİ
+1. "En soldaki 46, ekranda 47 diye yazıyor neden — mağazalara sıra no kaymış."
+
+### ✔ YAPILAN (GITHUB1128)
+- **Mağaza no kayması fix (ALARMING 01.1 + POLICY 06.2):** `storeName` ham `accounts.findIndex+1` kullanıyordu (inbox hesabını da sayar) → sidebar (`_navNo`, inbox HARİÇ) ile **+1 kayıyordu** (ör. SALIHBUTE12 sidebar 46, tabloda 47).
+- Artık `storeName` **`navNo(id)`** prop'unu kullanır = S panel ile **birebir**. (Overview zaten QM1121'de düzeltilmişti; AlarmingTab + PolicyTab atlanmış.)
+- Kural pekiştirme: **her tabloda mağaza no = sidebar `_navNo`**, asla ham index+1.
+
+---
+
 ## 🗒️ OTURUM LOGU — 22 Ağustos 2026 (GITHUB1127)
 
 ### ▶ EJDER DEDİ
