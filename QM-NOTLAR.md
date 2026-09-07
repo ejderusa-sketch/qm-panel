@@ -1,4 +1,5 @@
 <!-- ================= SON OTURUM LOGU — EJDER DEDİ → YAPILAN ================= -->
+## GITHUB1129 — AYLIK SATIŞ 2025 kırmızı / 2026 yeşil, 24 ay.
 
 ## 🗒️ OTURUM LOGU — 22 Ağustos 2026 (GITHUB1128)
 
