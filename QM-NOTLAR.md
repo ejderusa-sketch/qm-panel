@@ -1,4 +1,5 @@
 <!-- ================= SON OTURUM LOGU — EJDER DEDİ → YAPILAN ================= -->
+## GITHUB1130 (12 Eyl 2026) — GÜNLÜK T-SHIRT (2.4) ay seçici: Ağu/Eyl/Eki/Kas/Ara; hangi aya basılırsa o ay Ağustos gibi gün gün. ssFetchTshirt(mo) parametreli, ay-anahtarlı tsMonData, 0-kural korumalı.
 ## GITHUB1129 — AYLIK SATIŞ 2025 kırmızı / 2026 yeşil, 24 ay.
 
 ## 🗒️ OTURUM LOGU — 22 Ağustos 2026 (GITHUB1128)
