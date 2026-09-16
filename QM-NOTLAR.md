@@ -1,4 +1,5 @@
 <!-- ================= SON OTURUM LOGU — EJDER DEDİ → YAPILAN ================= -->
+## GITHUB1133 (16 Eyl 2026) — ⭐ ALARMING/legal/cases boş görünme kök fix: bulut store.get takılınca (Failed to fetch) yükleme sonsuz bekliyordu → boş. 9sn timeout + _prevList yerel EN DOLU kopyadan (aynı hesabın başka e-posta kopyası dahil) geri yükler. Veri silinmiyor, artık görünür.
 ## GITHUB1132 (15 Eyl 2026) — GÜNLÜK T-SHIRT: günlük kırmızı kutunun yanına yeşil "TOPLAM <ay>" kutusu (ayın tamamının toplamı).
 ## GITHUB1131 (13 Eyl 2026) — GÜNLÜK T-SHIRT: gün seçilince o günün toplam adedi üstte kırmızı kutu/kare içinde. (EJDER: toplam altta, o günü üstte kare içinde kırmızı göster.)
 ## GITHUB1130 (12 Eyl 2026) — GÜNLÜK T-SHIRT (2.4) ay seçici: Ağu/Eyl/Eki/Kas/Ara; hangi aya basılırsa o ay Ağustos gibi gün gün. ssFetchTshirt(mo) parametreli, ay-anahtarlı tsMonData, 0-kural korumalı.
